@@ -105,7 +105,7 @@ export interface LeagueEntry {
 
 export interface Transaction {
   id: string;
-  type: 'deposit' | 'bet' | 'win' | 'withdrawal' | 'bonus' | 'refund' | 'convert' | 'redeem' | 'referral' | 'sign_in' | 'sign_up';
+  type: 'deposit' | 'bet' | 'win' | 'withdrawal' | 'bonus' | 'refund' | 'convert' | 'redeem' | 'referral' | 'sign_in' | 'sign_up' | 'claim';
   amount: number;
   currency: 'kor' | 'coins';
   description: string;
@@ -153,6 +153,7 @@ export interface UserStats {
   lastWalkDate: string;
   coins: number;
   korBalance: number;
+  unclaimedBalance: number;
   referralCode: string;
   hasReferred: boolean;
   referralCount: number; // New: track referral count

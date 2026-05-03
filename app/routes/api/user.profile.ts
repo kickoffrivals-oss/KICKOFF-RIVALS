@@ -29,12 +29,15 @@ export const Route = createFileRoute("/api/user/profile")({
           });
 
           return Response.json(result);
-        } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Profile API error:", error);
+        } catch (error: any) {
+          console.error("Profile API CRITICAL error:", error);
           return Response.json(
-            { success: false, error: errorMessage },
+            { 
+              success: false, 
+              error: error.message,
+              stack: error.stack,
+              note: "Detailed error captured for debugging" 
+            },
             { status: 500 },
           );
         }

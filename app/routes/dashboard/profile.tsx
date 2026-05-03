@@ -22,6 +22,7 @@ function ProfileTab() {
     handleAdminSyncRequest,
     handleClaimAllianceRewards,
     handleCheckIn,
+    onClaimWinnings,
     setShowSwapConfirm,
   } = useGame();
 
@@ -64,6 +65,7 @@ function ProfileTab() {
         onOpenWallet={() => setShowWallet(true)}
         onClaimAllianceRewards={handleClaimAllianceRewards}
         onCheckIn={handleCheckIn}
+        onClaimWinnings={onClaimWinnings}
         onSwapRequest={() => setShowSwapConfirm(true)}
       />
     </main>

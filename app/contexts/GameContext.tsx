@@ -267,6 +267,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [profile?.korBalance, balance]);
 
+
   // Game State
   const [gameState, setGameState] = useState<GameState>("BETTING");
   const [timer, setTimer] = useState(ROUND_DURATION_SEC);
@@ -289,18 +290,19 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   >({});
 
   // Transactions
-  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  // Load transactions after mount to avoid hydration mismatch
+  useEffect(() => {
     if (typeof window !== "undefined") {
       try {
         const saved = localStorage.getItem("kor_transactions");
-        return saved ? JSON.parse(saved) : [];
+        if (saved) setTransactions(JSON.parse(saved));
       } catch (e) {
-        console.error("Failed to load transactions from localStorage", e);
-        return [];
+        console.error("Failed to load transactions", e);
       }
     }
-    return [];
-  });
+  }, []);
 
   // Persist transactions to localStorage
   useEffect(() => {
@@ -1238,10 +1240,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [gameState]);
 
-  // PREFETCH DATA: Start fetching as soon as initialization is complete
+  // PREFETCH DATA: Already handled above for immediate start
+  // Keeping this as a secondary sync if initialization state changes
   useEffect(() => {
     if (!isInitializing) {
-      console.log("[PREFETCH] App initialized. Fetching background data...");
       fetchMatches();
       fetchStandings();
     }
@@ -1324,6 +1326,57 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     return Math.min(90, Math.max(0, minute));
   }, [gameState, timer]);
 
+  // Initial Data Fetch - Moved to bottom to ensure all handlers are initialized
+  // This ensures matches are loading as soon as the provider mounts
+  useEffect(() => {
+    fetchMatches();
+    fetchStandings();
+  }, [fetchMatches, fetchStandings]);
+
+  const handleClaimWinnings = useCallback(async () => {
+    if (!profile?.unclaimedBalance || profile.unclaimedBalance <= 0 || !wagmiAddress) return;
+
+    try {
+      toast.loading("Preparing claim...", { id: "claim" });
+      
+      // 1. Trigger on-chain transaction (Gas Fee only)
+      // We send 0 value to the user's own address to trigger the network fee
+      const tx = await wagmiAdapter.wagmiConfig.getClient().request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: wagmiAddress as `0x${string}`,
+          to: wagmiAddress as `0x${string}`,
+          value: '0x0',
+          data: '0x', // Empty data, just a claim signal
+        }],
+      });
+
+      toast.loading("Verifying on-chain...", { id: "claim" });
+
+      // 2. Call our API to move the balance
+      const res = await fetch(`${API_URL}/api/user/claim-winnings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          walletAddress: wagmiAddress,
+          txHash: tx
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success(`Successfully claimed ${data.amount} KOR!`, { id: "claim" });
+        refreshProfile();
+      } else {
+        toast.error(data.error || "Claim failed", { id: "claim" });
+      }
+    } catch (err: any) {
+      console.error("Claim failed:", err);
+      toast.error(err.message || "Transaction cancelled", { id: "claim" });
+    }
+  }, [profile?.unclaimedBalance, wagmiAddress, refreshProfile]);
+
   return (
     <GameContext.Provider
       value={{
@@ -1353,6 +1406,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         setLeagueTables,
         transactions,
         addTransaction,
+        onClaimWinnings: handleClaimWinnings,
         coupons,
         setCoupons,
         bettingOn,

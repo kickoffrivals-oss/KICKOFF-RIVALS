@@ -66,6 +66,7 @@ export const users = pgTable(
     username: varchar("username", { length: 50 }).notNull().unique(),
     coins: integer("coins").default(5000).notNull(),
     doodlBalance: integer("doodl_balance").default(1000).notNull(),
+    unclaimedBalance: integer("unclaimed_balance").default(0).notNull(),
     allianceLeagueId: varchar("alliance_league_id", { length: 10 }).references(
       () => leagues.id
     ),

@@ -254,6 +254,7 @@ export const getUserProfile = createServerFn({ method: "GET" })
       username: user.username,
       coins: user.coins,
       korBalance: user.doodlBalance,
+      unclaimedBalance: user.unclaimedBalance,
       allianceLeagueId: user.allianceLeagueId,
       allianceTeamId: user.allianceTeamId,
       unclaimedAllianceRewards: user.unclaimedAllianceRewards,

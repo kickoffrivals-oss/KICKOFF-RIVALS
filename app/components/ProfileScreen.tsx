@@ -55,6 +55,7 @@ interface ProfileScreenProps {
     message: string;
     reward?: number;
   }>;
+  onClaimWinnings: () => Promise<void>;
   onSwapRequest?: () => void;
   notify?: (message: string, type?: "success" | "error" | "info") => void;
 }
@@ -70,6 +71,7 @@ export function ProfileScreen({
   onOpenWallet,
   onClaimAllianceRewards,
   onCheckIn,
+  onClaimWinnings,
   onSwapRequest,
   notify,
 }: ProfileScreenProps) {
@@ -310,6 +312,52 @@ export function ProfileScreen({
             Tradable Assets
           </p>
         </div>
+      </div>
+
+      {/* Unclaimed Winnings Card */}
+      <div className={cn(
+        "card p-5 border-dashed border-2 transition-all",
+        (stats?.unclaimedBalance || 0) > 0 
+          ? "border-primary/50 bg-primary/5 shadow-lg shadow-primary/5" 
+          : "border-muted/30 bg-muted/5 opacity-80"
+      )}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "p-2.5 rounded-xl flex items-center justify-center",
+              (stats?.unclaimedBalance || 0) > 0 ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+            )}>
+              <IconTrophy className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                Unclaimed Winnings
+              </p>
+              <p className="text-2xl font-black text-foreground">
+                {formatNumber(stats?.unclaimedBalance || 0)} <span className="text-xs font-normal text-muted-foreground">KOR</span>
+              </p>
+            </div>
+          </div>
+          
+          <button 
+            onClick={onClaimWinnings}
+            disabled={(stats?.unclaimedBalance || 0) <= 0}
+            className={cn(
+              "btn h-11 px-6 font-black uppercase tracking-tighter shadow-md transition-all active:scale-95",
+              (stats?.unclaimedBalance || 0) > 0 
+                ? "btn-primary animate-pulse hover:animate-none" 
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            )}
+          >
+            {(stats?.unclaimedBalance || 0) > 0 ? "Claim Now" : "Nothing to Claim"}
+          </button>
+        </div>
+        {(stats?.unclaimedBalance || 0) > 0 && (
+          <p className="text-[10px] text-primary/70 mt-3 font-bold flex items-center gap-1.5">
+            <IconShield className="w-3 h-3" />
+            SECURE ON-CHAIN: REQUIRES GAS FEE (CELO)
+          </p>
+        )}
       </div>
 
       {/* Alliance Rewards Banner */}

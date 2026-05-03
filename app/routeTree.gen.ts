@@ -30,6 +30,7 @@ import { Route as ApiUserSubmitQuestVerificationRouteImport } from './routes/api
 import { Route as ApiUserRegisterReferralRouteImport } from './routes/api/user.register-referral'
 import { Route as ApiUserProfileRouteImport } from './routes/api/user.profile'
 import { Route as ApiUserConvertCoinsRouteImport } from './routes/api/user.convert-coins'
+import { Route as ApiUserClaimWinningsRouteImport } from './routes/api/user.claim-winnings'
 import { Route as ApiUserClaimWelcomeGiftRouteImport } from './routes/api/user.claim-welcome-gift'
 import { Route as ApiUserClaimSocialRewardRouteImport } from './routes/api/user.claim-social-reward'
 import { Route as ApiUserClaimAllianceRewardsRouteImport } from './routes/api/user.claim-alliance-rewards'
@@ -150,6 +151,11 @@ const ApiUserConvertCoinsRoute = ApiUserConvertCoinsRouteImport.update({
   path: '/api/user/convert-coins',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUserClaimWinningsRoute = ApiUserClaimWinningsRouteImport.update({
+  id: '/api/user/claim-winnings',
+  path: '/api/user/claim-winnings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUserClaimWelcomeGiftRoute = ApiUserClaimWelcomeGiftRouteImport.update({
   id: '/api/user/claim-welcome-gift',
   path: '/api/user/claim-welcome-gift',
@@ -250,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/api/user/claim-alliance-rewards': typeof ApiUserClaimAllianceRewardsRoute
   '/api/user/claim-social-reward': typeof ApiUserClaimSocialRewardRoute
   '/api/user/claim-welcome-gift': typeof ApiUserClaimWelcomeGiftRoute
+  '/api/user/claim-winnings': typeof ApiUserClaimWinningsRoute
   '/api/user/convert-coins': typeof ApiUserConvertCoinsRoute
   '/api/user/profile': typeof ApiUserProfileRoute
   '/api/user/register-referral': typeof ApiUserRegisterReferralRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/api/user/claim-alliance-rewards': typeof ApiUserClaimAllianceRewardsRoute
   '/api/user/claim-social-reward': typeof ApiUserClaimSocialRewardRoute
   '/api/user/claim-welcome-gift': typeof ApiUserClaimWelcomeGiftRoute
+  '/api/user/claim-winnings': typeof ApiUserClaimWinningsRoute
   '/api/user/convert-coins': typeof ApiUserConvertCoinsRoute
   '/api/user/profile': typeof ApiUserProfileRoute
   '/api/user/register-referral': typeof ApiUserRegisterReferralRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   '/api/user/claim-alliance-rewards': typeof ApiUserClaimAllianceRewardsRoute
   '/api/user/claim-social-reward': typeof ApiUserClaimSocialRewardRoute
   '/api/user/claim-welcome-gift': typeof ApiUserClaimWelcomeGiftRoute
+  '/api/user/claim-winnings': typeof ApiUserClaimWinningsRoute
   '/api/user/convert-coins': typeof ApiUserConvertCoinsRoute
   '/api/user/profile': typeof ApiUserProfileRoute
   '/api/user/register-referral': typeof ApiUserRegisterReferralRoute
@@ -360,6 +369,7 @@ export interface FileRouteTypes {
     | '/api/user/claim-alliance-rewards'
     | '/api/user/claim-social-reward'
     | '/api/user/claim-welcome-gift'
+    | '/api/user/claim-winnings'
     | '/api/user/convert-coins'
     | '/api/user/profile'
     | '/api/user/register-referral'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/api/user/claim-alliance-rewards'
     | '/api/user/claim-social-reward'
     | '/api/user/claim-welcome-gift'
+    | '/api/user/claim-winnings'
     | '/api/user/convert-coins'
     | '/api/user/profile'
     | '/api/user/register-referral'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/api/user/claim-alliance-rewards'
     | '/api/user/claim-social-reward'
     | '/api/user/claim-welcome-gift'
+    | '/api/user/claim-winnings'
     | '/api/user/convert-coins'
     | '/api/user/profile'
     | '/api/user/register-referral'
@@ -462,6 +474,7 @@ export interface RootRouteChildren {
   ApiUserClaimAllianceRewardsRoute: typeof ApiUserClaimAllianceRewardsRoute
   ApiUserClaimSocialRewardRoute: typeof ApiUserClaimSocialRewardRoute
   ApiUserClaimWelcomeGiftRoute: typeof ApiUserClaimWelcomeGiftRoute
+  ApiUserClaimWinningsRoute: typeof ApiUserClaimWinningsRoute
   ApiUserConvertCoinsRoute: typeof ApiUserConvertCoinsRoute
   ApiUserProfileRoute: typeof ApiUserProfileRoute
   ApiUserRegisterReferralRoute: typeof ApiUserRegisterReferralRoute
@@ -617,6 +630,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUserConvertCoinsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/user/claim-winnings': {
+      id: '/api/user/claim-winnings'
+      path: '/api/user/claim-winnings'
+      fullPath: '/api/user/claim-winnings'
+      preLoaderRoute: typeof ApiUserClaimWinningsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/user/claim-welcome-gift': {
       id: '/api/user/claim-welcome-gift'
       path: '/api/user/claim-welcome-gift'
@@ -758,6 +778,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiUserClaimAllianceRewardsRoute: ApiUserClaimAllianceRewardsRoute,
   ApiUserClaimSocialRewardRoute: ApiUserClaimSocialRewardRoute,
   ApiUserClaimWelcomeGiftRoute: ApiUserClaimWelcomeGiftRoute,
+  ApiUserClaimWinningsRoute: ApiUserClaimWinningsRoute,
   ApiUserConvertCoinsRoute: ApiUserConvertCoinsRoute,
   ApiUserProfileRoute: ApiUserProfileRoute,
   ApiUserRegisterReferralRoute: ApiUserRegisterReferralRoute,

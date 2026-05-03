@@ -76,6 +76,7 @@ import { GameSelection } from "./GameSelection";
 import { claimSocialReward } from "../server/user";
 import { AllianceSetup } from "./AllianceSetup";
 import { EntryChoice } from "./EntryChoice";
+import { useGame } from "../contexts/GameContext";
 
 // Session token management - no admin wallet exposed
 let adminSessionToken: string | null = null;
@@ -149,6 +150,7 @@ const App: React.FC = () => {
     verificationSignature: null,
     verificationTimestamp: null,
   });
+  const { onClaimWinnings } = useGame();
 
   const [matches, setMatches] = useState<Match[]>([]);
   const [activeBets, setActiveBets] = useState<Bet[]>([]);
@@ -1801,6 +1803,7 @@ const App: React.FC = () => {
             onOpenWallet={() => setShowWallet(true)}
             onClaimAllianceRewards={handleClaimAllianceRewards}
             onCheckIn={handleCheckIn}
+            onClaimWinnings={onClaimWinnings}
             onSwapRequest={() => setShowSwapConfirm(true)}
             notify={notify}
           />

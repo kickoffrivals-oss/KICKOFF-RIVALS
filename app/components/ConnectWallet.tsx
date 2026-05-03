@@ -155,7 +155,6 @@ export function ConnectWallet({ onConnected }: ConnectWalletProps) {
                         "Phantom",
                         "Ronin Wallet",
                         "Magic Eden",
-                        "Base Account",
                       ].includes(c.name)
                   )
                   .slice(0, 3)

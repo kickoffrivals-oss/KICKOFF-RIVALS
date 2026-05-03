@@ -138,8 +138,6 @@ export function IconFootball({ className, ...props }: LucideProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -147,6 +145,8 @@ export function IconFootball({ className, ...props }: LucideProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn("h-4 w-4", className)}
+      width={props.width || 24}
+      height={props.height || 24}
       {...props}
     >
       <circle cx="12" cy="12" r="10" />
@@ -161,8 +161,6 @@ export function IconGoal({ className, ...props }: LucideProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -170,6 +168,8 @@ export function IconGoal({ className, ...props }: LucideProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn("h-4 w-4", className)}
+      width={props.width || 24}
+      height={props.height || 24}
       {...props}
     >
       <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -184,8 +184,6 @@ export function IconWhistle({ className, ...props }: LucideProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -193,6 +191,8 @@ export function IconWhistle({ className, ...props }: LucideProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn("h-4 w-4", className)}
+      width={props.width || 24}
+      height={props.height || 24}
       {...props}
     >
       <path d="M4 15a4 4 0 0 1 4-4h8a4 4 0 0 1 0 8H8a4 4 0 0 1-4-4z" />
@@ -207,8 +207,6 @@ export function IconCard({ className, color = "yellow", ...props }: LucideProps 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
       viewBox="0 0 24 24"
       fill={color === "yellow" ? "#fbbf24" : "#ef4444"}
       stroke="currentColor"
@@ -216,6 +214,8 @@ export function IconCard({ className, color = "yellow", ...props }: LucideProps 
       strokeLinecap="round"
       strokeLinejoin="round"
       className={cn("h-4 w-4", className)}
+      width={props.width || 24}
+      height={props.height || 24}
       {...props}
     >
       <rect x="6" y="3" width="12" height="18" rx="2" />
