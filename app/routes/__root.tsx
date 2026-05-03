@@ -19,6 +19,11 @@ export const Route = createRootRoute({
         name: "description",
         content: "The ultimate virtual football betting league.",
       },
+      {
+        name: "talentapp:project_verification",
+        content:
+          "edaef554e272eeecec7b0a7e6b1c3fd06b1ff7a5c62c45e898443d17f78335b621d88dc1e158c62310dffdc1e119da6331a3d336bf05c75cfa8b4452732c8480",
+      },
       { title: "KickOff Rivals" },
     ],
     links: [
