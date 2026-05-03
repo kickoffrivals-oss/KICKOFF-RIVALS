@@ -88,7 +88,9 @@ export function LandingPage({ onEnter }: LandingPageProps) {
       Icon: FLOATING_ICONS[Math.floor(Math.random() * FLOATING_ICONS.length)],
       top: `${Math.random() * 100}%`,
       left: `${Math.random() * 100}%`,
-      size: `w-${Math.floor(Math.random() * 8 + 4)} h-${Math.floor(Math.random() * 8 + 4)}`, // random size between w-4 and w-12 roughly
+      size: `w-${Math.floor(Math.random() * 8 + 4)} h-${Math.floor(
+        Math.random() * 8 + 4
+      )}`, // random size between w-4 and w-12 roughly
       // Actually let's use fixed pixel sizes or standardized tailwind classes to be safe
       // changing size to class string
       delay: `${Math.random() * 5}s`,
@@ -101,7 +103,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
         size: ["w-6 h-6", "w-8 h-8", "w-10 h-10", "w-12 h-12", "w-16 h-16"][
           Math.floor(Math.random() * 5)
         ],
-      })),
+      }))
     );
   }, []);
 
@@ -143,13 +145,13 @@ export function LandingPage({ onEnter }: LandingPageProps) {
             Stats
           </a>
         </div>
-        <button
+        {/*<button
           onClick={onEnter}
           className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald-500/30 text-emerald-400 text-sm font-medium hover:bg-emerald-500/10 transition-all"
         >
           <IconWallet className="w-4 h-4" />
           Connect Wallet
-        </button>
+        </button>*/}
       </nav>
 
       {/* Hero Section */}
@@ -189,7 +191,7 @@ export function LandingPage({ onEnter }: LandingPageProps) {
               "hover:shadow-xl hover:shadow-emerald-500/40",
               "hover:from-emerald-400 hover:to-emerald-500",
               "transition-all duration-300 hover:scale-105 active:scale-100",
-              "animate-glow-pulse",
+              "animate-glow-pulse"
             )}
           >
             <span className="relative z-10 flex items-center gap-2">
@@ -316,37 +318,6 @@ export function LandingPage({ onEnter }: LandingPageProps) {
       </section>
 
       {/* Final CTA */}
-      <section className="relative z-10 px-6 md:px-12 py-20 md:py-28">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="glass-card p-10 md:p-14 relative overflow-hidden">
-            {/* Background glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-emerald-500/10 rounded-full blur-[80px]" />
-
-            <h2 className="relative text-3xl md:text-4xl font-bold mb-4">
-              Ready to Enter the Arena?
-            </h2>
-            <p className="relative text-slate-400 mb-8 max-w-lg mx-auto">
-              Join thousands of players already competing. Connect your wallet
-              and claim your welcome bonus today.
-            </p>
-            <button
-              onClick={onEnter}
-              className={cn(
-                "relative group px-10 py-4 rounded-2xl font-bold text-lg",
-                "bg-gradient-to-r from-emerald-500 to-emerald-600",
-                "text-white shadow-lg shadow-emerald-500/25",
-                "hover:shadow-xl hover:shadow-emerald-500/40",
-                "transition-all duration-300 hover:scale-105",
-              )}
-            >
-              <span className="flex items-center gap-2">
-                Get Started Now
-                <IconArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/5 px-6 md:px-12 py-10">
@@ -416,7 +387,7 @@ function FeatureCard({
           "w-12 h-12 rounded-xl flex items-center justify-center mb-4",
           "bg-gradient-to-br",
           gradient,
-          "text-emerald-400 group-hover:text-white transition-colors",
+          "text-emerald-400 group-hover:text-white transition-colors"
         )}
       >
         {icon}

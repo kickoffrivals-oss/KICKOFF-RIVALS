@@ -47,19 +47,27 @@ export const useProfile = () => {
           setIsNewUser(false);
         }
 
-        // Merge INITIAL_SOCIAL_QUESTS
-        if (data.quests) {
-          const socialIds = ["q-follow-x", "q-like-1", "q-like-2"];
-          const extra = INITIAL_QUESTS.filter(iq => socialIds.includes(iq.id) && !data.quests.some((sq: any) => sq.id === iq.id));
-          data.quests = [...data.quests, ...extra].map((q: any) => {
-            const isDoneLocal =
-              typeof window !== "undefined"
-                ? localStorage.getItem(`quest_completed_${q.id}`) === "true"
-                : false;
-            if (isDoneLocal && !q.completed) {
-              return { ...q, completed: true, progress: q.target };
-            }
-            return q;
+        // Robust quest merging logic
+        if (data.quests && Array.isArray(data.quests)) {
+          data.quests = INITIAL_QUESTS.map((baseQuest) => {
+            const dbQuest = data.quests.find((dq: any) => String(dq.questId || dq.id) === String(baseQuest.id));
+            
+            return {
+              ...baseQuest,
+              id: String(baseQuest.id),
+              progress: dbQuest?.progress ?? 0,
+              completed: dbQuest?.completed ?? false,
+              status: (() => {
+                if (dbQuest?.completed) return "CLAIMED";
+                if (dbQuest?.status === "VERIFYING" && dbQuest.verifiedAt) {
+                  const readyTime = new Date(dbQuest.verifiedAt).getTime();
+                  if (Date.now() >= readyTime) return "CLAIMABLE";
+                  return "VERIFYING";
+                }
+                return dbQuest?.status || "LIVE";
+              })(),
+              verifiedAt: dbQuest?.verifiedAt,
+            };
           });
         }
       }

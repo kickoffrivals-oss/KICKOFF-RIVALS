@@ -1,15 +1,16 @@
 import { db } from "./app/lib/db";
 import { sql } from "drizzle-orm";
 
-async function removeDraftQuests() {
-  console.log("Removing draft quests...");
+async function removeAllQuests() {
+  console.log("Removing ALL quests and USER quests...");
   try {
-    await db.execute(sql`DELETE FROM quests WHERE id IN ('q5', 'q6');`);
-    console.log("Removed q5 and q6 (Telegram & Discord) successfully!");
+    await db.execute(sql`DELETE FROM user_quests;`);
+    await db.execute(sql`DELETE FROM quests;`);
+    console.log("Database quests cleared successfully!");
   } catch (error) {
-    console.error(error);
+    console.error("Failed to clear quests:", error);
   } finally {
     process.exit(0);
   }
 }
-removeDraftQuests();
+removeAllQuests();

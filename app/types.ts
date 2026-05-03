@@ -118,11 +118,11 @@ export interface DailyQuest {
   title: string;
   reward: number;
   type: 'click' | 'play' | 'win' | 'bet' | 'social' | 'external' | 'referral';
-  frequency: 'daily' | 'weekly';
+  frequency: 'daily' | 'weekly' | 'once';
   target: number;
   progress: number;
   completed: boolean;
-  status: 'LIVE' | 'QUEUED' | 'VERIFYING';
+  status: 'LIVE' | 'QUEUED' | 'VERIFYING' | 'ARCHIVED' | 'IN_PROGRESS' | 'COMPLETED' | 'CLAIMABLE' | 'CLAIMED' | 'UNLOCKED';
   liveAt?: number; // timestamp
   externalUrl?: string;
   socialLinks?: {

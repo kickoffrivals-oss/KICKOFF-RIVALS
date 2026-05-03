@@ -2,69 +2,58 @@ import { db } from "./app/lib/db";
 import { sql } from "drizzle-orm";
 
 const ALL_QUESTS = [
-  // Old Social Verification Quests
+  // Social Quests
   {
-    id: "q-follow-x",
-    title: "Follow us on X",
+    id: "q_social_like",
+    title: "Like, Comment & Retweet Post",
     reward: 2500,
-    type: "external",
-    frequency: "daily",
-    target: 1,
-    progress: 0,
-    completed: false,
-    status: "LIVE",
-    externalUrl: "https://x.com/Kickoffrivals",
-    requiresVerification: true,
-    verificationPlaceholder: "Your X username (e.g. @user)",
-    verificationType: "username",
+    type: "social",
     category: "social",
+    frequency: "once",
+    target: 1,
+    status: "LIVE",
+    externalUrl: "https://x.com/Kickoffrivals/status/2034928785825431674",
+    requiresVerification: true,
+    verificationPlaceholder: "Paste status URL",
+    verificationType: "link"
   },
   {
-    id: "q-like-1",
-    title: "Like & Comment on Post #1",
+    id: "q_social_follow",
+    title: "Follow @kickoffrivals",
     reward: 2500,
-    type: "external",
-    frequency: "daily",
-    target: 1,
-    progress: 0,
-    completed: false,
-    status: "LIVE",
-    externalUrl: "https://x.com/Kickoffrivals/status/2030753040072933867",
-    requiresVerification: true,
-    verificationPlaceholder: "Link to your comment",
-    verificationType: "link",
+    type: "social",
     category: "social",
-  },
-  {
-    id: "q-like-2",
-    title: "Like & Comment on Post #2",
-    reward: 2500,
-    type: "external",
-    frequency: "daily",
+    frequency: "once",
     target: 1,
-    progress: 0,
-    completed: false,
     status: "LIVE",
-    externalUrl: "https://x.com/Kickoffrivals/status/2033300788471067118",
+    externalUrl: "https://x.com/KICKOFFRIVALS",
     requiresVerification: true,
-    verificationPlaceholder: "Link to your comment",
-    verificationType: "link",
-    category: "social",
+    verificationPlaceholder: "@username",
+    verificationType: "username"
   },
-  
-  // Basic External/Click
-  { id: "q1", title: "Follow @kickoffrivals", reward: 200, type: "click", frequency: "daily", target: 1, completed: false, status: "LIVE" },
-  { id: "q5", title: "Join Telegram Channel", reward: 500, type: "external", frequency: "daily", target: 1, completed: false, status: "LIVE", externalUrl: "https://t.me/kickoffrivals" },
-  { id: "q6", title: "Join Discord Server", reward: 500, type: "external", frequency: "daily", target: 1, completed: false, status: "LIVE", externalUrl: "https://discord.gg/kickoffrivals" },
-  { id: "q7", title: "Retweet Pinned Post", reward: 500, type: "external", frequency: "daily", target: 1, completed: false, status: "LIVE", externalUrl: "https://twitter.com/kickoffrivals" },
 
-  // New User requested gameplay quests
-  { id: "dq_play5", title: "Play 5 games", reward: 1000, type: "play", frequency: "daily", target: 5, completed: false, status: "LIVE" },
-  { id: "dq_win10", title: "Win 10 games", reward: 10000, type: "win", frequency: "daily", target: 10, completed: false, status: "LIVE" },
-  { id: "dq_win15", title: "Win 15 games", reward: 12000, type: "win", frequency: "daily", target: 15, completed: false, status: "LIVE" },
-  { id: "wq_play30", title: "Play 30 games", reward: 10000, type: "play", frequency: "weekly", target: 30, completed: false, status: "LIVE" },
-  { id: "wq_win30", title: "Win 30 games", reward: 15000, type: "win", frequency: "weekly", target: 30, completed: false, status: "LIVE" },
-  { id: "wq_win10acc", title: "Win 10 Accumulated games", reward: 25000, type: "win", frequency: "weekly", target: 10, completed: false, status: "LIVE" },
+  // Daily Quests
+  { id: "dq_refer_1", title: "Refer 1 Friend", reward: 5000, type: "referral", frequency: "daily", target: 1, status: "LIVE" },
+  { id: "dq_win_15", title: "Win 15 games", reward: 12000, type: "win", frequency: "daily", target: 15, status: "LIVE" },
+  { id: "dq_win_10", title: "Win 10 games", reward: 8000, type: "win", frequency: "daily", target: 10, status: "LIVE" },
+  { id: "dq_win_5_acc", title: "Win 5 accumulated games", reward: 6000, type: "win", frequency: "daily", target: 5, status: "LIVE" },
+  { id: "dq_win_15_acc", title: "Win 15 accumulated games", reward: 15000, type: "win", frequency: "daily", target: 15, status: "LIVE" },
+  { id: "dq_win_10_acc", title: "Win 10 accumulated games", reward: 10000, type: "win", frequency: "daily", target: 10, status: "LIVE" },
+  { id: "dq_win_5", title: "Win 5 games", reward: 4000, type: "win", frequency: "daily", target: 5, status: "LIVE" },
+  { id: "dq_play_20", title: "Play 20 Games", reward: 5000, type: "play", frequency: "daily", target: 20, status: "LIVE" },
+  { id: "dq_play_50", title: "Play 50 games", reward: 10000, type: "play", frequency: "daily", target: 50, status: "LIVE" },
+
+  // Weekly Quests
+  { id: "wq_win_30", title: "Win 30 games", reward: 20000, type: "win", frequency: "weekly", target: 30, status: "LIVE" },
+  { id: "wq_win_15_acc", title: "Win 15 accumulated games", reward: 18000, type: "win", frequency: "weekly", target: 15, status: "LIVE" },
+  { id: "wq_win_10_acc", title: "Win 10 accumulated games", reward: 12000, type: "win", frequency: "weekly", target: 10, status: "LIVE" },
+  { id: "wq_play_50", title: "Play 50 games", reward: 15000, type: "play", frequency: "weekly", target: 50, status: "LIVE" },
+  { id: "wq_play_70", title: "Play 70 games", reward: 25000, type: "play", frequency: "weekly", target: 70, status: "LIVE" },
+
+  // Partner Quests
+  { id: "p_1", title: "Visit Partner #1", reward: 1000, type: "click", frequency: "daily", target: 1, status: "LIVE", category: "partners", externalUrl: "https://google.com" },
+  { id: "p_2", title: "Visit Partner #2", reward: 1000, type: "click", frequency: "daily", target: 1, status: "LIVE", category: "partners", externalUrl: "https://google.com" },
+  { id: "p_3", title: "Visit Partner #3", reward: 1000, type: "click", frequency: "daily", target: 1, status: "LIVE", category: "partners", externalUrl: "https://google.com" },
 ];
 
 async function seedQuests() {

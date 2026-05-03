@@ -289,7 +289,25 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   >({});
 
   // Transactions
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("kor_transactions");
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        console.error("Failed to load transactions from localStorage", e);
+        return [];
+      }
+    }
+    return [];
+  });
+
+  // Persist transactions to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("kor_transactions", JSON.stringify(transactions));
+    }
+  }, [transactions]);
 
   // Coupons
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -896,6 +914,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         const data = await res.json();
         if (data.success) {
           // Success handled by backend, we just notify user
+          if (data.type === "coins" && typeof data.value === "number") {
+            addTransaction("redeem", data.value, "coins", `Coupon: ${code}`);
+          }
+          refreshProfileQuery();
           return { success: true, message: data.message || "Code redeemed!" };
         }
         return { success: false, message: data.error || "Invalid code" };
@@ -939,6 +961,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (data.success) {
+        addTransaction("bonus", data.claimed, "kor", "Alliance Rewards");
         alert(`SUCCESS! Claimed ${data.claimed} KOR from Alliance matches.`);
         refreshProfileQuery();
       } else {

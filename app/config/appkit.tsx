@@ -1,5 +1,5 @@
 import { createAppKit } from "@reown/appkit/react";
-import { avalanche } from "@reown/appkit/networks";
+import { base } from "@reown/appkit/networks";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ const metadata = {
 };
 
 // 3. Set the networks
-const networks = [avalanche] as any;
+const networks = [base] as any;
 
 // 4. Create Wagmi Adapter
 export const wagmiAdapter = new WagmiAdapter({

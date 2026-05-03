@@ -47,6 +47,7 @@ export function DashboardModals() {
     handleAdminAuthSuccess,
     handleAdminLogout,
     betSlipSelections,
+    transactions,
     coupons,
     setCoupons,
     fetchMatches,
@@ -66,6 +67,7 @@ export function DashboardModals() {
           }}
           currentBalance={profile.korBalance}
           userStats={profile}
+          transactions={transactions}
           onWalkReward={() => {}}
         />
       )}
@@ -73,9 +75,7 @@ export function DashboardModals() {
       {showSwapConfirm && (
         <SwapConfirm
           coins={profile.coins}
-          onConfirm={async () => {
-            const amount =
-              Math.floor(profile.coins / CONVERSION_RATE) * CONVERSION_RATE;
+          onConfirm={async (amount: number) => {
             try {
               const res = await fetch(`${API_URL}/api/user/convert-coins`, {
                 method: "POST",

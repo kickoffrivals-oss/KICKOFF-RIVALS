@@ -4,9 +4,11 @@ import { getLeaderboard } from "../../server/user";
 export const Route = createFileRoute("/api/leaderboard")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
         try {
-          const result = await getLeaderboard();
+          const url = new URL(request.url);
+          const walletAddress = url.searchParams.get("walletAddress") || undefined;
+          const result = await getLeaderboard({ data: { walletAddress } });
           return Response.json(result);
         } catch (error: unknown) {
           const errorMessage =

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { db, users, transactions, userQuests, quests } from "../lib/db";
-import { eq, and } from "drizzle-orm";
+import { db, users, transactions, userQuests, quests, bets } from "../lib/db";
+import { eq, and, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { INITIAL_QUESTS } from "../constants";
 
@@ -23,6 +23,22 @@ function generateReferralCode(): string {
 // ==========================================
 // INTERNAL LOGIC (Decoupled from createServerFn)
 // ==========================================
+
+async function findUniqueUsername(baseUsername: string): Promise<string> {
+  const { sql } = await import("drizzle-orm");
+  let username = baseUsername.toLowerCase().trim();
+  let attempts = 0;
+  
+  while (true) {
+    const candidate = attempts === 0 ? username : `${username}${attempts}`;
+    const existing = await db.query.users.findFirst({
+      where: sql`lower(${users.username}) = ${candidate}`
+    });
+    
+    if (!existing) return candidate;
+    attempts++;
+  }
+}
 
 const getOrCreateUserSchema = z.object({
   walletAddress: z.string().min(1),
@@ -48,12 +64,17 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
     // If we have existing user BUT we are passing NEW registration data (username/league),
     // we should update the existing record. This fixed the "not reflecting" issue.
     if (
-      (data.username && existingUser.username !== data.username) ||
+      (data.username && existingUser.username.toLowerCase() !== data.username.toLowerCase()) ||
       (data.leagueId && !existingUser.allianceLeagueId) ||
       (data.teamId && !existingUser.allianceTeamId)
     ) {
       const updateData: any = {};
-      if (data.username) updateData.username = data.username;
+      
+      if (data.username) {
+        // Ensure new username is also unique/lowercased
+        updateData.username = await findUniqueUsername(data.username);
+      }
+      
       if (data.leagueId) updateData.allianceLeagueId = data.leagueId;
       if (data.teamId) updateData.allianceTeamId = data.teamId;
 
@@ -87,6 +108,7 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
         frequency: q.frequency,
         target: q.target,
         status: q.status || "LIVE",
+        category: q.category || null,
       }));
       await db.insert(userQuests).values(questValues).onConflictDoNothing();
       
@@ -115,10 +137,9 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
     };
   }
 
-  // Create new user - DISABLE automatic generation as requested
-  // Username is now expected to be provided from onboarding
-  const username =
-    data.username || `User_${normalized.slice(2, 8).toUpperCase()}`;
+  // Find a unique username (case-insensitive)
+  const baseName = data.username || `user_${normalized.slice(2, 8)}`;
+  const finalUsername = await findUniqueUsername(baseName);
   const referralCode = generateReferralCode();
 
   try {
@@ -126,7 +147,7 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
       .insert(users)
       .values({
         walletAddress: normalized,
-        username,
+        username: finalUsername,
         allianceLeagueId: data.leagueId || null,
         allianceTeamId: data.teamId || null,
         referralCode,
@@ -147,14 +168,20 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
           frequency: q.frequency,
           target: q.target,
           status: q.status || "LIVE",
+          category: q.category || null,
         }))
       );
     }
 
-    const newUserWithQuests = {
-      ...newUser,
-      quests: INITIAL_QUESTS.map(q => ({ ...q, walletAddress: normalized })),
-    };
+    // Re-fetch user with quests to ensure we have database-level objects (with integer IDs)
+    const newUserWithQuests = await db.query.users.findFirst({
+      where: eq(users.walletAddress, normalized),
+      with: { quests: true },
+    });
+
+    if (!newUserWithQuests) {
+      throw new Error("Failed to re-fetch new user");
+    }
 
     return {
       success: true,
@@ -162,51 +189,8 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
       isNew: true,
     };
   } catch (error: any) {
-    // Handle username conflict
-    if (error.code === "23505" && error.message?.includes("username")) {
-      const retryUsername = `${username}${Math.floor(
-        100 + Math.random() * 900
-      )}`;
-      const [retryUser] = await db
-        .insert(users)
-        .values({
-          walletAddress: normalized,
-          username: retryUsername,
-          allianceLeagueId: data.leagueId || null,
-          allianceTeamId: data.teamId || null,
-          referralCode,
-          coins: 5000,
-          doodlBalance: 1000,
-        })
-        .returning();
-
-      // Initialize quests for new user (retry case)
-      if (INITIAL_QUESTS.length > 0) {
-        await db.insert(userQuests).values(
-          INITIAL_QUESTS.map((q) => ({
-            walletAddress: normalized,
-            questId: q.id,
-            title: q.title,
-            reward: q.reward,
-            type: q.type,
-            frequency: q.frequency,
-            target: q.target,
-            status: q.status || "LIVE",
-          }))
-        );
-      }
-
-      const retryUserWithQuests = {
-        ...retryUser,
-        quests: INITIAL_QUESTS.map(q => ({ ...q, walletAddress: normalized })),
-      };
-
-      return {
-        success: true,
-        user: retryUserWithQuests,
-        isNew: true,
-      };
-    }
+    // If somehow we still hit a race condition conflict, let findUniqueUsername handle the retry logic by being called again
+    // But realistically, findUniqueUsername should result in success on first try now.
     throw error;
   }
 }
@@ -291,24 +275,56 @@ export const getUserProfile = createServerFn({ method: "GET" })
       lastCheckInDate: user.lastCheckInDate,
       canCheckIn: true,
       nextCheckInIn: 0,
-      quests: ((user as any).quests || []).map((q: any) => {
-        // If already completed in DB, keep it
-        if (q.completed) return q;
+      quests: await (async () => {
+        const now = new Date();
+        const lastDailyReset = new Date(now);
+        lastDailyReset.setUTCHours(4, 0, 0, 0);
+        if (now < lastDailyReset) lastDailyReset.setUTCDate(lastDailyReset.getUTCDate() - 1);
 
-        // Auto-update progress for play/win types
-        let progress = q.progress || 0;
-        let completed = q.completed;
+        const lastWeeklyReset = new Date(now);
+        lastWeeklyReset.setUTCHours(4, 0, 0, 0);
+        lastWeeklyReset.setUTCDate(lastWeeklyReset.getUTCDate() - lastWeeklyReset.getUTCDay()); // Sunday is 0
+        if (now < lastWeeklyReset) lastWeeklyReset.setUTCDate(lastWeeklyReset.getUTCDate() - 7);
 
-        if (q.type === "play") {
-          progress = user.gamePlays || 0;
-          if (progress >= q.target) completed = true;
-        } else if (q.type === "win") {
-          progress = user.wins || 0;
-          if (progress >= q.target) completed = true;
+        const userQuestsList = (user as any).quests || [];
+        const updatedQuests = [];
+
+        for (const q of userQuestsList) {
+          let needsReset = false;
+          const resetAt = q.resetAt ? new Date(q.resetAt) : new Date(0);
+
+          if (q.frequency === "daily" && resetAt < lastDailyReset) {
+            needsReset = true;
+          } else if (q.frequency === "weekly" && resetAt < lastWeeklyReset) {
+            needsReset = true;
+          }
+
+          if (needsReset) {
+            console.log(`[QUESTS] Resetting ${q.id} for user ${user.walletAddress}`);
+            // Use both id and walletAddress/questId for maximum safety during update
+            await db.update(userQuests)
+              .set({ progress: 0, completed: false, status: "LIVE", resetAt: new Date() })
+              .where(
+                q.id && typeof q.id === 'number' 
+                  ? eq(userQuests.id, q.id) 
+                  : and(eq(userQuests.walletAddress, user.walletAddress), eq(userQuests.questId, q.questId || q.id))
+              );
+            updatedQuests.push({ ...q, progress: 0, completed: false, status: "LIVE", resetAt: new Date() });
+          } else {
+            // Check if progress reached target while in-game (fallback check)
+            let completed = q.completed;
+            let status = q.status;
+            if (!completed && q.progress >= q.target) {
+              if (q.type === 'win' || q.type === 'play' || q.type === 'referral') {
+                completed = true;
+                status = "CLAIMABLE";
+              }
+            }
+            updatedQuests.push({ ...q, completed, status });
+          }
         }
-
-        return { ...q, progress, completed };
-      }),
+        return updatedQuests;
+      })(),
       masterQuests: await db.select().from(quests),
       isNew: result.isNew,
     };
@@ -417,7 +433,7 @@ export const registerReferral = createServerFn({ method: "POST" })
     const refQuest = await db.query.userQuests.findFirst({
       where: and(
         eq(userQuests.walletAddress, referrer.walletAddress),
-        eq(userQuests.questId, "q_referral")
+        eq(userQuests.questId, "dq_refer_1")
       ),
     });
 
@@ -430,6 +446,7 @@ export const registerReferral = createServerFn({ method: "POST" })
         .set({
           progress: newProgress,
           completed: isCompleted,
+          status: isCompleted ? "CLAIMABLE" : "LIVE"
         })
         .where(eq(userQuests.id, refQuest.id));
       
@@ -593,7 +610,7 @@ export const claimAllianceRewards = createServerFn({ method: "POST" })
     await db
       .update(users)
       .set({
-        doodlBalance: (user.doodlBalance || 0) + unclaimed,
+        coins: (user.coins || 0) + unclaimed,
         unclaimedAllianceRewards: 0,
       })
       .where(eq(users.walletAddress, normalized));
@@ -604,7 +621,7 @@ export const claimAllianceRewards = createServerFn({ method: "POST" })
       walletAddress: normalized,
       type: "bonus",
       amount: unclaimed,
-      currency: "kor",
+      currency: "coins",
       description: "Alliance Rewards",
     });
 
@@ -625,8 +642,9 @@ const checkUsernameSchema = z.object({
 export const checkUsernameAvailability = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => checkUsernameSchema.parse(data))
   .handler(async ({ data }) => {
+    const { sql } = await import("drizzle-orm");
     const existingUser = await db.query.users.findFirst({
-      where: eq(users.username, data.username),
+      where: sql`lower(${users.username}) = ${data.username.toLowerCase().trim()}`,
     });
 
     return {
@@ -670,9 +688,9 @@ export const checkIn = createServerFn({ method: "POST" })
       }
     }
 
-    // Add reward to KOR balance
+    // Add reward to coins balance
     await db.update(users).set({
-      doodlBalance: (user.doodlBalance || 0) + REWARD,
+      coins: (user.coins || 0) + REWARD,
       lastCheckInDate: new Date(),
     }).where(eq(users.walletAddress, normalized));
 
@@ -682,7 +700,7 @@ export const checkIn = createServerFn({ method: "POST" })
       walletAddress: normalized,
       type: "bonus",
       amount: REWARD,
-      currency: "kor",
+      currency: "coins",
       description: "4-Hourly Check-in Bonus"
     });
 
@@ -696,7 +714,7 @@ export const claimSocialReward = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => 
     z.object({
       walletAddress: z.string().min(1),
-      questId: z.string().min(1),
+      questId: z.union([z.string(), z.number()]).transform(v => String(v)),
     }).parse(data)
   )
   .handler(async ({ data }) => {
@@ -727,29 +745,36 @@ export const claimSocialReward = createServerFn({ method: "POST" })
     }
 
     const questData = INITIAL_QUESTS.find(iq => iq.id === data.questId);
-    const REWARD = questData?.reward || 2500;
+    if (!questData) {
+      return { success: false, error: "Generic quest data not found" };
+    }
+    const REWARD = questData.reward || 2500;
 
-    // 1. Mark as completed in userQuests table
+    // 1. Update userQuests table to CLAIMED
     await db.insert(userQuests).values({
       walletAddress: normalized,
       questId: data.questId,
       title: questData?.title || "Social Quest",
       reward: REWARD,
-      type: "external",
-      frequency: "daily",
+      type: questData?.type || "social",
+      frequency: questData?.frequency || "once",
       target: 1,
       progress: 1,
       completed: true,
-      status: "LIVE",
+      status: "CLAIMED",
       createdAt: new Date(),
     }).onConflictDoUpdate({
       target: [userQuests.walletAddress, userQuests.questId],
-      set: { completed: true, progress: 1 }
+      set: { 
+        completed: true, 
+        progress: 1, 
+        status: "CLAIMED" 
+      }
     });
 
-    // 2. Add reward to KOR balance in DB
+    // 2. Add reward to COINS balance in DB
     await db.update(users).set({
-      doodlBalance: (user.doodlBalance || 0) + REWARD,
+      coins: (user.coins || 0) + REWARD,
     }).where(eq(users.walletAddress, normalized));
 
     // 3. Log transaction in DB
@@ -758,7 +783,7 @@ export const claimSocialReward = createServerFn({ method: "POST" })
       walletAddress: normalized,
       type: "redeem",
       amount: REWARD,
-      currency: "kor",
+      currency: "coins",
       description: `Social Quest Reward: ${questData?.title || data.questId}`
     });
 
@@ -775,7 +800,7 @@ export const claimSocialReward = createServerFn({ method: "POST" })
 
 const submitQuestVerificationSchema = z.object({
   walletAddress: z.string().min(1),
-  questId: z.string().min(1),
+  questId: z.union([z.string(), z.number()]).transform(v => String(v)),
   verificationCode: z.string().nullable().optional(),
 });
 
@@ -815,6 +840,10 @@ export const submitQuestVerification = createServerFn({ method: "POST" })
       }
     }
 
+    const isSocial = questData.type === "social";
+    const status = isSocial ? "VERIFYING" : "CLAIMABLE";
+    const verifiedTime = isSocial ? new Date(Date.now() + 45 * 60 * 1000) : new Date();
+
     // Upsert user quest progress
     await db
       .insert(userQuests)
@@ -826,17 +855,23 @@ export const submitQuestVerification = createServerFn({ method: "POST" })
         type: questData.type as any,
         frequency: questData.frequency as any,
         target: questData.target,
-        progress: questData.target, // Mark as complete (ready to claim)
-        verifiedAt: new Date(),
-        status: "LIVE",
+        progress: questData.target, 
+        verifiedAt: verifiedTime,
+        status: status,
+        completed: false, // Ensure not completed yet!
       })
       .onConflictDoUpdate({
         target: [userQuests.walletAddress, userQuests.questId],
         set: {
           progress: questData.target,
-          verifiedAt: new Date(),
+          verifiedAt: verifiedTime,
+          status: status,
         },
       });
+
+    if (isSocial) {
+      console.log(`[QUEST_VERIFY] Social Quest ${data.questId} set to PENDING (45m delay) for ${normalized}`);
+    }
 
     return { 
       success: true, 
@@ -872,6 +907,15 @@ export const recordGamePlay = createServerFn({ method: "POST" })
       })
       .where(eq(users.walletAddress, normalized));
 
+    // Update active PLAY quests
+    await db.update(userQuests)
+      .set({ progress: sql`${userQuests.progress} + 1` })
+      .where(and(
+        eq(userQuests.walletAddress, normalized),
+        eq(userQuests.type, "play"),
+        eq(userQuests.completed, false)
+      ));
+
     return {
       success: true,
       gamePlays: (user.gamePlays || 0) + 1,
@@ -882,11 +926,16 @@ export const recordGamePlay = createServerFn({ method: "POST" })
 // GET LEADERBOARD
 // ==========================================
 
-export const getLeaderboard = createServerFn({ method: "GET" }).handler(
-  async () => {
+const getLeaderboardSchema = z.object({
+  walletAddress: z.string().optional(),
+});
+
+export const getLeaderboard = createServerFn({ method: "GET" })
+  .inputValidator((data: unknown) => getLeaderboardSchema.parse(data))
+  .handler(async ({ data }) => {
     try {
-      // Import desc from drizzle-orm
-      const { desc } = await import("drizzle-orm");
+      const { walletAddress } = data;
+      const { desc, gt, sql, eq } = await import("drizzle-orm");
 
       const topUsersKor = await db
         .select({
@@ -916,10 +965,48 @@ export const getLeaderboard = createServerFn({ method: "GET" }).handler(
         .orderBy(desc(users.referralCount))
         .limit(50);
 
+      let userRankKor = null;
+      let userRankReferrals = null;
+      let currentUserStats = null;
+
+      if (walletAddress) {
+        const normalized = walletAddress.toLowerCase();
+        const user = await db.query.users.findFirst({
+          where: eq(users.walletAddress, normalized),
+        });
+
+        if (user) {
+          const higherKor = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(users)
+            .where(gt(users.doodlBalance, user.doodlBalance || 0));
+          userRankKor = Number(higherKor[0].count) + 1;
+
+          const higherRefs = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(users)
+            .where(gt(users.referralCount, user.referralCount || 0));
+          userRankReferrals = Number(higherRefs[0].count) + 1;
+
+          currentUserStats = {
+            walletAddress: user.walletAddress,
+            username: user.username,
+            doodlBalance: user.doodlBalance,
+            totalBets: user.totalBets,
+            wins: user.wins,
+            referralCount: user.referralCount,
+            coins: user.coins,
+          };
+        }
+      }
+
       return {
         success: true,
         leaderboardKor: topUsersKor,
         leaderboardReferrals: topUsersReferrals,
+        userRankKor,
+        userRankReferrals,
+        currentUserStats,
       };
     } catch (error) {
       console.error("Failed to fetch leaderboard", error);
@@ -928,5 +1015,89 @@ export const getLeaderboard = createServerFn({ method: "GET" }).handler(
         error: "Failed to fetch leaderboard",
       };
     }
-  }
-);
+  });
+
+// ==========================================
+// SYNC QUESTS (Manual Catch-up)
+// ==========================================
+
+const syncQuestsSchema = z.object({
+  walletAddress: z.string().min(1),
+});
+
+export const syncQuests = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => syncQuestsSchema.parse(data))
+  .handler(async ({ data }) => {
+    const normalized = data.walletAddress.toLowerCase();
+    const now = new Date();
+
+    // 1. Calculate Daily Reset (4 AM UTC)
+    const lastDailyReset = new Date(now);
+    lastDailyReset.setUTCHours(4, 0, 0, 0);
+    if (now < lastDailyReset) lastDailyReset.setUTCDate(lastDailyReset.getUTCDate() - 1);
+
+    // 2. Calculate Weekly Reset (Monday 4 AM UTC)
+    const lastWeeklyReset = new Date(now);
+    lastWeeklyReset.setUTCHours(4, 0, 0, 0);
+    lastWeeklyReset.setUTCDate(lastWeeklyReset.getUTCDate() - lastWeeklyReset.getUTCDay());
+    if (now < lastWeeklyReset) lastWeeklyReset.setUTCDate(lastWeeklyReset.getUTCDate() - 7);
+
+    // 3. Fetch all settled bets since resets
+    const dailyBets = await db.select().from(bets).where(and(
+      eq(bets.walletAddress, normalized),
+      gt(bets.settledAt, lastDailyReset)
+    ));
+
+    const weeklyBets = await db.select().from(bets).where(and(
+      eq(bets.walletAddress, normalized),
+      gt(bets.settledAt, lastWeeklyReset)
+    ));
+
+    // 4. Update Function
+    const reconcile = async (betsList: any[], freq: string) => {
+      const plays = betsList.length;
+      const singleWins = betsList.filter(b => b.status === "won" && b.betType === "single").length;
+      const accWins = new Set(
+        betsList
+          .filter(b => b.status === "won" && b.betType === "accumulator" && b.accumulatorId)
+          .map(b => b.accumulatorId)
+      ).size;
+
+      // Update Play Quests
+      await db.update(userQuests)
+        .set({ progress: plays })
+        .where(and(
+          eq(userQuests.walletAddress, normalized),
+          eq(userQuests.frequency, freq as any),
+          eq(userQuests.type, "play"),
+          eq(userQuests.completed, false)
+        ));
+
+      // Update Single Win Quests
+      await db.update(userQuests)
+        .set({ progress: singleWins })
+        .where(and(
+          eq(userQuests.walletAddress, normalized),
+          eq(userQuests.frequency, freq as any),
+          eq(userQuests.type, "win"),
+          eq(userQuests.completed, false),
+          sql`NOT (title LIKE '%accumulated%')`
+        ));
+
+      // Update Acc Win Quests
+      await db.update(userQuests)
+        .set({ progress: accWins })
+        .where(and(
+          eq(userQuests.walletAddress, normalized),
+          eq(userQuests.frequency, freq as any),
+          eq(userQuests.type, "win"),
+          eq(userQuests.completed, false),
+          sql`title LIKE '%accumulated%'`
+        ));
+    };
+
+    await reconcile(dailyBets, "daily");
+    await reconcile(weeklyBets, "weekly");
+
+    return { success: true };
+  });

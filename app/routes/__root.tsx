@@ -41,12 +41,15 @@ export const Route = createRootRoute({
   component: RootComponent,
 });
 
+import { FloatingSupport } from "../components/FloatingSupport";
+
 function RootComponent() {
   return (
     <RootDocument>
       <AppKitProvider>
         <GameProvider>
           <Outlet />
+          <FloatingSupport />
           <Toaster position="top-center" />
         </GameProvider>
       </AppKitProvider>

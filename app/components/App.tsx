@@ -412,10 +412,18 @@ const App: React.FC = () => {
           walletAddress: address,
           username: userData.username || prev.username,
           coins: Number(userData.coins) || 0,
-          korBalance: Number(userData.korBalance) || 1000,
-          referralEarnings: userData.referralEarnings || 0,
-          unclaimedAllianceRewards:
-            Number(userData.unclaimedAllianceRewards) || 0,
+          korBalance: Number(userData.korBalance) || 0,
+          level: Number(userData.level) || 1,
+          xp: Number(userData.xp) || 0,
+          totalBets: Number(userData.totalBets) || 0,
+          wins: Number(userData.wins) || 0,
+          biggestWin: Number(userData.biggestWin) || 0,
+          currentStreak: Number(userData.currentStreak) || 0,
+          longestStreak: Number(userData.longestStreak) || 0,
+          bestOddsWon: Number(userData.bestOddsWon) || 0,
+          referralEarnings: Number(userData.referralEarnings) || 0,
+          referralCount: Number(userData.referralCount) || 0,
+          unclaimedAllianceRewards: Number(userData.unclaimedAllianceRewards) || 0,
           allianceLeagueId: userData.allianceLeagueId,
           allianceTeamId: userData.allianceTeamId,
           canCheckIn: userData.canCheckIn,
@@ -434,21 +442,32 @@ const App: React.FC = () => {
                 : INITIAL_QUESTS;
 
             return masterQuests.map((baseQuest: any) => {
-              const prevQuest = prev.quests.find(
-                (pq) => pq.id === baseQuest.id,
+              const dbQuest = (userData.quests || []).find(
+                (dq: any) => (dq.questId || String(dq.id)) === String(baseQuest.id)
               );
+              
               const isCompleted =
-                dbCompletedIds.has(baseQuest.id) ||
-                (prevQuest?.completed ?? false);
+                dbCompletedIds.has(String(baseQuest.id)) ||
+                dbQuest?.completed === true;
+                
               return {
                 ...baseQuest,
-                progress: prevQuest?.progress ?? baseQuest.progress,
+                id: String(baseQuest.id), // FORCE STRING ID
+                progress: Number(dbQuest?.progress) || 0,
                 completed: isCompleted,
+                status: dbQuest?.status || (isCompleted ? "CLAIMABLE" : "LIVE"),
+                // STRICT OVERRIDE FOR TEST/PROD INTEGRITY
+                requiresVerification: baseQuest.requiresVerification === true,
+                verificationPlaceholder: baseQuest.verificationPlaceholder,
+                verificationType: baseQuest.verificationType,
+                type: baseQuest.type, // FORCE CORRECT TYPE
+                externalUrl: baseQuest.externalUrl,
+                category: baseQuest.category || (String(baseQuest.id).startsWith('p_') ? 'partners' : 'social'),
               };
             });
           })(),
         }));
-        setBalance(Number(userData.korBalance) || 1000);
+        setBalance(Number(userData.korBalance) || 0);
       } else {
         // Fallback for failed profile fetch - don't block the user
         console.warn(
@@ -1280,12 +1299,17 @@ const App: React.FC = () => {
     const quest = userStats.quests.find((q) => q.id === id);
     if (!quest) return;
 
-    // Fallback URL from INITIAL_QUESTS if missing in current state
-    const targetUrl =
-      quest.externalUrl ||
-      INITIAL_QUESTS.find((iq) => iq.id === id)?.externalUrl;
+    // VERY robust lookup for base quest data
+    const baseData = INITIAL_QUESTS.find((iq) => 
+      iq.id === quest.id || 
+      iq.id === (quest as any).questId ||
+      iq.title.toLowerCase() === quest.title.toLowerCase()
+    );
+    
+    const targetUrl = quest.externalUrl || baseData?.externalUrl;
+    const requiresVerification = quest.requiresVerification ?? baseData?.requiresVerification ?? false;
 
-    if (quest.category === "social" || quest.type === "external") {
+    if (quest.category === "social" || quest.type === "external" || (baseData && (baseData.category === "social" || baseData.type === "external"))) {
       // Mark as visited locally for the UI
       if (typeof window !== "undefined") {
         localStorage.setItem(`quest_visited_${id}`, "true");
@@ -1295,12 +1319,16 @@ const App: React.FC = () => {
         window.open(targetUrl, "_blank");
       }
 
-      if (quest.requiresVerification && openUrl) {
+      if (requiresVerification && openUrl) {
         // Just opened the link, don't mark as complete yet
+        setUserStats(prev => ({...prev}));
       } else {
-        // Mark as complete in LS for local persistence
+        // Mark as verified/visit in LS
         if (typeof window !== "undefined") {
-          localStorage.setItem(`quest_completed_${id}`, "true");
+           localStorage.setItem(`quest_visited_${id}`, "true");
+           if (requiresVerification && verificationCode) {
+             localStorage.setItem(`quest_verify_${id}`, verificationCode);
+           }
         }
 
         // 1. UPDATE SERVER (DB)
@@ -1315,13 +1343,22 @@ const App: React.FC = () => {
           }),
         }).catch((err) => console.error("Quest submission DB error:", err));
 
-        // 2. UPDATE LOCAL STATE
-        setUserStats((prev) => ({
-          ...prev,
-          quests: prev.quests.map((q) =>
-            q.id === id ? { ...q, progress: q.target } : q,
-          ),
-        }));
+        // 2. UPDATE LOCAL STATE - Transition to CLAIMABLE, not COMPLETED
+        console.log("QUEST_DEBUG: handleQuestAction updating local state for ID:", id);
+        
+        // Force React Query to refetch so ProfileScreen sees the change
+        queryClient.invalidateQueries({ queryKey: ['profile'] });
+
+        setUserStats((prev) => {
+          const newQuests = prev.quests.map((q) =>
+            q.id === id ? { ...q, progress: Math.max(q.progress, q.target || 1), status: "CLAIMABLE" } : q
+          );
+          console.log("QUEST_DEBUG: New status for quest:", newQuests.find(q => q.id === id)?.status);
+          return {
+            ...prev,
+            quests: newQuests
+          };
+        });
       }
     } else if (quest.type === "click") {
       // Simple click complete
@@ -1376,7 +1413,7 @@ const App: React.FC = () => {
         const reward = result.reward || quest.reward;
         console.log(`[QUEST] DB confirmed! +${reward} coins.`);
 
-        // 1. Persist to localStorage so refreshProfile keeps it as completed
+        // 1. Persist to localStorage
         if (typeof window !== "undefined") {
           localStorage.setItem(`quest_completed_${id}`, "true");
         }
@@ -1384,10 +1421,13 @@ const App: React.FC = () => {
         // 2. Update local state immediately
         setUserStats((prev) => ({
           ...prev,
-          coins: prev.coins + reward,
-          quests: prev.quests.map((q) =>
-            q.id === id ? { ...q, completed: true } : q,
-          ),
+          coins: (prev.coins || 0) + reward,
+          quests: prev.quests.map((q) => {
+            if (q.id === id) {
+              return { ...q, completed: true, status: "CLAIMED", progress: q.target || 1 };
+            }
+            return q;
+          }),
         }));
         addTransaction(
           "redeem",
@@ -1693,6 +1733,9 @@ const App: React.FC = () => {
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
+                      <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">
+                        {b.id}
+                      </p>
                       <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
                         {b.betType === "accumulator"
                           ? "Accumulator Selection"
@@ -1758,6 +1801,7 @@ const App: React.FC = () => {
             onOpenWallet={() => setShowWallet(true)}
             onClaimAllianceRewards={handleClaimAllianceRewards}
             onCheckIn={handleCheckIn}
+            onSwapRequest={() => setShowSwapConfirm(true)}
             notify={notify}
           />
         </main>

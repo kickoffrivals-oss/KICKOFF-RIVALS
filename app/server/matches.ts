@@ -8,6 +8,8 @@ import {
   bets,
   users,
   transactions,
+  userQuests,
+  quests,
 } from "../lib/db";
 import { eq, and, desc, sql, lte, not, aliasedTable } from "drizzle-orm";
 import { z } from "zod";
@@ -294,21 +296,46 @@ export async function getCurrentMatchesInternal(data: { leagueId?: string }) {
               const statusUpdated = won ? "won" : "lost";
               await db.update(bets).set({ status: statusUpdated, settledAt: new Date() }).where(eq(bets.id, bet.id));
 
+              // TRACK GAME PLAYED (Win or Loss)
+              await db.update(users).set({ 
+                gamePlays: sql`${users.gamePlays} + 1`,
+                xp: sql`${users.xp} + ${won ? 25 : 5}`
+              }).where(eq(users.walletAddress, bet.walletAddress));
+
+              await db.update(userQuests)
+                .set({ progress: sql`${userQuests.progress} + 1` })
+                .where(and(
+                  eq(userQuests.walletAddress, bet.walletAddress),
+                  eq(userQuests.type, "play"),
+                  eq(userQuests.completed, false)
+                ));
+
               if (won) {
                 const potentialReturn = Math.floor(bet.potentialReturn);
                 await db.update(users).set({
                    doodlBalance: sql`${users.doodlBalance} + ${potentialReturn}`,
                    wins: sql`${users.wins} + 1`,
                    biggestWin: sql`CASE WHEN ${potentialReturn} > ${users.biggestWin} THEN ${potentialReturn} ELSE ${users.biggestWin} END`,
-                   xp: sql`${users.xp} + 25`,
                 }).where(eq(users.walletAddress, bet.walletAddress));
+
+                // ONLY update SINGLE win quests if this is a single bet
+                if (bet.betType === 'single') {
+                   await db.update(userQuests)
+                     .set({ progress: sql`${userQuests.progress} + 1` })
+                     .where(and(
+                       eq(userQuests.walletAddress, bet.walletAddress),
+                       eq(userQuests.type, "win"),
+                       eq(userQuests.completed, false),
+                       sql`NOT (title LIKE '%accumulated%')`
+                     ));
+                }
                 
                 await db.insert(transactions).values({
                   id: `tx-${Date.now()}-${Math.floor(Math.random()*1000)}`,
                   walletAddress: bet.walletAddress, type: "win", amount: potentialReturn, currency: "kor", description: `Win (Auto)`
                 });
               } else {
-                 await db.update(users).set({ xp: sql`${users.xp} + 5`, currentStreak: 0 }).where(eq(users.walletAddress, bet.walletAddress));
+                 await db.update(users).set({ currentStreak: 0 }).where(eq(users.walletAddress, bet.walletAddress));
               }
             }
           }
@@ -579,7 +606,7 @@ export async function getCurrentMatchesInternal(data: { leagueId?: string }) {
 
     const result = {
       success: true,
-      matches: currentMatchesWithTeams,
+      matches: transformedMatches,
       gameState: "active", // Placeholder, derive from season status if needed
       timer: 0, // Placeholder, derive from match/round start time if needed
       round: currentActiveRound,
@@ -1021,6 +1048,16 @@ export const settleBets = createServerFn({ method: "POST" })
                     level: sql`CASE WHEN ${users.xp} + 50 >= (${users.level} + 1) * 1000 THEN ${users.level} + 1 ELSE ${users.level} END`,
                   })
                   .where(eq(users.walletAddress, bet.walletAddress));
+
+                // Increment "Win X Accumulated Games" quests
+                await db.update(userQuests)
+                  .set({ progress: sql`${userQuests.progress} + 1` })
+                  .where(and(
+                    eq(userQuests.walletAddress, bet.walletAddress),
+                    eq(userQuests.type, "win"),
+                    eq(userQuests.completed, false),
+                    sql`title LIKE '%accumulated%'`
+                  ));
 
                 // Log win transaction
                 await db.insert(transactions).values({
