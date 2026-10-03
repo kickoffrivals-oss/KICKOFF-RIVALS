@@ -262,10 +262,10 @@
   },
   "matches": [
     {
-      "id": "m-1-37-l1-0",
+      "id": "m-1-39-l1-0",
       "leagueId": "l1",
       "seasonId": 1,
-      "round": 37,
+      "round": 39,
       "homeTeam": {
         "id": "t22",
         "name": "Brighton Ballers",
@@ -275,6 +275,31 @@
         "logo": "/assets/rivals_premier/brighton_ballers.svg"
       },
       "awayTeam": {
+        "id": "t4",
+        "name": "Striker Athletic",
+        "strength": 78,
+        "leagueId": "l1",
+        "color": "#f97316",
+        "logo": "/assets/rivals_premier/striker_athletic.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 1.59,
+        "draw": 3.44,
+        "away": 2.08,
+        "gg": 2.16,
+        "nogg": 2
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l1-0",
+      "commitHash": "commit-39-m-1-39-l1-0"
+    },
+    {
+      "id": "m-1-39-l1-1",
+      "leagueId": "l1",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
         "id": "t3",
         "name": "Elite FC",
         "strength": 75,
@@ -282,30 +307,71 @@
         "color": "#111827",
         "logo": "/assets/rivals_premier/elite_fc.svg"
       },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.13,
-        "draw": 3.02,
-        "away": 2.17,
-        "gg": 1.87,
-        "nogg": 2.14
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l1-0",
-      "commitHash": "commit-37-m-1-37-l1-0"
-    },
-    {
-      "id": "m-1-37-l1-1",
-      "leagueId": "l1",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
+      "awayTeam": {
         "id": "t19",
         "name": "Vector Chelsea",
         "strength": 84,
         "leagueId": "l1",
         "color": "#2563eb",
         "logo": "/assets/rivals_premier/vector_chelsea.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.78,
+        "draw": 3.2,
+        "away": 2.42,
+        "gg": 2.01,
+        "nogg": 2.1
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l1-1",
+      "commitHash": "commit-39-m-1-39-l1-1"
+    },
+    {
+      "id": "m-1-39-l1-2",
+      "leagueId": "l1",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t6",
+        "name": "Pitch Hotspur",
+        "strength": 82,
+        "leagueId": "l1",
+        "color": "#1e3a8a",
+        "logo": "/assets/rivals_premier/pitch_hotspur.svg"
+      },
+      "awayTeam": {
+        "id": "t24",
+        "name": "Everton Edge",
+        "strength": 72,
+        "leagueId": "l1",
+        "color": "#1d4ed8",
+        "logo": "/assets/rivals_premier/everton_edge.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.43,
+        "draw": 3.31,
+        "away": 2.97,
+        "gg": 1.9,
+        "nogg": 2.16
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l1-2",
+      "commitHash": "commit-39-m-1-39-l1-2"
+    },
+    {
+      "id": "m-1-39-l1-3",
+      "leagueId": "l1",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t5",
+        "name": "Goal Rovers",
+        "strength": 70,
+        "leagueId": "l1",
+        "color": "#22c55e",
+        "logo": "/assets/rivals_premier/goal_rovers.svg"
       },
       "awayTeam": {
         "id": "t23",
@@ -315,56 +381,23 @@
         "color": "#9f1239",
         "logo": "/assets/rivals_premier/west_ham_win.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 2.27,
-        "draw": 3.42,
-        "away": 1.86,
-        "gg": 1.87,
-        "nogg": 1.76
+        "home": 2.29,
+        "draw": 3.96,
+        "away": 1.98,
+        "gg": 1.98,
+        "nogg": 1.79
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l1-1",
-      "commitHash": "commit-37-m-1-37-l1-1"
+      "roundHash": "hash-39-m-1-39-l1-3",
+      "commitHash": "commit-39-m-1-39-l1-3"
     },
     {
-      "id": "m-1-37-l1-2",
+      "id": "m-1-39-l1-4",
       "leagueId": "l1",
       "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t1",
-        "name": "Rivals Utd",
-        "strength": 88,
-        "leagueId": "l1",
-        "color": "#ef4444",
-        "logo": "/assets/rivals_premier/rivals_utd.svg"
-      },
-      "awayTeam": {
-        "id": "t5",
-        "name": "Goal Rovers",
-        "strength": 70,
-        "leagueId": "l1",
-        "color": "#22c55e",
-        "logo": "/assets/rivals_premier/goal_rovers.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.17,
-        "draw": 3.81,
-        "away": 1.96,
-        "gg": 1.92,
-        "nogg": 1.76
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l1-2",
-      "commitHash": "commit-37-m-1-37-l1-2"
-    },
-    {
-      "id": "m-1-37-l1-3",
-      "leagueId": "l1",
-      "seasonId": 1,
-      "round": 37,
+      "round": 39,
       "homeTeam": {
         "id": "t21",
         "name": "Newcastle Net",
@@ -381,30 +414,30 @@
         "color": "#7f1d1d",
         "logo": "/assets/rivals_premier/villa_vibe.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 1.72,
-        "draw": 3.17,
-        "away": 2.08,
-        "gg": 1.9,
-        "nogg": 1.77
+        "home": 2.36,
+        "draw": 3.66,
+        "away": 2.7,
+        "gg": 1.99,
+        "nogg": 1.83
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l1-3",
-      "commitHash": "commit-37-m-1-37-l1-3"
+      "roundHash": "hash-39-m-1-39-l1-4",
+      "commitHash": "commit-39-m-1-39-l1-4"
     },
     {
-      "id": "m-1-37-l1-4",
+      "id": "m-1-39-l1-5",
       "leagueId": "l1",
       "seasonId": 1,
-      "round": 37,
+      "round": 39,
       "homeTeam": {
-        "id": "t6",
-        "name": "Pitch Hotspur",
-        "strength": 82,
+        "id": "t1",
+        "name": "Rivals Utd",
+        "strength": 88,
         "leagueId": "l1",
-        "color": "#1e3a8a",
-        "logo": "/assets/rivals_premier/pitch_hotspur.svg"
+        "color": "#ef4444",
+        "logo": "/assets/rivals_premier/rivals_utd.svg"
       },
       "awayTeam": {
         "id": "t2",
@@ -414,122 +447,23 @@
         "color": "#0ea5e9",
         "logo": "/assets/rivals_premier/kor_city.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 1.56,
-        "draw": 3.59,
-        "away": 2.25,
-        "gg": 1.77,
-        "nogg": 1.96
+        "home": 2.08,
+        "draw": 2.89,
+        "away": 3.43,
+        "gg": 1.87,
+        "nogg": 2.27
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l1-4",
-      "commitHash": "commit-37-m-1-37-l1-4"
+      "roundHash": "hash-39-m-1-39-l1-5",
+      "commitHash": "commit-39-m-1-39-l1-5"
     },
     {
-      "id": "m-1-37-l1-5",
-      "leagueId": "l1",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t4",
-        "name": "Striker Athletic",
-        "strength": 78,
-        "leagueId": "l1",
-        "color": "#f97316",
-        "logo": "/assets/rivals_premier/striker_athletic.svg"
-      },
-      "awayTeam": {
-        "id": "t24",
-        "name": "Everton Edge",
-        "strength": 72,
-        "leagueId": "l1",
-        "color": "#1d4ed8",
-        "logo": "/assets/rivals_premier/everton_edge.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.47,
-        "draw": 3.76,
-        "away": 2.96,
-        "gg": 2.13,
-        "nogg": 1.98
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l1-5",
-      "commitHash": "commit-37-m-1-37-l1-5"
-    },
-    {
-      "id": "m-1-37-l2-0",
+      "id": "m-1-39-l2-0",
       "leagueId": "l2",
       "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t29",
-        "name": "Celta Champion",
-        "strength": 71,
-        "leagueId": "l2",
-        "color": "#60a5fa",
-        "logo": "/assets/elite_laliga/celta_champion.svg"
-      },
-      "awayTeam": {
-        "id": "t26",
-        "name": "Sociedad Sharp",
-        "strength": 78,
-        "leagueId": "l2",
-        "color": "#3b82f6",
-        "logo": "/assets/elite_laliga/sociedad_sharp.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.2,
-        "draw": 3.54,
-        "away": 2.64,
-        "gg": 1.79,
-        "nogg": 1.82
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l2-0",
-      "commitHash": "commit-37-m-1-37-l2-0"
-    },
-    {
-      "id": "m-1-37-l2-1",
-      "leagueId": "l2",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t7",
-        "name": "Real Rivals",
-        "strength": 92,
-        "leagueId": "l2",
-        "color": "#eab308",
-        "logo": "/assets/elite_laliga/real_rivals.svg"
-      },
-      "awayTeam": {
-        "id": "t8",
-        "name": "Barca Bold",
-        "strength": 89,
-        "leagueId": "l2",
-        "color": "#be185d",
-        "logo": "/assets/elite_laliga/barca_bold.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.42,
-        "draw": 3.34,
-        "away": 3,
-        "gg": 1.7,
-        "nogg": 2.08
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l2-1",
-      "commitHash": "commit-37-m-1-37-l2-1"
-    },
-    {
-      "id": "m-1-37-l2-2",
-      "leagueId": "l2",
-      "seasonId": 1,
-      "round": 37,
+      "round": 39,
       "homeTeam": {
         "id": "t28",
         "name": "Getafe Glory",
@@ -539,39 +473,6 @@
         "logo": "/assets/elite_laliga/getafe_glory.svg"
       },
       "awayTeam": {
-        "id": "t12",
-        "name": "Villarreal Vision",
-        "strength": 72,
-        "leagueId": "l2",
-        "color": "#facc15",
-        "logo": "/assets/elite_laliga/villarreal_vision.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 1.73,
-        "draw": 3.98,
-        "away": 2.01,
-        "gg": 2.06,
-        "nogg": 2.08
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l2-2",
-      "commitHash": "commit-37-m-1-37-l2-2"
-    },
-    {
-      "id": "m-1-37-l2-3",
-      "leagueId": "l2",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t10",
-        "name": "Sevilla Striker",
-        "strength": 76,
-        "leagueId": "l2",
-        "color": "#dc2626",
-        "logo": "/assets/elite_laliga/sevilla_striker.svg"
-      },
-      "awayTeam": {
         "id": "t27",
         "name": "Bilbao Blast",
         "strength": 75,
@@ -579,23 +480,122 @@
         "color": "#dc2626",
         "logo": "/assets/elite_laliga/bilbao_blast.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 2.89,
-        "draw": 2.91,
-        "away": 3.25,
-        "gg": 2.2,
-        "nogg": 2
+        "home": 2.03,
+        "draw": 3.64,
+        "away": 1.83,
+        "gg": 1.92,
+        "nogg": 2.1
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l2-3",
-      "commitHash": "commit-37-m-1-37-l2-3"
+      "roundHash": "hash-39-m-1-39-l2-0",
+      "commitHash": "commit-39-m-1-39-l2-0"
     },
     {
-      "id": "m-1-37-l2-4",
+      "id": "m-1-39-l2-1",
       "leagueId": "l2",
       "seasonId": 1,
-      "round": 37,
+      "round": 39,
+      "homeTeam": {
+        "id": "t26",
+        "name": "Sociedad Sharp",
+        "strength": 78,
+        "leagueId": "l2",
+        "color": "#3b82f6",
+        "logo": "/assets/elite_laliga/sociedad_sharp.svg"
+      },
+      "awayTeam": {
+        "id": "t25",
+        "name": "Betis Brave",
+        "strength": 77,
+        "leagueId": "l2",
+        "color": "#16a34a",
+        "logo": "/assets/elite_laliga/betis_brave.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.14,
+        "draw": 3.55,
+        "away": 1.88,
+        "gg": 1.76,
+        "nogg": 2.16
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l2-1",
+      "commitHash": "commit-39-m-1-39-l2-1"
+    },
+    {
+      "id": "m-1-39-l2-2",
+      "leagueId": "l2",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t12",
+        "name": "Villarreal Vision",
+        "strength": 72,
+        "leagueId": "l2",
+        "color": "#facc15",
+        "logo": "/assets/elite_laliga/villarreal_vision.svg"
+      },
+      "awayTeam": {
+        "id": "t29",
+        "name": "Celta Champion",
+        "strength": 71,
+        "leagueId": "l2",
+        "color": "#60a5fa",
+        "logo": "/assets/elite_laliga/celta_champion.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.85,
+        "draw": 3.01,
+        "away": 3.55,
+        "gg": 1.82,
+        "nogg": 2.16
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l2-2",
+      "commitHash": "commit-39-m-1-39-l2-2"
+    },
+    {
+      "id": "m-1-39-l2-3",
+      "leagueId": "l2",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t11",
+        "name": "Valencia Victory",
+        "strength": 74,
+        "leagueId": "l2",
+        "color": "#f97316",
+        "logo": "/assets/elite_laliga/valencia_victory.svg"
+      },
+      "awayTeam": {
+        "id": "t10",
+        "name": "Sevilla Striker",
+        "strength": 76,
+        "leagueId": "l2",
+        "color": "#dc2626",
+        "logo": "/assets/elite_laliga/sevilla_striker.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.82,
+        "draw": 2.82,
+        "away": 1.93,
+        "gg": 1.71,
+        "nogg": 2.06
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l2-3",
+      "commitHash": "commit-39-m-1-39-l2-3"
+    },
+    {
+      "id": "m-1-39-l2-4",
+      "leagueId": "l2",
+      "seasonId": 1,
+      "round": 39,
       "homeTeam": {
         "id": "t9",
         "name": "Atletico Ace",
@@ -605,37 +605,37 @@
         "logo": "/assets/elite_laliga/atletico_ace.svg"
       },
       "awayTeam": {
-        "id": "t11",
-        "name": "Valencia Victory",
-        "strength": 74,
+        "id": "t8",
+        "name": "Barca Bold",
+        "strength": 89,
         "leagueId": "l2",
-        "color": "#f97316",
-        "logo": "/assets/elite_laliga/valencia_victory.svg"
+        "color": "#be185d",
+        "logo": "/assets/elite_laliga/barca_bold.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 2.47,
-        "draw": 3.65,
-        "away": 1.88,
-        "gg": 2,
+        "home": 2.77,
+        "draw": 3.8,
+        "away": 3.04,
+        "gg": 1.86,
         "nogg": 2.28
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l2-4",
-      "commitHash": "commit-37-m-1-37-l2-4"
+      "roundHash": "hash-39-m-1-39-l2-4",
+      "commitHash": "commit-39-m-1-39-l2-4"
     },
     {
-      "id": "m-1-37-l2-5",
+      "id": "m-1-39-l2-5",
       "leagueId": "l2",
       "seasonId": 1,
-      "round": 37,
+      "round": 39,
       "homeTeam": {
-        "id": "t25",
-        "name": "Betis Brave",
-        "strength": 77,
+        "id": "t7",
+        "name": "Real Rivals",
+        "strength": 92,
         "leagueId": "l2",
-        "color": "#16a34a",
-        "logo": "/assets/elite_laliga/betis_brave.svg"
+        "color": "#eab308",
+        "logo": "/assets/elite_laliga/real_rivals.svg"
       },
       "awayTeam": {
         "id": "t30",
@@ -645,195 +645,30 @@
         "color": "#b91c1c",
         "logo": "/assets/elite_laliga/mallorca_master.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 2.63,
-        "draw": 3.23,
-        "away": 2.4,
-        "gg": 1.78,
-        "nogg": 1.91
+        "home": 2.87,
+        "draw": 3.96,
+        "away": 2.13,
+        "gg": 2.2,
+        "nogg": 2.25
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l2-5",
-      "commitHash": "commit-37-m-1-37-l2-5"
+      "roundHash": "hash-39-m-1-39-l2-5",
+      "commitHash": "commit-39-m-1-39-l2-5"
     },
     {
-      "id": "m-1-37-l3-0",
+      "id": "m-1-39-l3-0",
       "leagueId": "l3",
       "seasonId": 1,
-      "round": 37,
+      "round": 39,
       "homeTeam": {
-        "id": "t16",
-        "name": "Roma Royal",
-        "strength": 77,
-        "leagueId": "l3",
-        "color": "#9f1239",
-        "logo": "/assets/prime_serie_a/roma_royal.svg"
-      },
-      "awayTeam": {
-        "id": "t33",
-        "name": "Torino Titan",
-        "strength": 72,
-        "leagueId": "l3",
-        "color": "#991b1b",
-        "logo": "/assets/prime_serie_a/torino_titan.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.48,
-        "draw": 3.32,
-        "away": 3.08,
-        "gg": 1.67,
-        "nogg": 1.79
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l3-0",
-      "commitHash": "commit-37-m-1-37-l3-0"
-    },
-    {
-      "id": "m-1-37-l3-1",
-      "leagueId": "l3",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t35",
-        "name": "Monza Major",
-        "strength": 70,
-        "leagueId": "l3",
-        "color": "#dc2626",
-        "logo": "/assets/prime_serie_a/monza_major.svg"
-      },
-      "awayTeam": {
-        "id": "t13",
-        "name": "Juve Jet",
-        "strength": 85,
-        "leagueId": "l3",
-        "color": "#000000",
-        "logo": "/assets/prime_serie_a/juve_jet.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 1.98,
-        "draw": 3.4,
-        "away": 2.96,
-        "gg": 1.66,
-        "nogg": 1.93
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l3-1",
-      "commitHash": "commit-37-m-1-37-l3-1"
-    },
-    {
-      "id": "m-1-37-l3-2",
-      "leagueId": "l3",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t18",
-        "name": "Lazio Legend",
-        "strength": 73,
-        "leagueId": "l3",
-        "color": "#06b6d4",
-        "logo": "/assets/prime_serie_a/lazio_legend.svg"
-      },
-      "awayTeam": {
-        "id": "t17",
-        "name": "Napoli Noble",
-        "strength": 81,
-        "leagueId": "l3",
-        "color": "#0ea5e9",
-        "logo": "/assets/prime_serie_a/napoli_noble.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.14,
-        "draw": 3.22,
-        "away": 2.74,
-        "gg": 2.12,
-        "nogg": 2.07
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l3-2",
-      "commitHash": "commit-37-m-1-37-l3-2"
-    },
-    {
-      "id": "m-1-37-l3-3",
-      "leagueId": "l3",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t36",
-        "name": "Sassuolo Star",
-        "strength": 71,
-        "leagueId": "l3",
-        "color": "#15803d",
-        "logo": "/assets/prime_serie_a/sassuolo_star.svg"
-      },
-      "awayTeam": {
-        "id": "t15",
-        "name": "Inter Icon",
-        "strength": 86,
-        "leagueId": "l3",
-        "color": "#1e3a8a",
-        "logo": "/assets/prime_serie_a/inter_icon.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 1.86,
-        "draw": 3.07,
-        "away": 3.11,
-        "gg": 1.83,
-        "nogg": 1.85
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l3-3",
-      "commitHash": "commit-37-m-1-37-l3-3"
-    },
-    {
-      "id": "m-1-37-l3-4",
-      "leagueId": "l3",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t31",
-        "name": "Atalanta Ace",
-        "strength": 79,
-        "leagueId": "l3",
-        "color": "#1e40af",
-        "logo": "/assets/prime_serie_a/atalanta_ace.svg"
-      },
-      "awayTeam": {
         "id": "t32",
         "name": "Fiorentina Flash",
         "strength": 76,
         "leagueId": "l3",
         "color": "#7e22ce",
         "logo": "/assets/prime_serie_a/fiorentina_flash.svg"
-      },
-      "startTime": 1791050455645,
-      "odds": {
-        "home": 2.9,
-        "draw": 3.77,
-        "away": 3.45,
-        "gg": 1.74,
-        "nogg": 1.78
-      },
-      "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l3-4",
-      "commitHash": "commit-37-m-1-37-l3-4"
-    },
-    {
-      "id": "m-1-37-l3-5",
-      "leagueId": "l3",
-      "seasonId": 1,
-      "round": 37,
-      "homeTeam": {
-        "id": "t14",
-        "name": "Milan Master",
-        "strength": 84,
-        "leagueId": "l3",
-        "color": "#b91c1c",
-        "logo": "/assets/prime_serie_a/milan_master.svg"
       },
       "awayTeam": {
         "id": "t34",
@@ -843,17 +678,182 @@
         "color": "#be123c",
         "logo": "/assets/prime_serie_a/bologna_bold.svg"
       },
-      "startTime": 1791050455645,
+      "startTime": 1791050617565,
       "odds": {
-        "home": 1.87,
-        "draw": 3.1,
-        "away": 2.35,
-        "gg": 2.18,
+        "home": 2.24,
+        "draw": 3.22,
+        "away": 2.6,
+        "gg": 2.14,
+        "nogg": 2.12
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l3-0",
+      "commitHash": "commit-39-m-1-39-l3-0"
+    },
+    {
+      "id": "m-1-39-l3-1",
+      "leagueId": "l3",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t13",
+        "name": "Juve Jet",
+        "strength": 85,
+        "leagueId": "l3",
+        "color": "#000000",
+        "logo": "/assets/prime_serie_a/juve_jet.svg"
+      },
+      "awayTeam": {
+        "id": "t33",
+        "name": "Torino Titan",
+        "strength": 72,
+        "leagueId": "l3",
+        "color": "#991b1b",
+        "logo": "/assets/prime_serie_a/torino_titan.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.63,
+        "draw": 3.7,
+        "away": 2.61,
+        "gg": 2.17,
+        "nogg": 1.7
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l3-1",
+      "commitHash": "commit-39-m-1-39-l3-1"
+    },
+    {
+      "id": "m-1-39-l3-2",
+      "leagueId": "l3",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t31",
+        "name": "Atalanta Ace",
+        "strength": 79,
+        "leagueId": "l3",
+        "color": "#1e40af",
+        "logo": "/assets/prime_serie_a/atalanta_ace.svg"
+      },
+      "awayTeam": {
+        "id": "t14",
+        "name": "Milan Master",
+        "strength": 84,
+        "leagueId": "l3",
+        "color": "#b91c1c",
+        "logo": "/assets/prime_serie_a/milan_master.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 1.58,
+        "draw": 3.33,
+        "away": 3.32,
+        "gg": 2.17,
         "nogg": 1.98
       },
       "status": "SCHEDULED",
-      "roundHash": "hash-37-m-1-37-l3-5",
-      "commitHash": "commit-37-m-1-37-l3-5"
+      "roundHash": "hash-39-m-1-39-l3-2",
+      "commitHash": "commit-39-m-1-39-l3-2"
+    },
+    {
+      "id": "m-1-39-l3-3",
+      "leagueId": "l3",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t17",
+        "name": "Napoli Noble",
+        "strength": 81,
+        "leagueId": "l3",
+        "color": "#0ea5e9",
+        "logo": "/assets/prime_serie_a/napoli_noble.svg"
+      },
+      "awayTeam": {
+        "id": "t18",
+        "name": "Lazio Legend",
+        "strength": 73,
+        "leagueId": "l3",
+        "color": "#06b6d4",
+        "logo": "/assets/prime_serie_a/lazio_legend.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.13,
+        "draw": 3.89,
+        "away": 2.6,
+        "gg": 1.8,
+        "nogg": 2.24
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l3-3",
+      "commitHash": "commit-39-m-1-39-l3-3"
+    },
+    {
+      "id": "m-1-39-l3-4",
+      "leagueId": "l3",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t35",
+        "name": "Monza Major",
+        "strength": 70,
+        "leagueId": "l3",
+        "color": "#dc2626",
+        "logo": "/assets/prime_serie_a/monza_major.svg"
+      },
+      "awayTeam": {
+        "id": "t15",
+        "name": "Inter Icon",
+        "strength": 86,
+        "leagueId": "l3",
+        "color": "#1e3a8a",
+        "logo": "/assets/prime_serie_a/inter_icon.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 1.59,
+        "draw": 3.99,
+        "away": 1.99,
+        "gg": 2.13,
+        "nogg": 1.76
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l3-4",
+      "commitHash": "commit-39-m-1-39-l3-4"
+    },
+    {
+      "id": "m-1-39-l3-5",
+      "leagueId": "l3",
+      "seasonId": 1,
+      "round": 39,
+      "homeTeam": {
+        "id": "t16",
+        "name": "Roma Royal",
+        "strength": 77,
+        "leagueId": "l3",
+        "color": "#9f1239",
+        "logo": "/assets/prime_serie_a/roma_royal.svg"
+      },
+      "awayTeam": {
+        "id": "t36",
+        "name": "Sassuolo Star",
+        "strength": 71,
+        "leagueId": "l3",
+        "color": "#15803d",
+        "logo": "/assets/prime_serie_a/sassuolo_star.svg"
+      },
+      "startTime": 1791050617565,
+      "odds": {
+        "home": 2.89,
+        "draw": 3.54,
+        "away": 3.21,
+        "gg": 1.86,
+        "nogg": 2.06
+      },
+      "status": "SCHEDULED",
+      "roundHash": "hash-39-m-1-39-l3-5",
+      "commitHash": "commit-39-m-1-39-l3-5"
     }
   ],
   "bets": [
@@ -2698,7 +2698,7 @@
       "isActive": true
     }
   },
-  "currentRound": 37,
+  "currentRound": 39,
   "seasonId": 1,
-  "roundStartTime": 1791050455645
+  "roundStartTime": 1791050617565
 }
