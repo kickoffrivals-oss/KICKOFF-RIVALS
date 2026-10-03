@@ -90,7 +90,7 @@ export function AdminAuth({ onAuthSuccess, onCancel }: AdminAuthProps) {
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <IconShield className="w-5 h-5 text-primary" />
-            <h2 className="font-bold text-foreground">Admin Authentication</h2>
+            <h2 className="font-bold text-foreground">Wallet Verification</h2>
           </div>
           {status !== "signing" && status !== "verifying" && (
             <button
@@ -111,17 +111,17 @@ export function AdminAuth({ onAuthSuccess, onCancel }: AdminAuthProps) {
                 <IconShield className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                Admin Access Required
+                Verification Required
               </h3>
               <p className="text-sm text-muted-foreground mb-6">
-                Sign a message to verify your admin credentials. This action is
+                Sign a message to verify your wallet session. This action is
                 free and doesn't cost gas.
               </p>
               <button
                 onClick={handleAuthenticate}
                 className="btn btn-primary w-full h-12 font-semibold"
               >
-                Authenticate
+                Sign & Authorize
               </button>
             </div>
           )}
@@ -201,8 +201,7 @@ export function AdminAuth({ onAuthSuccess, onCancel }: AdminAuthProps) {
             <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border">
               <IconShield className="w-4 h-4 text-muted-foreground flex-shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground">
-                Only authorized admin wallets can access the admin portal.
-                Signing is free and secure.
+                Signing is instant, free, and secure without gas fees.
               </p>
             </div>
           </div>

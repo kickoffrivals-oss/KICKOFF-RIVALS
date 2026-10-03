@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getCurrentMatchesInternal } from "../../server/matches";
+import { getLocalMatches } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/matches/current")({
   server: {
@@ -13,15 +14,14 @@ export const Route = createFileRoute("/api/matches/current")({
             leagueId,
           });
 
-          return Response.json(result);
+          if (result && result.success) {
+            return Response.json(result);
+          }
+          throw new Error("DB matches failed");
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Matches API error:", error);
-          return Response.json(
-            { success: false, error: errorMessage, matches: [] },
-            { status: 500 },
-          );
+          console.warn("[Matches API] Using local in-memory fallback");
+          const fallback = getLocalMatches(leagueId);
+          return Response.json(fallback);
         }
       },
     },

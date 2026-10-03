@@ -6,6 +6,7 @@ interface RivalsLogoProps {
   size?: "sm" | "md" | "lg" | "xl";
   variant?: "full" | "icon" | "text";
   to?: string;
+  disableLink?: boolean;
 }
 
 export function RivalsLogo({
@@ -13,6 +14,7 @@ export function RivalsLogo({
   size = "md",
   variant = "full",
   to = "/",
+  disableLink = false,
 }: RivalsLogoProps) {
   const sizeClasses = {
     sm: "h-6",
@@ -55,6 +57,19 @@ export function RivalsLogo({
       )}
     </>
   );
+
+  if (disableLink) {
+    return (
+      <div
+        className={cn(
+          "flex items-center gap-2 whitespace-nowrap",
+          variant === "full" && className
+        )}
+      >
+        {content}
+      </div>
+    );
+  }
 
   return (
     <Link

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getActiveBets } from "../../server/matches";
+import { getLocalActiveBets } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/bets/active")({
   server: {
@@ -22,15 +23,14 @@ export const Route = createFileRoute("/api/bets/active")({
             },
           });
 
-          return Response.json(result);
+          if (result && result.success) {
+            return Response.json(result);
+          }
+          throw new Error("DB active bets failed");
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Active bets API error:", error);
-          return Response.json(
-            { success: false, error: errorMessage, bets: [] },
-            { status: 500 },
-          );
+          console.warn("[Active bets API] Using local in-memory fallback");
+          const fallback = getLocalActiveBets(walletAddress);
+          return Response.json(fallback);
         }
       },
     },

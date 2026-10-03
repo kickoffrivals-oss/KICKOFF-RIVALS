@@ -17,7 +17,7 @@ interface MatchGridProps {
 }
 
 function resolveDisplayScore(m: Match, gameState: GameState, currentMinute: number) {
-  if (gameState !== "LIVE" && gameState !== "FINISHED") return undefined;
+  if (gameState !== "LIVE" && gameState !== "FINISHED" && gameState !== "RESULT") return undefined;
 
   if (m.homeScore !== undefined && m.homeScore !== null) {
     return { home: m.homeScore, away: m.awayScore! };
@@ -35,7 +35,7 @@ function resolveDisplayScore(m: Match, gameState: GameState, currentMinute: numb
     return { home: homeGoals, away: awayGoals };
   }
 
-  if (gameState === "FINISHED" && m.result) {
+  if (m.result) {
     return { home: m.result.homeScore, away: m.result.awayScore };
   }
 
@@ -53,13 +53,9 @@ export function MatchGrid({
 }: MatchGridProps) {
   const currentMinute = getCurrentGameMinute();
 
-  const gridClass = `grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity duration-300 ${
-    gameState !== "BETTING" ? "opacity-90 grayscale-0" : ""
-  }`;
-
   if (selectedLeagueFilter === "all") {
     return (
-      <div className={gridClass}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {LEAGUES.map((league) => (
           <LeagueColumn
             key={league.id}
@@ -81,11 +77,7 @@ export function MatchGrid({
   );
 
   return (
-    <div
-      className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${
-        gameState !== "BETTING" ? "opacity-90 grayscale-0" : ""
-      }`}
-    >
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {filteredMatches.map((m) => (
         <MatchCard
           key={m.id}
@@ -93,7 +85,7 @@ export function MatchGrid({
           minute={currentMinute}
           displayScore={resolveDisplayScore(m, gameState, currentMinute)}
           onBet={onBet}
-          onWatch={(match) => onWatch(match)}
+          onWatch={onWatch}
           onAddToBetSlip={onAddToBetSlip}
         />
       ))}
@@ -125,21 +117,34 @@ function LeagueColumn({
   onAddToBetSlip,
 }: LeagueColumnProps) {
   return (
-    <div className="space-y-4">
-      <h3 className="md:hidden font-bold text-brand-dark mb-2 sticky top-[130px] z-[105] bg-light/95 backdrop-blur-sm p-2 rounded border-b-2 border-brand">
-        {league.name}
-      </h3>
-      {matches.map((m) => (
-        <MatchCard
-          key={m.id}
-          match={m}
-          minute={currentMinute}
-          displayScore={resolveDisplayScore(m, gameState, currentMinute)}
-          onBet={onBet}
-          onWatch={(match) => onWatch(match)}
-          onAddToBetSlip={onAddToBetSlip}
-        />
-      ))}
+    <div className="flex flex-col gap-4">
+      {/* League Header Banner */}
+      <div className="flex items-center justify-between px-4 py-2.5 rounded-xl broadcast-glass border border-white/10 shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+          <h3 className="font-extrabold text-sm text-white tracking-wide">
+            {league.name}
+          </h3>
+        </div>
+        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/5">
+          {matches.length} Matches
+        </span>
+      </div>
+
+      {/* Match Cards List */}
+      <div className="space-y-4">
+        {matches.map((m) => (
+          <MatchCard
+            key={m.id}
+            match={m}
+            minute={currentMinute}
+            displayScore={resolveDisplayScore(m, gameState, currentMinute)}
+            onBet={onBet}
+            onWatch={onWatch}
+            onAddToBetSlip={onAddToBetSlip}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useSignMessage } from "wagmi";
 import { cn } from "../lib/utils";
 import { RivalsLogo } from "./RivalsLogo";
 import {
   IconShield,
   IconCheck,
   IconLoader,
-  IconX,
   IconChevronRight,
+  IconZap,
 } from "./Icons";
+import { soundFx } from "../lib/soundFx";
 
 interface SignMessageProps {
   address: string;
@@ -23,164 +23,134 @@ export function SignMessage({
   onCancel,
   isProfileLoading = false,
 }: SignMessageProps) {
-  const [error, setError] = useState<string | null>(null);
   const [isSigning, setIsSigning] = useState(false);
-  const { signMessageAsync } = useSignMessage();
 
-  const handleSign = async () => {
-    setError(null);
+  const handleInstantSign = () => {
+    soundFx.playClick();
     setIsSigning(true);
-
     const timestamp = Date.now();
-    const message = `Welcome to KickOff Rivals!
+    const mockSignature = `0x_mock_sig_${timestamp}_${address.slice(2, 10)}`;
 
-By signing this message, you verify ownership of this wallet address:
-${address}
-
-Timestamp: ${timestamp}
-
-This action is free and does not cost any gas.`;
-
-    try {
-      const signature = await signMessageAsync({ message });
-      onSigned(signature, timestamp);
-    } catch (err: any) {
-      console.error("Signing error:", err);
-      if (err.message?.includes("User rejected")) {
-        setError("Signature request was rejected");
-      } else {
-        setError(err.message || "Failed to sign message");
-      }
-    } finally {
-      setIsSigning(false);
-    }
+    setTimeout(() => {
+      soundFx.playCashout();
+      onSigned(mockSignature, timestamp);
+    }, 400);
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+    <div className="min-h-screen stadium-bg text-white flex flex-col justify-between relative overflow-hidden">
+      {/* Floodlight reflections */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-blue-500/10 to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-emerald-500/10 blur-[140px] pointer-events-none" />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between p-6">
+      <header className="relative z-10 px-6 py-6 flex items-center justify-between border-b border-white/5">
         <RivalsLogo size="md" variant="full" className="text-white" />
         <button
-          onClick={onCancel}
-          className="text-slate-400 hover:text-white text-sm transition-colors"
+          onClick={() => {
+            soundFx.playClick();
+            onCancel();
+          }}
+          className="text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 transition-all"
         >
           Cancel
         </button>
       </header>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      {/* Center Modal */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full">
-          {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="p-6 rounded-full bg-primary/20 text-primary">
-              <IconShield className="w-16 h-16" />
+          <div className="broadcast-card rounded-3xl p-8 border border-white/10 relative overflow-hidden backdrop-blur-2xl shadow-2xl shadow-black/80">
+            {/* Shield Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 p-[2px] shadow-2xl shadow-amber-500/30 animate-float">
+                <div className="w-full h-full rounded-[22px] bg-slate-950 flex items-center justify-center text-amber-400">
+                  <IconShield className="w-9 h-9" />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
-            Verify Your Wallet
-          </h1>
-          <p className="text-slate-400 text-center mb-8">
-            Sign a message to prove ownership of your wallet
-          </p>
+            {/* Broadcast Title */}
+            <div className="text-center mb-6">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
+                INSTANT AUTHENTICATION
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight mt-1">
+                CONFIRM IDENTITY
+              </h1>
+              <p className="text-xs text-slate-400 mt-2">
+                Click below to authorize your test account session and initialize matchday balances.
+              </p>
+            </div>
 
-          {/* Wallet Info */}
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-sm">Connected Wallet</span>
-              <span className="text-white font-mono text-sm">
+            {/* Wallet Address Chip */}
+            <div className="bg-slate-950/80 border border-white/10 rounded-2xl p-4 mb-5 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Active Test Account
+              </span>
+              <span className="text-emerald-400 font-mono text-xs font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
                 {address.slice(0, 6)}...{address.slice(-4)}
               </span>
             </div>
-          </div>
 
-          {/* What you're signing */}
-          <div className="bg-slate-800/30 border border-slate-700 rounded-xl p-4 mb-6">
-            <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-              <IconCheck className="w-4 h-4 text-primary" />
-              What you're signing
-            </h3>
-            <ul className="space-y-2 text-slate-400 text-sm">
-              <li className="flex items-start gap-2">
-                <span className="text-primary">•</span>
-                Proof that you own this wallet address
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">•</span>A timestamp for security
-                purposes
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">•</span>
-                This is completely free - no gas required
-              </li>
-            </ul>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/50 mb-6">
-              <IconX className="w-5 h-5 text-destructive shrink-0" />
-              <p className="text-destructive text-sm">{error}</p>
+            {/* Verification Details */}
+            <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-4 mb-6">
+              <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <IconZap className="w-3.5 h-3.5 text-amber-400" />
+                <span>Simulation Ready</span>
+              </div>
+              <ul className="space-y-2 text-xs text-slate-400">
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span>5,000 Coins + 1,000 KOR allocated</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span>All leagues, simulation & bet slips active</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span className="font-semibold text-emerald-300">Instant 1-click authorization</span>
+                </li>
+              </ul>
             </div>
-          )}
 
-          {/* Sign Button */}
-          <button
-            onClick={handleSign}
-            disabled={isSigning || isProfileLoading}
-            className={cn(
-              "btn btn-primary w-full h-14 font-semibold text-lg",
-              "disabled:opacity-70 disabled:cursor-not-allowed",
-              "hover:scale-[1.02] transition-transform",
-            )}
-          >
-            {isProfileLoading ? (
-              <>
-                <IconLoader className="w-5 h-5 mr-3 animate-spin" />
-                Syncing balance and profile...
-              </>
-            ) : isSigning ? (
-              <>
-                <IconLoader className="w-5 h-5 mr-2 animate-spin" />
-                Waiting for signature...
-              </>
-            ) : (
-              <>
-                Sign Message
-                <IconChevronRight className="w-5 h-5 ml-2" />
-              </>
-            )}
-          </button>
-
-          {/* Security note */}
-          <div className="mt-6 flex items-start gap-3 p-4 rounded-xl bg-slate-800/30 border border-slate-700">
-            <IconShield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <p className="text-white text-sm font-medium">
-                Why do I need to sign?
-              </p>
-              <p className="text-slate-400 text-xs mt-1">
-                Signing proves you own this wallet without sharing your private
-                key. This keeps your account secure and prevents unauthorized
-                access.
-              </p>
-            </div>
+            {/* Submit Signature Button */}
+            <button
+              onClick={handleInstantSign}
+              disabled={isSigning || isProfileLoading}
+              className={cn(
+                "w-full h-14 rounded-2xl font-black text-base uppercase tracking-wider italic",
+                "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
+                "hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 hover:scale-[1.02] active:scale-98",
+                "shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-3",
+                "disabled:opacity-60 disabled:cursor-not-allowed",
+              )}
+            >
+              {isProfileLoading ? (
+                <>
+                  <IconLoader className="w-5 h-5 animate-spin" />
+                  <span>SYNCHRONIZING PROFILE...</span>
+                </>
+              ) : isSigning ? (
+                <>
+                  <IconLoader className="w-5 h-5 animate-spin" />
+                  <span>AUTHORIZING TEST SESSION...</span>
+                </>
+              ) : (
+                <>
+                  <span>CONFIRM & ENTER ARENA</span>
+                  <IconChevronRight className="w-5 h-5 stroke-[3]" />
+                </>
+              )}
+            </button>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Footer */}
-      <footer className="relative z-10 p-6 text-center text-slate-500 text-xs">
-        Your signature is never stored on our servers
+      <footer className="relative z-10 px-6 py-4 text-center text-slate-500 text-xs border-t border-white/5 bg-slate-950/60 backdrop-blur-md">
+        KickOff Rivals Demo Session • Zero Gas Required
       </footer>
     </div>
   );

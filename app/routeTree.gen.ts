@@ -41,9 +41,14 @@ import { Route as ApiMatchesUpdateResultRouteImport } from './routes/api/matches
 import { Route as ApiMatchesCurrentRouteImport } from './routes/api/matches.current'
 import { Route as ApiMatchesCreateRouteImport } from './routes/api/matches.create'
 import { Route as ApiLeaguesStandingsRouteImport } from './routes/api/leagues.standings'
+import { Route as ApiGameResetRouteImport } from './routes/api/game.reset'
 import { Route as ApiCouponsVerifyRouteImport } from './routes/api/coupons.verify'
 import { Route as ApiBetsSettleRouteImport } from './routes/api/bets.settle'
 import { Route as ApiBetsActiveRouteImport } from './routes/api/bets.active'
+import { Route as ApiAdminVerifyRouteImport } from './routes/api/admin.verify'
+import { Route as ApiAdminValidateSessionRouteImport } from './routes/api/admin.validate-session'
+import { Route as ApiAdminLogoutRouteImport } from './routes/api/admin.logout'
+import { Route as ApiAdminConfigRouteImport } from './routes/api/admin.config'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -209,6 +214,11 @@ const ApiLeaguesStandingsRoute = ApiLeaguesStandingsRouteImport.update({
   path: '/api/leagues/standings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiGameResetRoute = ApiGameResetRouteImport.update({
+  id: '/api/game/reset',
+  path: '/api/game/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCouponsVerifyRoute = ApiCouponsVerifyRouteImport.update({
   id: '/api/coupons/verify',
   path: '/api/coupons/verify',
@@ -222,6 +232,26 @@ const ApiBetsSettleRoute = ApiBetsSettleRouteImport.update({
 const ApiBetsActiveRoute = ApiBetsActiveRouteImport.update({
   id: '/api/bets/active',
   path: '/api/bets/active',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminVerifyRoute = ApiAdminVerifyRouteImport.update({
+  id: '/api/admin/verify',
+  path: '/api/admin/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminValidateSessionRoute = ApiAdminValidateSessionRouteImport.update({
+  id: '/api/admin/validate-session',
+  path: '/api/admin/validate-session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminLogoutRoute = ApiAdminLogoutRouteImport.update({
+  id: '/api/admin/logout',
+  path: '/api/admin/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminConfigRoute = ApiAdminConfigRouteImport.update({
+  id: '/api/admin/config',
+  path: '/api/admin/config',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -243,9 +273,14 @@ export interface FileRoutesByFullPath {
   '/dashboard/league': typeof DashboardLeagueRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/admin/config': typeof ApiAdminConfigRoute
+  '/api/admin/logout': typeof ApiAdminLogoutRoute
+  '/api/admin/validate-session': typeof ApiAdminValidateSessionRoute
+  '/api/admin/verify': typeof ApiAdminVerifyRoute
   '/api/bets/active': typeof ApiBetsActiveRoute
   '/api/bets/settle': typeof ApiBetsSettleRoute
   '/api/coupons/verify': typeof ApiCouponsVerifyRoute
+  '/api/game/reset': typeof ApiGameResetRoute
   '/api/leagues/standings': typeof ApiLeaguesStandingsRoute
   '/api/matches/create': typeof ApiMatchesCreateRoute
   '/api/matches/current': typeof ApiMatchesCurrentRoute
@@ -279,9 +314,14 @@ export interface FileRoutesByTo {
   '/dashboard/league': typeof DashboardLeagueRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/admin/config': typeof ApiAdminConfigRoute
+  '/api/admin/logout': typeof ApiAdminLogoutRoute
+  '/api/admin/validate-session': typeof ApiAdminValidateSessionRoute
+  '/api/admin/verify': typeof ApiAdminVerifyRoute
   '/api/bets/active': typeof ApiBetsActiveRoute
   '/api/bets/settle': typeof ApiBetsSettleRoute
   '/api/coupons/verify': typeof ApiCouponsVerifyRoute
+  '/api/game/reset': typeof ApiGameResetRoute
   '/api/leagues/standings': typeof ApiLeaguesStandingsRoute
   '/api/matches/create': typeof ApiMatchesCreateRoute
   '/api/matches/current': typeof ApiMatchesCurrentRoute
@@ -317,9 +357,14 @@ export interface FileRoutesById {
   '/dashboard/league': typeof DashboardLeagueRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/admin/config': typeof ApiAdminConfigRoute
+  '/api/admin/logout': typeof ApiAdminLogoutRoute
+  '/api/admin/validate-session': typeof ApiAdminValidateSessionRoute
+  '/api/admin/verify': typeof ApiAdminVerifyRoute
   '/api/bets/active': typeof ApiBetsActiveRoute
   '/api/bets/settle': typeof ApiBetsSettleRoute
   '/api/coupons/verify': typeof ApiCouponsVerifyRoute
+  '/api/game/reset': typeof ApiGameResetRoute
   '/api/leagues/standings': typeof ApiLeaguesStandingsRoute
   '/api/matches/create': typeof ApiMatchesCreateRoute
   '/api/matches/current': typeof ApiMatchesCurrentRoute
@@ -356,9 +401,14 @@ export interface FileRouteTypes {
     | '/dashboard/league'
     | '/dashboard/profile'
     | '/dashboard/'
+    | '/api/admin/config'
+    | '/api/admin/logout'
+    | '/api/admin/validate-session'
+    | '/api/admin/verify'
     | '/api/bets/active'
     | '/api/bets/settle'
     | '/api/coupons/verify'
+    | '/api/game/reset'
     | '/api/leagues/standings'
     | '/api/matches/create'
     | '/api/matches/current'
@@ -392,9 +442,14 @@ export interface FileRouteTypes {
     | '/dashboard/league'
     | '/dashboard/profile'
     | '/dashboard'
+    | '/api/admin/config'
+    | '/api/admin/logout'
+    | '/api/admin/validate-session'
+    | '/api/admin/verify'
     | '/api/bets/active'
     | '/api/bets/settle'
     | '/api/coupons/verify'
+    | '/api/game/reset'
     | '/api/leagues/standings'
     | '/api/matches/create'
     | '/api/matches/current'
@@ -429,9 +484,14 @@ export interface FileRouteTypes {
     | '/dashboard/league'
     | '/dashboard/profile'
     | '/dashboard/'
+    | '/api/admin/config'
+    | '/api/admin/logout'
+    | '/api/admin/validate-session'
+    | '/api/admin/verify'
     | '/api/bets/active'
     | '/api/bets/settle'
     | '/api/coupons/verify'
+    | '/api/game/reset'
     | '/api/leagues/standings'
     | '/api/matches/create'
     | '/api/matches/current'
@@ -461,9 +521,14 @@ export interface RootRouteChildren {
   SignRoute: typeof SignRoute
   WelcomeRoute: typeof WelcomeRoute
   ApiLeaderboardRoute: typeof ApiLeaderboardRoute
+  ApiAdminConfigRoute: typeof ApiAdminConfigRoute
+  ApiAdminLogoutRoute: typeof ApiAdminLogoutRoute
+  ApiAdminValidateSessionRoute: typeof ApiAdminValidateSessionRoute
+  ApiAdminVerifyRoute: typeof ApiAdminVerifyRoute
   ApiBetsActiveRoute: typeof ApiBetsActiveRoute
   ApiBetsSettleRoute: typeof ApiBetsSettleRoute
   ApiCouponsVerifyRoute: typeof ApiCouponsVerifyRoute
+  ApiGameResetRoute: typeof ApiGameResetRoute
   ApiLeaguesStandingsRoute: typeof ApiLeaguesStandingsRoute
   ApiMatchesCreateRoute: typeof ApiMatchesCreateRoute
   ApiMatchesCurrentRoute: typeof ApiMatchesCurrentRoute
@@ -707,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLeaguesStandingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/game/reset': {
+      id: '/api/game/reset'
+      path: '/api/game/reset'
+      fullPath: '/api/game/reset'
+      preLoaderRoute: typeof ApiGameResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/coupons/verify': {
       id: '/api/coupons/verify'
       path: '/api/coupons/verify'
@@ -726,6 +798,34 @@ declare module '@tanstack/react-router' {
       path: '/api/bets/active'
       fullPath: '/api/bets/active'
       preLoaderRoute: typeof ApiBetsActiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/verify': {
+      id: '/api/admin/verify'
+      path: '/api/admin/verify'
+      fullPath: '/api/admin/verify'
+      preLoaderRoute: typeof ApiAdminVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/validate-session': {
+      id: '/api/admin/validate-session'
+      path: '/api/admin/validate-session'
+      fullPath: '/api/admin/validate-session'
+      preLoaderRoute: typeof ApiAdminValidateSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/logout': {
+      id: '/api/admin/logout'
+      path: '/api/admin/logout'
+      fullPath: '/api/admin/logout'
+      preLoaderRoute: typeof ApiAdminLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/config': {
+      id: '/api/admin/config'
+      path: '/api/admin/config'
+      fullPath: '/api/admin/config'
+      preLoaderRoute: typeof ApiAdminConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -765,9 +865,14 @@ const rootRouteChildren: RootRouteChildren = {
   SignRoute: SignRoute,
   WelcomeRoute: WelcomeRoute,
   ApiLeaderboardRoute: ApiLeaderboardRoute,
+  ApiAdminConfigRoute: ApiAdminConfigRoute,
+  ApiAdminLogoutRoute: ApiAdminLogoutRoute,
+  ApiAdminValidateSessionRoute: ApiAdminValidateSessionRoute,
+  ApiAdminVerifyRoute: ApiAdminVerifyRoute,
   ApiBetsActiveRoute: ApiBetsActiveRoute,
   ApiBetsSettleRoute: ApiBetsSettleRoute,
   ApiCouponsVerifyRoute: ApiCouponsVerifyRoute,
+  ApiGameResetRoute: ApiGameResetRoute,
   ApiLeaguesStandingsRoute: ApiLeaguesStandingsRoute,
   ApiMatchesCreateRoute: ApiMatchesCreateRoute,
   ApiMatchesCurrentRoute: ApiMatchesCurrentRoute,

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { useSignMessage } from "wagmi";
 import { useGame } from "../../contexts/GameContext";
 import { useProfile } from "../../hooks/useProfile";
 import { CONVERSION_RATE } from "../../constants";
@@ -23,6 +24,7 @@ const API_URL = "";
  */
 export function DashboardModals() {
   const { profile, refresh: refreshProfile } = useProfile();
+  const { signMessageAsync } = useSignMessage();
   const {
     showWallet,
     setShowWallet,
@@ -37,6 +39,7 @@ export function DashboardModals() {
     bettingOn,
     setBettingOn,
     matches,
+    gameState,
     setBalance,
     addTransaction,
     getCurrentGameMinute,
@@ -74,9 +77,31 @@ export function DashboardModals() {
 
       {showSwapConfirm && (
         <SwapConfirm
-          coins={profile.coins}
+          korBalance={profile.korBalance}
           onConfirm={async (amount: number) => {
             try {
+              // Sign wallet conversion message
+              try {
+                const message = `KickOff Rivals - Convert KOR to Coins
+
+Account: ${profile.walletAddress}
+Convert: ${amount.toLocaleString()} KOR
+Receive: ${(amount * 10).toLocaleString()} Coins
+Timestamp: ${Date.now()}
+
+Authorize converting your KOR reward tokens into Game Coins.
+This action does not cost gas.`;
+
+                await signMessageAsync({ message });
+              } catch (signErr: any) {
+                if (signErr.message?.includes("User rejected") || signErr.message?.includes("User denied")) {
+                  alert("Signature request was cancelled");
+                  setShowSwapConfirm(false);
+                  return;
+                }
+                console.warn("Wallet sign skipped or mock wallet active:", signErr);
+              }
+
               const res = await fetch(`${API_URL}/api/user/convert-coins`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -90,7 +115,7 @@ export function DashboardModals() {
                 // Refresh profile to pick up new balances
                 refreshProfile();
                 setBalance(data.korBalance);
-                addTransaction("convert", amount, "coins", "Swapped for KOR");
+                addTransaction("convert", amount * 10, "coins", `Swapped ${amount} KOR for Coins`);
               } else {
                 alert("Swap failed: " + data.error);
               }
@@ -106,7 +131,7 @@ export function DashboardModals() {
       {watchingMatchId && matches.find((m) => m.id === watchingMatchId) && (
         <SimulationScreen
           match={matches.find((m) => m.id === watchingMatchId)!}
-          result={matches.find((m) => m.id === watchingMatchId)!.result!}
+          result={matches.find((m) => m.id === watchingMatchId)?.result}
           currentMinute={getCurrentGameMinute()}
           onFinish={() => setWatchingMatchId(null)}
         />
@@ -115,7 +140,7 @@ export function DashboardModals() {
       {bettingOn && (
         <BetModal
           match={bettingOn}
-          balance={profile.korBalance}
+          balance={profile.coins}
           onClose={() => setBettingOn(null)}
           onPlaceBet={handleBetPlacement}
         />
@@ -151,7 +176,8 @@ export function DashboardModals() {
 
       <BetSlip
         selections={betSlipSelections}
-        balance={profile.korBalance}
+        balance={profile.coins}
+        gameState={gameState}
         onRemoveSelection={handleRemoveFromBetSlip}
         onClearAll={handleClearBetSlip}
         onPlaceBet={handlePlaceBetSlip}

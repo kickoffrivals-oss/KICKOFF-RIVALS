@@ -73,6 +73,8 @@ export interface Bet {
   potentialReturn: number;
   status: 'pending' | 'won' | 'lost';
   timestamp: number;
+  settledAt?: number;
+  createdAt?: Date | string | number;
   txHash: string;
   betType?: 'single' | 'accumulator';  // Type of bet
   accumulatorId?: string;              // Group ID for accumulator bets
@@ -80,6 +82,7 @@ export interface Bet {
   awayTeamName?: string;
   homeScore?: number | null;
   awayScore?: number | null;
+  walletAddress?: string;
 }
 
 export interface BetSlipSelection {
@@ -132,7 +135,7 @@ export interface DailyQuest {
   };
   verificationTime?: number; // milliseconds before verification completes
   verifiedAt?: number; // timestamp when verification was completed
-  category?: 'social' | 'gameplay' | 'betting';
+  category?: 'social' | 'gameplay' | 'betting' | 'partners';
   requiresVerification?: boolean;
   verificationPlaceholder?: string;
   verificationType?: 'username' | 'link';

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getLeagueStandings } from "../../server/matches";
+import { getLocalStandings } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/leagues/standings")({
   server: {
@@ -18,15 +19,23 @@ export const Route = createFileRoute("/api/leagues/standings")({
             },
           });
 
-          return Response.json(result);
+          if (result && result.success) {
+            return Response.json(result);
+          }
+          throw new Error("DB standings failed");
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Standings API error:", error);
-          return Response.json(
-            { success: false, error: errorMessage, standings: [] },
-            { status: 500 },
-          );
+          console.warn("[Standings API] Using local in-memory fallback");
+          const l1 = getLocalStandings("l1");
+          const l2 = getLocalStandings("l2");
+          const l3 = getLocalStandings("l3");
+          return Response.json({
+            success: true,
+            standings: {
+              l1: l1.standings,
+              l2: l2.standings,
+              l3: l3.standings,
+            },
+          });
         }
       },
     },

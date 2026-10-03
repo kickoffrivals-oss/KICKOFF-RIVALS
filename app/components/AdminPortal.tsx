@@ -710,6 +710,31 @@ export function AdminPortal({
               </div>
 
               <button
+                onClick={async () => {
+                  if (confirm("Reset local game data back to Round 1 with fresh balances?")) {
+                    setIsLoading(true);
+                    try {
+                      const res = await fetch("/api/game/reset", { method: "POST" });
+                      const data = await res.json();
+                      if (data.success) {
+                        alert("Game data reset to Round 1! Reloading page...");
+                        window.location.reload();
+                      }
+                    } catch (e) {
+                      alert("Reset failed: " + e);
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }
+                }}
+                disabled={isLoading}
+                className="btn btn-outline w-full h-11 text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+              >
+                <IconRefresh className="w-4 h-4 mr-2" />
+                Reset Game State to Round 1
+              </button>
+
+              <button
                 onClick={onClose}
                 className="btn btn-outline w-full h-11 text-destructive hover:bg-destructive/10"
               >

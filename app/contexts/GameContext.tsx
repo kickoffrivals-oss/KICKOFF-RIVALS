@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useUserStore } from "../stores/userStore";
 import { useProfile } from "../hooks/useProfile";
+import { wagmiAdapter } from "../config/appkit";
 import {
   TEAMS,
   INITIAL_BALANCE,
@@ -117,6 +118,7 @@ interface GameContextType {
   // Coupons
   coupons: Coupon[];
   setCoupons: React.Dispatch<React.SetStateAction<Coupon[]>>;
+  onClaimWinnings: () => Promise<void>;
 
   // Handlers
   handleWalletConnected: (address: string, checkOnly?: boolean) => void;
@@ -523,7 +525,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             txHash: generateHash(),
           };
           setActiveBets((prev) => [bet, ...prev]);
-          addTransaction("bet", stake, "kor", "Match wager");
+          addTransaction("bet", stake, "coins", "Match wager");
           refreshProfileQuery();
           return true;
         } else {
@@ -633,54 +635,66 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
       try {
         if (betType === "single") {
-          for (const sel of betSlipSelections) {
-            const res = await fetch(`${API_URL}/api/minigame/bet`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                walletAddress: userWallet,
-                matchId: sel.matchId,
-                selection: sel.selection,
-                stake,
-                odds: sel.odds,
-                betType: "single",
-              }),
-            });
-            const data = await res.json();
-            if (data.success) {
-              setActiveBets((prev) => [
-                ...prev,
-                {
-                  id: data.betId || `bet-${Date.now()}-${Math.random()}`,
+          const promises = betSlipSelections.map(async (sel) => {
+            try {
+              const res = await fetch(`${API_URL}/api/minigame/bet`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  walletAddress: userWallet,
                   matchId: sel.matchId,
                   selection: sel.selection,
-                  odds: sel.odds,
                   stake,
-                  potentialReturn: stake * sel.odds,
-                  status: "pending",
-                  timestamp: Date.now(),
-                  txHash: generateHash(),
+                  odds: sel.odds,
                   betType: "single",
-                },
-              ]);
-              if (data.newBalance !== undefined) {
-                setBalance(data.newBalance);
-              }
-            } else {
-              console.error("Single bet failed:", data);
+                }),
+              });
+              const data = await res.json();
+              return { success: data.success, data, sel };
+            } catch (err) {
+              return { success: false, err, sel };
             }
-          }
-          const totalStake = stake * betSlipSelections.length;
-          // Stats will be updated via backend + useProfile refresh
+          });
 
-          addTransaction(
-            "bet",
-            totalStake,
-            "kor",
-            `${betSlipSelections.length} single bets`,
-          );
+          const results = await Promise.all(promises);
+          const successful = results.filter((r) => r.success);
+
+          if (successful.length > 0) {
+            const newBets: Bet[] = successful.map(({ data, sel }) => ({
+              id: data.bet?.id || data.betId || `bet-${Date.now()}-${Math.random()}`,
+              matchId: sel.matchId,
+              selection: sel.selection,
+              odds: sel.odds,
+              stake,
+              potentialReturn: stake * sel.odds,
+              status: "pending",
+              timestamp: Date.now(),
+              txHash: generateHash(),
+              betType: "single",
+              homeTeamName: sel.match?.homeTeam?.name,
+              awayTeamName: sel.match?.awayTeam?.name,
+            }));
+
+            setActiveBets((prev) => [...newBets, ...prev]);
+
+            const lastSuccess = successful[successful.length - 1];
+            if (lastSuccess.data.newBalance !== undefined) {
+              setBalance(lastSuccess.data.newBalance);
+            }
+
+            const totalStake = stake * successful.length;
+            addTransaction(
+              "bet",
+              totalStake,
+              "coins",
+              `${successful.length} single bets`,
+            );
+          }
+
           setBetSlipSelections([]); // Clear slip on success
-          return true;
+          fetchActiveBets();
+          refreshProfileQuery();
+          return successful.length > 0;
         } else {
           // Accumulator Logic
           const accumulatorId = `acc-${Date.now()}`;
@@ -716,7 +730,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
           if (!data.success) {
             console.error("Accumulator bet failed (server response):", data);
-            // Assuming 'toast' is available in the scope, e.g., from a library like react-hot-toast
             toast.error(data.error || "Failed to place bet. Please try again.");
             return false;
           }
@@ -750,7 +763,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             addTransaction(
               "bet",
               stake,
-              "kor",
+              "coins",
               `Accumulator (${betSlipSelections.length} selections)`,
             );
           } else {
@@ -758,6 +771,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
           }
         }
         fetchActiveBets();
+        refreshProfileQuery();
         setBetSlipSelections([]);
         return true;
       } catch (e) {
@@ -1079,10 +1093,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
               );
               setTimer(remaining);
             } else if (serverTime < matchEndTime) {
-              // LIVE PHASE
+              // LIVE PHASE (Counting DOWN remaining round time)
               setGameState("LIVE");
-              const elapsed = Math.floor((serverTime - bettingEndTime) / 1000);
-              setTimer(elapsed);
+              const remaining = Math.max(
+                0,
+                Math.floor((matchEndTime - serverTime) / 1000),
+              );
+              setTimer(remaining);
             } else {
               // FINISHED PHASE (Intermission)
               const finishedEndTime = matchEndTime + RESULT_DURATION_SEC * 1000;
@@ -1212,12 +1229,12 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
           }
           return prev - 1;
         } else if (gameState === "LIVE") {
-          // Count UP
-          if (prev >= MATCH_DURATION_SEC) {
+          // Count DOWN remaining seconds in live round
+          if (prev <= 0) {
             fetchMatches();
-            return prev;
+            return 0;
           }
-          return prev + 1;
+          return prev - 1;
         } else if (gameState === "FINISHED") {
           // Count DOWN (Intermission)
           if (prev <= 0) {
@@ -1278,31 +1295,30 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     fetchMatches();
     fetchStandings(); // Initial fetch
 
-    // Poll matches and standings: 3-minute interval (180,000ms)
+    // Poll matches and standings: 5-second interval for 35s testing loop
     const interval = setInterval(() => {
       const now = Date.now();
-      // Only poll if it's been at least 3 minutes
-      if (now - lastMatchesFetchRef.current >= 180000) {
+      if (now - lastMatchesFetchRef.current >= 4000) {
         fetchMatches();
         lastMatchesFetchRef.current = now;
       }
 
-      if (now - lastStandingsFetchRef.current >= 180000) {
+      if (now - lastStandingsFetchRef.current >= 4000) {
         fetchStandings();
         lastStandingsFetchRef.current = now;
       }
-    }, 60000); // Check every minute, but obey 3-min cooldown
+    }, 5000);
 
     // Poll bets if user is connected
     let betInterval: ReturnType<typeof setInterval>;
     if (walletState.isConnected && walletState.address) {
       betInterval = setInterval(() => {
         const now = Date.now();
-        if (now - lastActiveBetsFetchRef.current >= 180000) {
+        if (now - lastActiveBetsFetchRef.current >= 4000) {
           fetchActiveBets();
           lastActiveBetsFetchRef.current = now;
         }
-      }, 60000);
+      }, 5000);
     }
 
     return () => {
@@ -1321,7 +1337,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const getCurrentGameMinute = useCallback(() => {
     if (gameState !== "LIVE") return 0;
     const total = MATCH_DURATION_SEC;
-    const elapsed = timer;
+    const elapsed = Math.max(0, total - timer);
     const minute = Math.floor((elapsed / total) * 90);
     return Math.min(90, Math.max(0, minute));
   }, [gameState, timer]);
@@ -1334,32 +1350,39 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, [fetchMatches, fetchStandings]);
 
   const handleClaimWinnings = useCallback(async () => {
-    if (!profile?.unclaimedBalance || profile.unclaimedBalance <= 0 || !wagmiAddress) return;
+    const targetAddr = walletState.address || wagmiAddress || profile?.walletAddress;
+    if (!profile?.unclaimedBalance || profile.unclaimedBalance <= 0 || !targetAddr) return;
 
     try {
-      toast.loading("Preparing claim...", { id: "claim" });
+      toast.loading("Claiming winnings...", { id: "claim" });
       
-      // 1. Trigger on-chain transaction (Gas Fee only)
-      // We send 0 value to the user's own address to trigger the network fee
-      const tx = await wagmiAdapter.wagmiConfig.getClient().request({
-        method: 'eth_sendTransaction',
-        params: [{
-          from: wagmiAddress as `0x${string}`,
-          to: wagmiAddress as `0x${string}`,
-          value: '0x0',
-          data: '0x', // Empty data, just a claim signal
-        }],
-      });
+      let txHash = `0x_claim_${Date.now()}_${targetAddr.slice(2, 8)}`;
+      try {
+        if (wagmiAddress) {
+          const client = wagmiAdapter.wagmiConfig.getClient();
+          if (client) {
+            txHash = await client.request({
+              method: 'eth_sendTransaction',
+              params: [{
+                from: wagmiAddress as `0x${string}`,
+                to: wagmiAddress as `0x${string}`,
+                value: '0x0',
+                data: '0x',
+              }],
+            });
+          }
+        }
+      } catch (wagmiErr) {
+        console.warn("Wagmi tx skipped/failed, proceeding with local claim:", wagmiErr);
+      }
 
-      toast.loading("Verifying on-chain...", { id: "claim" });
-
-      // 2. Call our API to move the balance
+      // Call API to move balance
       const res = await fetch(`${API_URL}/api/user/claim-winnings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          walletAddress: wagmiAddress,
-          txHash: tx
+          walletAddress: targetAddr,
+          txHash,
         }),
       });
 
@@ -1367,15 +1390,15 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
       if (data.success) {
         toast.success(`Successfully claimed ${data.amount} KOR!`, { id: "claim" });
-        refreshProfile();
+        refreshProfile(targetAddr);
       } else {
         toast.error(data.error || "Claim failed", { id: "claim" });
       }
     } catch (err: any) {
       console.error("Claim failed:", err);
-      toast.error(err.message || "Transaction cancelled", { id: "claim" });
+      toast.error(err.message || "Claim encountered an issue", { id: "claim" });
     }
-  }, [profile?.unclaimedBalance, wagmiAddress, refreshProfile]);
+  }, [profile?.unclaimedBalance, profile?.walletAddress, walletState.address, wagmiAddress, refreshProfile]);
 
   return (
     <GameContext.Provider

@@ -732,9 +732,9 @@ export const placeBet = createServerFn({ method: "POST" })
         return { success: false, error: "User not found" };
       }
 
-      // Check balance
-      if ((user.doodlBalance || 0) < data.stake) {
-        return { success: false, error: "Insufficient balance" };
+      // Check balance (Coins)
+      if ((user.coins || 0) < data.stake) {
+        return { success: false, error: "Insufficient Coins balance" };
       }
 
       // Check match exists and is open for betting
@@ -775,12 +775,12 @@ export const placeBet = createServerFn({ method: "POST" })
         txHash: `0x${Math.random().toString(16).substring(2)}`,
       });
 
-      // Deduct balance
-      const newBalance = (user.doodlBalance || 0) - data.stake;
+      // Deduct coins balance immediately upon placing bet
+      const newCoins = (user.coins || 0) - data.stake;
       await db
         .update(users)
         .set({
-          doodlBalance: newBalance,
+          coins: newCoins,
           totalBets: (user.totalBets || 0) + 1,
         })
         .where(eq(users.walletAddress, normalized));
@@ -791,14 +791,14 @@ export const placeBet = createServerFn({ method: "POST" })
         walletAddress: normalized,
         type: "bet",
         amount: -data.stake,
-        currency: "kor",
+        currency: "coins",
         description: `Bet on ${data.selection} @ ${data.odds}`,
       });
 
       return {
         success: true,
         bet: { id: betId },
-        newBalance,
+        newBalance: newCoins,
       };
     } catch (error: any) {
       console.error("Failed to place bet:", error);
@@ -839,9 +839,9 @@ export const placeAccumulatorBet = createServerFn({ method: "POST" })
         return { success: false, error: "User not found" };
       }
 
-      // Check balance
-      if ((user.doodlBalance || 0) < data.stake) {
-        return { success: false, error: "Insufficient balance" };
+      // Check balance (Coins)
+      if ((user.coins || 0) < data.stake) {
+        return { success: false, error: "Insufficient Coins balance" };
       }
 
       const potentialReturn = Math.floor(data.stake * data.totalOdds);
@@ -863,14 +863,14 @@ export const placeAccumulatorBet = createServerFn({ method: "POST" })
 
       await db.insert(bets).values(betValues);
 
-      // Deduct balance
-      const newBalance = (user.doodlBalance || 0) - data.stake;
-      console.log(`[ACCUMULATOR] Deducting stake ${data.stake} from ${user.doodlBalance}. New Balance: ${newBalance}`);
+      // Deduct coins balance immediately upon placing bet
+      const newCoins = (user.coins || 0) - data.stake;
+      console.log(`[ACCUMULATOR] Deducting stake ${data.stake} from ${user.coins} coins. New Balance: ${newCoins}`);
 
       await db
         .update(users)
         .set({
-          doodlBalance: newBalance,
+          coins: newCoins,
           totalBets: (user.totalBets || 0) + 1,
         })
         .where(eq(users.walletAddress, normalized));
@@ -883,14 +883,14 @@ export const placeAccumulatorBet = createServerFn({ method: "POST" })
         walletAddress: normalized,
         type: "bet",
         amount: -data.stake,
-        currency: "kor",
+        currency: "coins",
         description: `Accumulator bet (${data.selections.length} selections) @ ${data.totalOdds.toFixed(2)}`,
       });
 
       return {
         success: true,
         accumulatorId: data.accumulatorId,
-        newBalance,
+        newBalance: newCoins,
       };
     } catch (error: any) {
       console.error("Failed to place accumulator:", error);

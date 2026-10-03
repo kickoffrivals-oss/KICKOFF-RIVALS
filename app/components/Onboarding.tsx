@@ -11,6 +11,7 @@ import {
   IconUsers,
   IconZap,
 } from "./Icons";
+import { soundFx } from "../lib/soundFx";
 
 interface OnboardingProps {
   onFinish: (username: string) => void;
@@ -18,6 +19,7 @@ interface OnboardingProps {
 
 interface OnboardingStep {
   id: number;
+  badge: string;
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -27,75 +29,66 @@ interface OnboardingStep {
 const infoSteps: OnboardingStep[] = [
   {
     id: 1,
-    title: "Welcome to KickOff Rivals",
+    badge: "ARENA OVERVIEW",
+    title: "The Ultimate Matchday Engine",
     description:
-      "The ultimate virtual football betting experience. Place bets, watch live matches, and win big!",
-    icon: <IconFootball className="w-16 h-16" />,
+      "Predict continuous 3-phase matchdays with compressed 90-minute live radar pitch simulations, dynamic combo multipliers, and instant settlements.",
+    icon: <IconFootball className="w-14 h-14 text-emerald-400" />,
     features: [
-      "Real-time match simulations",
-      "Multiple betting markets",
-      "24/7 matches available",
+      "Real-time 2D radar pitch with ball & player telemetry",
+      "Dynamic 1X2 & Both Teams Score (GG/NG) markets",
+      "Non-stop round cycles running 24/7",
     ],
   },
   {
     id: 2,
-    title: "Earn KOR Tokens",
+    badge: "REWARD ECONOMY",
+    title: "Earn Coins & KOR Tokens",
     description:
-      "Win bets to earn KOR tokens. Convert your coins to tokens and climb the leaderboards!",
-    icon: <IconCoins className="w-16 h-16" />,
+      "Win predictions to collect KOR token rewards. Complete daily 4-hour check-in grants and convert coins for competitive staking.",
+    icon: <IconCoins className="w-14 h-14 text-amber-400" />,
     features: [
-      "Win bets to earn rewards",
-      "Daily quests for bonus coins",
-      "Convert coins to KOR tokens",
+      "5,000 Coins + 1,000 KOR Starter Grant",
+      "4-Hourly Free Stadium Bonus Grants",
+      "Transparent decentralized balance management",
     ],
   },
   {
     id: 3,
-    title: "Join an Alliance",
+    badge: "TEAM ALLIANCES",
+    title: "Draft Your Club Alliance",
     description:
-      "Pick your favorite team and league. Earn alliance rewards when your team wins!",
-    icon: <IconUsers className="w-16 h-16" />,
+      "Choose your favorite club in the Premier Division, La Liga, Serie A, or European Champions League. Earn alliance bonuses when your squad wins!",
+    icon: <IconUsers className="w-14 h-14 text-blue-400" />,
     features: [
-      "Support your favorite team",
-      "Earn alliance bonuses",
-      "Compete with other alliances",
+      "Support premier European clubs",
+      "Earn collaborative alliance points & bonuses",
+      "Climb the global club league standings",
     ],
   },
   {
     id: 4,
-    title: "Complete Quests",
+    badge: "OBJECTIVES & PASS",
+    title: "Daily & Weekly Quests",
     description:
-      "Daily and weekly quests give you bonus coins. Complete them all to maximize your earnings!",
-    icon: <IconTrophy className="w-16 h-16" />,
+      "Complete matchday missions, referral targets, and community tasks to unlock coin bounties and level up your Manager Passport.",
+    icon: <IconTrophy className="w-14 h-14 text-yellow-400" />,
     features: [
-      "Daily quest rewards",
-      "Weekly challenge bonuses",
-      "Social tasks for extra coins",
-    ],
-  },
-  {
-    id: 5,
-    title: "Ready to Play!",
-    description:
-      "You're all set! Connect your wallet to start betting and winning. Good luck!",
-    icon: <IconZap className="w-16 h-16" />,
-    features: [
-      "5000 welcome coins bonus",
-      "Free first-time referral rewards",
-      "Instant betting - no delays",
+      "Daily betting & victory quests",
+      "Weekly accumulator combo challenges",
+      "Direct referral reward multipliers",
     ],
   },
 ];
 
-// Total steps = info slides + username step at the end
-const TOTAL_STEPS = infoSteps.length + 1; // last step is username
+const TOTAL_STEPS = infoSteps.length + 1; // Last step is Manager Name input
 
 export function Onboarding({ onFinish }: OnboardingProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [username, setUsername] = useState("");
   const [usernameError, setUsernameError] = useState<string | null>(null);
 
-  const isUsernameStep = currentStep === infoSteps.length; // last step
+  const isUsernameStep = currentStep === infoSteps.length;
   const isFirstStep = currentStep === 0;
   const step = isUsernameStep ? null : infoSteps[currentStep];
 
@@ -109,13 +102,14 @@ export function Onboarding({ onFinish }: OnboardingProps) {
   };
 
   const handleNext = () => {
+    soundFx.playClick();
     if (isUsernameStep) {
-      // Final step — validate and finish
       const err = validateUsername(username);
       if (err) {
         setUsernameError(err);
         return;
       }
+      soundFx.playWhistle();
       onFinish(username.trim());
     } else {
       setCurrentStep((prev) => prev + 1);
@@ -123,167 +117,150 @@ export function Onboarding({ onFinish }: OnboardingProps) {
   };
 
   const handlePrev = () => {
+    soundFx.playClick();
     if (!isFirstStep) {
       setCurrentStep((prev) => prev - 1);
     }
   };
 
   const handleSkip = () => {
-    // Skip info slides — jump straight to username step
+    soundFx.playClick();
     setCurrentStep(infoSteps.length);
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      {/* Animated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+    <div className="min-h-screen stadium-bg text-white overflow-x-hidden flex flex-col justify-between relative">
+      {/* Floodlights */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-blue-500/10 to-transparent blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-amber-500/10 blur-[140px]" />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between p-6">
-        <RivalsLogo size="sm" variant="full" className="text-white" />
+      <header className="relative z-10 px-6 py-6 flex items-center justify-between border-b border-white/5">
+        <RivalsLogo size="md" variant="full" className="text-white" />
         {!isUsernameStep && (
           <button
             onClick={handleSkip}
-            className="text-slate-400 hover:text-white text-sm transition-colors"
+            className="text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 transition-all"
           >
-            Skip
+            Skip Intro
           </button>
         )}
       </header>
 
-      {/* Progress dots */}
-      <div className="relative z-10 flex items-center justify-center gap-2 pt-2">
+      {/* Progress Dots */}
+      <div className="relative z-10 flex items-center justify-center gap-2 pt-6">
         {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
           <div
             key={index}
             className={cn(
-              "rounded-full transition-all duration-300",
+              "h-1.5 rounded-full transition-all duration-300",
               index === currentStep
-                ? "w-8 h-2 bg-primary"
+                ? "w-8 bg-gradient-to-r from-emerald-400 to-teal-300 shadow-md shadow-emerald-500/40"
                 : index < currentStep
-                  ? "w-2 h-2 bg-primary/50"
-                  : "w-2 h-2 bg-slate-600",
+                  ? "w-3 bg-emerald-500/40"
+                  : "w-3 bg-slate-800",
             )}
           />
         ))}
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
-        {/* INFO STEPS */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8 max-w-lg mx-auto w-full">
+        {/* Info Slide Card */}
         {step && (
-          <div
-            className="max-w-md w-full text-center animate-fade-in"
-            key={step.id}
-          >
+          <div className="broadcast-card rounded-3xl p-7 sm:p-8 border border-white/10 text-center w-full shadow-2xl relative overflow-hidden animate-slide-up" key={step.id}>
             {/* Icon */}
-            <div className="flex justify-center mb-6">
-              <div className="p-6 rounded-full bg-primary/20 text-primary">
-                {step.icon}
-              </div>
+            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-tr from-emerald-500/30 via-slate-900 to-slate-950 p-[2px] border border-white/10 flex items-center justify-center shadow-xl shadow-emerald-500/10 animate-float">
+              {step.icon}
             </div>
 
-            {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-white mb-4">
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400 block mb-1">
+              {step.badge}
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight mb-3">
               {step.title}
-            </h1>
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6 font-medium">
+              {step.description}
+            </p>
 
-            {/* Description */}
-            <p className="text-slate-400 mb-8">{step.description}</p>
-
-            {/* Features */}
-            <div className="space-y-3 mb-8">
-              {step.features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 bg-slate-800/50 rounded-lg p-3 border border-slate-700"
-                >
-                  <div className="shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                    <IconCheck className="w-4 h-4 text-primary" />
+            {/* Features Checkpoints */}
+            <div className="space-y-2.5 mb-6 text-left">
+              {step.features.map((feat, i) => (
+                <div key={i} className="flex items-center gap-3 bg-slate-950/70 border border-white/5 rounded-xl p-3">
+                  <div className="w-5 h-5 rounded-md bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                    <IconCheck className="w-3.5 h-3.5 stroke-[3]" />
                   </div>
-                  <span className="text-slate-300 text-sm text-left">
-                    {feature}
-                  </span>
+                  <span className="text-xs text-slate-300 font-semibold">{feat}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* USERNAME STEP */}
+        {/* Username Setup Card */}
         {isUsernameStep && (
-          <div className="max-w-md w-full animate-fade-in">
-            <div className="flex justify-center mb-6">
-              <div className="p-5 rounded-full bg-primary/20 text-primary">
-                <IconUsers className="w-14 h-14" />
+          <div className="broadcast-card rounded-3xl p-7 sm:p-8 border border-white/10 text-center w-full shadow-2xl relative overflow-hidden animate-slide-up">
+            <div className="w-20 h-20 mx-auto mb-5 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-300 p-[2px] shadow-xl shadow-amber-500/20 flex items-center justify-center">
+              <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-amber-400">
+                <IconZap className="w-10 h-10" />
               </div>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-bold text-white text-center mb-2">
-              Choose Your Name
-            </h1>
-            <p className="text-slate-400 text-center mb-8">
-              This is how other players will see you on KickOff Rivals
+            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-amber-400 block mb-1">
+              MANAGER CALL-SIGN
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight mb-2">
+              DRAFT YOUR IDENTITY
+            </h2>
+            <p className="text-xs text-slate-300 leading-relaxed mb-6">
+              Choose your public manager name to appear on global leaderboards and matchday telemetry.
             </p>
 
-            <div className="space-y-4">
-              <div>
-                <input
-                  id="onboarding-username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value);
-                    if (usernameError) setUsernameError(null);
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && handleNext()}
-                  placeholder="e.g. GoalKing99"
-                  maxLength={20}
-                  autoFocus
-                  className={cn(
-                    "w-full h-14 px-4 rounded-xl border bg-slate-800 text-white text-lg",
-                    "placeholder:text-slate-500 outline-none transition-all",
-                    usernameError
-                      ? "border-red-500 focus:border-red-400"
-                      : "border-slate-600 focus:border-primary",
-                  )}
-                />
-                {usernameError ? (
-                  <p className="text-red-400 text-sm mt-2">{usernameError}</p>
-                ) : (
-                  <p className="text-slate-500 text-xs mt-2">
-                    3–20 characters · letters, numbers, underscores only
-                  </p>
+            <div className="space-y-3 mb-6">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (usernameError) setUsernameError(null);
+                }}
+                onKeyDown={(e) => e.key === "Enter" && handleNext()}
+                placeholder="e.g. Tactician_99"
+                maxLength={20}
+                autoFocus
+                className={cn(
+                  "w-full h-14 px-4 rounded-2xl border bg-slate-950 text-white text-base font-bold",
+                  "placeholder:text-slate-500 outline-none transition-all",
+                  usernameError
+                    ? "border-red-500 focus:border-red-400"
+                    : "border-white/10 focus:border-emerald-400"
                 )}
+              />
+
+              <div className="flex items-center justify-between text-xs px-1">
+                <span className="text-slate-500">3–20 characters • Letters/Numbers/Underscore</span>
+                <span className="text-slate-400 font-mono font-bold">{username.length}/20</span>
               </div>
 
-              {/* Character count */}
-              <div className="flex justify-end">
-                <span
-                  className={cn(
-                    "text-xs tabular-nums",
-                    username.length > 18 ? "text-yellow-400" : "text-slate-500",
-                  )}
-                >
-                  {username.length}/20
-                </span>
-              </div>
+              {usernameError && (
+                <p className="text-red-400 text-xs text-left font-semibold">{usernameError}</p>
+              )}
             </div>
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="flex items-center gap-4 w-full max-w-md mt-6">
+        {/* Action Controls */}
+        <div className="flex items-center gap-3 w-full mt-6">
           {!isFirstStep && (
             <button
               onClick={handlePrev}
-              className="btn btn-ghost h-12 px-6 text-slate-400 hover:text-white"
+              className="h-13 px-5 rounded-2xl border border-white/10 bg-slate-900/60 hover:bg-white/5 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1"
             >
-              <IconChevronLeft className="w-5 h-5 mr-1" />
-              Back
+              <IconChevronLeft className="w-4 h-4" />
+              <span>Back</span>
             </button>
           )}
 
@@ -291,32 +268,30 @@ export function Onboarding({ onFinish }: OnboardingProps) {
             onClick={handleNext}
             disabled={isUsernameStep && username.trim().length < 3}
             className={cn(
-              "btn btn-primary h-12 flex-1 font-semibold",
-              "hover:scale-105 transition-transform",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+              "h-13 flex-1 rounded-2xl font-black text-xs uppercase tracking-wider italic transition-all duration-300",
+              "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
+              "hover:from-emerald-400 hover:to-teal-300 hover:scale-[1.02] active:scale-98 shadow-xl shadow-emerald-500/25",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2",
             )}
           >
             {isUsernameStep ? (
               <>
-                Let's Go
-                <IconZap className="w-5 h-5 ml-2" />
+                <span>PROCEED TO CLUB DRAFT</span>
+                <IconZap className="w-4 h-4 fill-slate-950" />
               </>
             ) : (
               <>
-                Next
-                <IconChevronRight className="w-5 h-5 ml-1" />
+                <span>CONTINUE</span>
+                <IconChevronRight className="w-4 h-4 stroke-[3]" />
               </>
             )}
           </button>
         </div>
-      </div>
+      </main>
 
       {/* Footer */}
-      <footer className="relative z-10 p-6 text-center text-slate-500 text-xs">
-        Step {currentStep + 1} of {TOTAL_STEPS}
-        {isUsernameStep && (
-          <span className="text-primary font-medium"> · Almost there!</span>
-        )}
+      <footer className="relative z-10 px-6 py-4 text-center text-slate-500 text-xs border-t border-white/5 bg-slate-950/60 backdrop-blur-md">
+        Step {currentStep + 1} of {TOTAL_STEPS} • KickOff Rivals Manager Academy
       </footer>
     </div>
   );

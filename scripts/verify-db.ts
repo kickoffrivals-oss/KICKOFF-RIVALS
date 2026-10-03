@@ -8,7 +8,8 @@ const connectionString = process.env.DATABASE_URL;
 
 const pool = new pg.Pool({
     connectionString,
-    ssl: { rejectUnauthorized: false },
+    ssl: false,
+    connectionTimeoutMillis: 5000,
 });
 
 async function check() {

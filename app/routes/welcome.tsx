@@ -28,16 +28,24 @@ function WelcomeRoute() {
     );
   }
 
-  if (!profile) return null;
+  if (!profile || profile.success === false) {
+    return (
+      <ReturningUserWelcome
+        username={profile?.username || "Player"}
+        totalBets={profile?.totalBets ?? 0}
+        wins={profile?.wins ?? 0}
+        korBalance={profile?.korBalance ?? 0}
+        onProceed={handleProceed}
+      />
+    );
+  }
 
-  // Optional: show new user welcome if storeIsNewUser is true
-  // For now, consistent with existing logic (returning welcome)
   return (
     <ReturningUserWelcome
-      username={profile.username}
-      totalBets={profile.totalBets}
-      wins={profile.wins}
-      korBalance={profile.korBalance}
+      username={profile.username || "Player"}
+      totalBets={profile.totalBets ?? 0}
+      wins={profile.wins ?? 0}
+      korBalance={profile.korBalance ?? 0}
       onProceed={handleProceed}
     />
   );

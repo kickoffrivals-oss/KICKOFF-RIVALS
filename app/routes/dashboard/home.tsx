@@ -26,25 +26,13 @@ function HomeTab() {
   const [selectedLeagueFilter, setSelectedLeagueFilter] = useState("all");
 
   return (
-    <div className="p-3 max-w-[95vw] mx-auto w-full relative min-h-[50vh]">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto w-full relative min-h-[70vh]">
       {/* Results Overlay — only shown when game is FINISHED */}
       {gameState === "FINISHED" && (
         <ResultsOverlay timer={timer} matches={matches} />
       )}
 
-      {/* League column headers (desktop only) */}
-      <div className="hidden md:grid grid-cols-3 gap-4 mb-4 font-bold text-white text-center">
-        {LEAGUES.map((league) => (
-          <div
-            key={league.id}
-            className="bg-dark/50 p-2 rounded-lg border border-pitch/30"
-          >
-            {league.name}
-          </div>
-        ))}
-      </div>
-
-      {/* Timer Banner */}
+      {/* Timer & Round Status Banner */}
       <TimerBanner
         timer={timer}
         gameState={gameState}
@@ -52,13 +40,13 @@ function HomeTab() {
         getCurrentGameMinute={getCurrentGameMinute}
       />
 
-      {/* League filter pills */}
+      {/* League Filter Chips */}
       <LeagueFilterBar
         selected={selectedLeagueFilter}
         onSelect={setSelectedLeagueFilter}
       />
 
-      {/* Match cards */}
+      {/* Match Cards Arena Grid */}
       <MatchGrid
         matches={matches}
         gameState={gameState}

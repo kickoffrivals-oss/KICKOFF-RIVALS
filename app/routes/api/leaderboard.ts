@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getLeaderboard } from "../../server/user";
+import { getLocalLeaderboard } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/leaderboard")({
   server: {
@@ -9,15 +10,14 @@ export const Route = createFileRoute("/api/leaderboard")({
           const url = new URL(request.url);
           const walletAddress = url.searchParams.get("walletAddress") || undefined;
           const result = await getLeaderboard({ data: { walletAddress } });
-          return Response.json(result);
+          if (result && result.success) {
+            return Response.json(result);
+          }
+          throw new Error("DB leaderboard failed");
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Leaderboard API error:", error);
-          return Response.json(
-            { success: false, error: errorMessage },
-            { status: 500 },
-          );
+          console.warn("[Leaderboard API] Using local in-memory fallback");
+          const fallback = getLocalLeaderboard();
+          return Response.json(fallback);
         }
       },
     },

@@ -64,11 +64,11 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="stadium-bg text-white min-h-screen">
         <div id="root">{children}</div>
         <Scripts />
       </body>

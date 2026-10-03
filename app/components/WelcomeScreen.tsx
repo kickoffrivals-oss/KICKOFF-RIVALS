@@ -7,7 +7,9 @@ import {
   IconTrophy,
   IconChevronRight,
   IconGift,
+  IconZap,
 } from "./Icons";
+import { soundFx } from "../lib/soundFx";
 
 interface WelcomeScreenProps {
   username: string;
@@ -22,9 +24,12 @@ export function WelcomeScreen({
   const [animationComplete, setAnimationComplete] = useState(false);
 
   useEffect(() => {
-    // Animate rewards appearing
-    const timer1 = setTimeout(() => setShowRewards(true), 500);
-    const timer2 = setTimeout(() => setAnimationComplete(true), 1500);
+    soundFx.playGoal();
+    const timer1 = setTimeout(() => {
+      setShowRewards(true);
+      soundFx.playCashout();
+    }, 400);
+    const timer2 = setTimeout(() => setAnimationComplete(true), 1000);
 
     return () => {
       clearTimeout(timer1);
@@ -32,130 +37,114 @@ export function WelcomeScreen({
     };
   }, []);
 
+  const handleStart = () => {
+    soundFx.playClick();
+    onProceed();
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      {/* Animated background with celebration effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl animate-pulse delay-500" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+    <div className="min-h-screen stadium-bg text-white flex flex-col justify-between relative overflow-hidden">
+      {/* Floodlights & Volumetric Beam Glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-amber-500/20 via-emerald-500/10 to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-emerald-500/10 blur-[140px] pointer-events-none" />
 
-        {/* Floating particles for celebration */}
-        <>
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 rounded-full animate-bounce"
-              style={{
-                backgroundColor: ["#fbbf24", "#22c55e", "#3b82f6", "#ec4899"][
-                  i % 4
-                ],
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
-                opacity: 0.6,
-              }}
-            />
-          ))}
-        </>
-
-      </div>
-
-      {/* Header */}
-      <header className="relative z-10 p-6">
+      {/* Top Header */}
+      <header className="relative z-10 px-6 py-6 flex items-center justify-between border-b border-white/5">
         <RivalsLogo size="md" variant="full" className="text-white" />
+        <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold text-amber-400">
+          <IconGift className="w-3.5 h-3.5" />
+          STARTER PACK ACTIVATED
+        </div>
       </header>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <div className="max-w-md w-full text-center">
-          {/* Welcome Icon */}
-          <div className="flex justify-center mb-6 animate-bounce-subtle">
-            <div className="p-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-lg shadow-yellow-500/30">
-              <IconSparkles className="w-16 h-16 text-white" />
+      {/* Center Welcome Card */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+        <div className="max-w-xl w-full">
+          <div className="broadcast-card rounded-3xl p-8 border border-white/10 relative overflow-hidden backdrop-blur-2xl shadow-2xl shadow-black/80 text-center">
+            {/* Ambient Background Aura */}
+            <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-500/20 rounded-full blur-2xl pointer-events-none" />
+
+            {/* Starter Trophy Badge */}
+            <div className="relative inline-flex items-center justify-center mb-6">
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-[2px] shadow-2xl shadow-yellow-500/30 animate-float">
+                <div className="w-full h-full rounded-[22px] bg-slate-950 flex flex-col items-center justify-center">
+                  <IconSparkles className="w-10 h-10 text-amber-400" />
+                </div>
+              </div>
+              <span className="absolute -bottom-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-black text-[10px] uppercase px-3 py-0.5 rounded-full shadow-md tracking-wider">
+                SIGNING BONUS
+              </span>
             </div>
-          </div>
 
-          {/* Welcome Message */}
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 animate-fade-in">
-            Welcome to the Arena!
-          </h1>
+            {/* Broadcast Title */}
+            <div className="mb-2">
+              <span className="text-[11px] font-black uppercase tracking-[0.3em] text-amber-400">
+                OFFICIAL PLAYER REGISTRATION
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight mt-1">
+                WELCOME TO THE ARENA, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200">{username}</span>
+              </h1>
+              <p className="text-sm text-slate-400 max-w-md mx-auto mt-2">
+                Your virtual stadium account has been credited with your starter grant.
+              </p>
+            </div>
 
-          <p className="text-xl text-slate-300 mb-2 animate-fade-in">
-            {username}
-          </p>
-
-          <p className="text-slate-400 mb-8 animate-fade-in">
-            Your account has been created successfully!
-          </p>
-
-          {/* Rewards Section */}
-          {showRewards && (
-            <div className="space-y-4 mb-8 animate-slide-up">
-              <h2 className="text-lg font-semibold text-white flex items-center justify-center gap-2">
-                <IconGift className="w-5 h-5 text-yellow-400" />
-                Your Welcome Bonus
-              </h2>
-
-              <div className="bg-slate-800/50 border border-yellow-500/30 rounded-xl p-6">
-                <div className="flex items-center justify-center gap-4">
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 rounded-full bg-yellow-500/20 flex items-center justify-center mb-2">
-                      <IconCoins className="w-8 h-8 text-yellow-400" />
+            {/* Starter Bonus Hub */}
+            {showRewards && (
+              <div className="mt-8 space-y-4 animate-slide-up">
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Coins Bonus */}
+                  <div className="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-5 text-center bg-gradient-to-b from-amber-500/15 to-transparent">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                      <IconCoins className="w-6 h-6" />
                     </div>
-                    <span className="text-2xl font-bold text-yellow-400">
-                      5000
-                    </span>
-                    <span className="text-sm text-slate-400">Coins</span>
+                    <div className="text-3xl font-black text-amber-400 led-number">
+                      5,000
+                    </div>
+                    <div className="text-xs text-amber-300/80 font-bold uppercase tracking-wider mt-1">
+                      Starter Coins
+                    </div>
                   </div>
 
-                  <div className="text-4xl text-slate-600">+</div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-2">
-                      <IconTrophy className="w-8 h-8 text-primary" />
+                  {/* KOR Tokens Bonus */}
+                  <div className="bg-slate-900/80 border border-emerald-500/30 rounded-2xl p-5 text-center bg-gradient-to-b from-emerald-500/15 to-transparent">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                      <IconZap className="w-6 h-6" />
                     </div>
-                    <span className="text-2xl font-bold text-primary">1000</span>
-                    <span className="text-sm text-slate-400">KOR Tokens</span>
+                    <div className="text-3xl font-black text-emerald-400 led-number">
+                      1,000
+                    </div>
+                    <div className="text-xs text-emerald-300/80 font-bold uppercase tracking-wider mt-1">
+                      KOR Tokens
+                    </div>
                   </div>
                 </div>
-
-                <p className="text-slate-500 text-sm mt-4">
-                  Use these to place your first bets!
-                </p>
               </div>
+            )}
+
+            {/* Launch Action Button */}
+            <div className="mt-8">
+              <button
+                onClick={handleStart}
+                className={cn(
+                  "w-full h-14 rounded-2xl font-black text-base uppercase tracking-wider italic",
+                  "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
+                  "hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 hover:scale-[1.02] active:scale-98",
+                  "shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-3",
+                  !animationComplete && "opacity-90",
+                )}
+              >
+                <span>COMMENCE MATCHDAY</span>
+                <IconChevronRight className="w-5 h-5 text-slate-950 stroke-[3]" />
+              </button>
             </div>
-          )}
-
-          {/* CTA Button */}
-          {animationComplete && (
-            <button
-              onClick={onProceed}
-              className={cn(
-                "btn btn-primary w-full h-14 font-semibold text-lg",
-                "hover:scale-[1.02] transition-all duration-300",
-                "shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30",
-                "animate-fade-in"
-              )}
-            >
-              Start Playing
-              <IconChevronRight className="w-5 h-5 ml-2" />
-            </button>
-          )}
-
-          {/* Tips */}
-          <div className="mt-8 text-slate-500 text-sm animate-fade-in">
-            <p>
-              Pro tip: Complete daily quests to earn more coins and tokens!
-            </p>
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* Footer */}
-      <footer className="relative z-10 p-6 text-center text-slate-500 text-xs">
-        Your progress is saved automatically
+      {/* Broadcast Ticker Footer */}
+      <footer className="relative z-10 px-6 py-4 text-center text-slate-500 text-xs border-t border-white/5 bg-slate-950/60 backdrop-blur-md">
+        KickOff Rivals v2.0 • Decentralized Football Simulation & Prediction Engine
       </footer>
     </div>
   );

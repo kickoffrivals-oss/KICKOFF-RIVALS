@@ -131,12 +131,12 @@ export const createAuthMessage = (): { message: string; nonce: string; timestamp
   const timestamp = Date.now();
   const nonce = Math.random().toString(36).substring(2, 10);
 
-  const message = `Admin Authentication Request
+  const message = `KickOff Rivals Verification Request
 
 Nonce: ${nonce}
 Timestamp: ${timestamp}
 
-By signing this message, you verify admin access to KickOff Rivals.
+By signing this message, you verify your wallet access to KickOff Rivals.
 This action will not cost gas.`;
 
   return { message, nonce, timestamp };

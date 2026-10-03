@@ -34,6 +34,9 @@ export const wagmiAdapter = new WagmiAdapter({
   networks,
   projectId,
   ssr: true,
+  enableCoinbase: false,
+  enableInjected: true,
+  enableWalletConnect: true,
 });
 
 // 5. Create modal - only on client
@@ -43,8 +46,9 @@ if (typeof window !== "undefined") {
     networks,
     projectId,
     metadata,
+    enableCoinbase: false,
     features: {
-      analytics: true,
+      analytics: false,
       email: false,
       socials: false,
     },

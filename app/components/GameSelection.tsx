@@ -1,252 +1,176 @@
 import { cn } from "../lib/utils";
 import { RivalsLogo } from "./RivalsLogo";
-import { IconFootball, IconChevronRight } from "./Icons";
+import { IconFootball, IconChevronRight, IconZap, IconTrophy } from "./Icons";
+import { soundFx } from "../lib/soundFx";
 
 interface GameSelectionProps {
   onSelectFootball: () => void;
 }
 
 export function GameSelection({ onSelectFootball }: GameSelectionProps) {
+  const handleSelectFootball = () => {
+    soundFx.playWhistle();
+    onSelectFootball();
+  };
+
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white overflow-x-hidden">
-      {/* Background Effects */}
+    <div className="min-h-screen stadium-bg text-white overflow-x-hidden flex flex-col justify-between relative">
+      {/* Stadium Floodlights */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-500/8 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-blue-500/6 rounded-full blur-[80px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-blue-500/10 to-transparent blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-emerald-500/10 blur-[140px]" />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-6 md:px-12 py-5 border-b border-white/5">
+      <header className="relative z-10 px-6 py-6 flex items-center justify-between border-b border-white/5">
         <RivalsLogo size="md" variant="full" className="text-white" />
+        <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold text-emerald-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          ARENA DISPATCH ACTIVE
+        </div>
       </header>
 
-      {/* Content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-16 md:py-24 min-h-[calc(100vh-80px)]">
-        <div className="text-center mb-12 animate-fade-in">
-          <span className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-3 block">
-            Choose Your Arena
+      {/* Center Arena Selection */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-12 max-w-5xl mx-auto w-full">
+        <div className="text-center mb-10">
+          <span className="text-emerald-400 text-xs font-black tracking-[0.3em] uppercase mb-1 block">
+            CHOOSE YOUR COMPETITION
           </span>
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">
-            Select Your Game
+          <h1 className="text-3xl sm:text-5xl font-black text-white uppercase italic tracking-tight">
+            SELECT SPORTING ARENA
           </h1>
-          <p className="text-slate-400 max-w-md mx-auto">
-            Pick your sport and start winning. More games coming soon.
+          <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mt-2">
+            Select your discipline to launch matchday predictions, study live team telemetry, and win KOR tokens.
           </p>
         </div>
 
-        {/* Game Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-5xl w-full">
-          {/* Football - Active */}
-          <GameCard
-            title="Football"
-            description="Virtual football betting with live matches, real-time odds, and instant settlement"
-            icon={<IconFootball className="w-14 h-14" />}
-            status="active"
-            onClick={onSelectFootball}
-            accentColor="emerald"
-          />
+        {/* Sporting Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          {/* Virtual Football - Live & Active */}
+          <button
+            onClick={handleSelectFootball}
+            className={cn(
+              "broadcast-card rounded-3xl p-6 border text-left transition-all duration-300 group flex flex-col justify-between relative overflow-hidden",
+              "border-emerald-400/80 bg-gradient-to-b from-emerald-950/40 via-slate-900 to-slate-900/90",
+              "hover:scale-[1.03] hover:border-emerald-300 hover:shadow-2xl hover:shadow-emerald-500/25 active:scale-98"
+            )}
+          >
+            {/* Live Badge */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[2px] shadow-lg shadow-emerald-500/30">
+                <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                  <IconFootball className="w-7 h-7" />
+                </div>
+              </div>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-pulse" />
+                LIVE 24/7
+              </span>
+            </div>
 
-          {/* Basketball - Coming Soon */}
-          <GameCard
-            title="Basketball"
-            description="Fast-paced basketball action with quarter-by-quarter predictions"
-            icon={
-              <svg
-                width="24"
-                height="24"
-                className="w-14 h-14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2a10 10 0 0 1 0 20M12 2a10 10 0 0 0 0 20" />
-                <path d="M2 12h20" />
-              </svg>
-            }
-            status="coming_soon"
-            accentColor="orange"
-          />
+            <div>
+              <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-0.5">
+                FLAGSHIP DISCIPLINE
+              </span>
+              <h3 className="text-xl font-black text-white uppercase italic tracking-tight mb-2">
+                FOOTBALL PRO
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-6">
+                4 Active Leagues, 2D visual pitch simulation, 1X2 & GG/NG markets with instant settlement.
+              </p>
+            </div>
 
-          {/* Tennis - Coming Soon */}
-          <GameCard
-            title="Tennis"
-            description="Set-by-set tennis betting with live match tracking and analysis"
-            icon={
-              <svg
-                width="24"
-                height="24"
-                className="w-14 h-14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2c-4 4-4 14 0 20M12 2c4 4 4 14 0 20" />
-              </svg>
-            }
-            status="coming_soon"
-            accentColor="yellow"
-          />
+            <div className="flex items-center justify-between pt-3 border-t border-white/10 text-xs font-black text-emerald-400 uppercase tracking-wider group-hover:text-emerald-300">
+              <span>ENTER MATCHDAY</span>
+              <IconChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </button>
 
-          {/* Aviator - Coming Soon */}
-          <GameCard
-            title="Aviator"
-            description="High-flying crash game — cash out before the plane flies away and multiply your stake!"
-            icon={
-              <svg
-                width="24"
-                height="24"
-                className="w-14 h-14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2L3 9l2 2 4-2-2 5 2 1 3-4 3 4 2-1-2-5 4 2 2-2z" />
-                <path d="M10 19l2 3 2-3" />
-                <path d="M7 13l-4 2" />
-                <path d="M17 13l4 2" />
-              </svg>
-            }
-            status="coming_soon"
-            accentColor="purple"
-          />
+          {/* Basketball Pro - Coming Soon */}
+          <div className="broadcast-card rounded-3xl p-6 border border-white/5 bg-slate-900/40 text-left opacity-60 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center text-slate-500">
+                  🏀
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-wider">
+                  SEASON 2
+                </span>
+              </div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-0.5">
+                IN DEVELOPMENT
+              </span>
+              <h3 className="text-xl font-black text-slate-300 uppercase italic tracking-tight mb-2">
+                BASKETBALL SLAM
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Quarter-by-quarter fast-break predictions, over/under point totals, and buzzer-beater payouts.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-white/5 text-[10px] font-bold text-slate-500 uppercase">
+              Coming in Q2
+            </div>
+          </div>
+
+          {/* Tennis Open - Coming Soon */}
+          <div className="broadcast-card rounded-3xl p-6 border border-white/5 bg-slate-900/40 text-left opacity-60 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center text-slate-500">
+                  🎾
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-wider">
+                  SEASON 2
+                </span>
+              </div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-0.5">
+                IN DEVELOPMENT
+              </span>
+              <h3 className="text-xl font-black text-slate-300 uppercase italic tracking-tight mb-2">
+                TENNIS SLAM
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Set-by-set ace predictions, match tie-breaks, and live grand slam multi-odds.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-white/5 text-[10px] font-bold text-slate-500 uppercase">
+              Coming in Q2
+            </div>
+          </div>
+
+          {/* Aviator Crash - Coming Soon */}
+          <div className="broadcast-card rounded-3xl p-6 border border-white/5 bg-slate-900/40 text-left opacity-60 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-white/5 flex items-center justify-center text-slate-500">
+                  🚀
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-wider">
+                  SEASON 2
+                </span>
+              </div>
+              <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-0.5">
+                IN DEVELOPMENT
+              </span>
+              <h3 className="text-xl font-black text-slate-300 uppercase italic tracking-tight mb-2">
+                AVIATOR ROCKET
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                High-multiplier curve multiplier crash game with instant cashout mechanics.
+              </p>
+            </div>
+            <div className="pt-3 border-t border-white/5 text-[10px] font-bold text-slate-500 uppercase">
+              Coming in Q3
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 text-center text-slate-600 text-sm border-t border-white/5">
-        More sports coming soon — stay tuned!
+      <footer className="relative z-10 px-6 py-4 text-center text-slate-500 text-xs border-t border-white/5 bg-slate-950/60 backdrop-blur-md">
+        KickOff Rivals Multi-Sport Game Hub
       </footer>
     </div>
-  );
-}
-
-interface GameCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  status: "active" | "coming_soon";
-  onClick?: () => void;
-  accentColor: "emerald" | "orange" | "yellow" | "purple";
-}
-
-const accentStyles = {
-  emerald: {
-    glow: "group-hover:shadow-emerald-500/20",
-    border: "group-hover:border-emerald-500/40",
-    iconBg: "bg-emerald-500/10",
-    iconColor: "text-emerald-400",
-    badge: "bg-emerald-500 text-white",
-    cta: "text-emerald-400",
-  },
-  orange: {
-    glow: "group-hover:shadow-orange-500/10",
-    border: "group-hover:border-orange-500/20",
-    iconBg: "bg-orange-500/10",
-    iconColor: "text-orange-400",
-    badge: "bg-slate-700 text-slate-300",
-    cta: "text-orange-400",
-  },
-  yellow: {
-    glow: "group-hover:shadow-yellow-500/10",
-    border: "group-hover:border-yellow-500/20",
-    iconBg: "bg-yellow-500/10",
-    iconColor: "text-yellow-400",
-    badge: "bg-slate-700 text-slate-300",
-    cta: "text-yellow-400",
-  },
-  purple: {
-    glow: "group-hover:shadow-purple-500/10",
-    border: "group-hover:border-purple-500/20",
-    iconBg: "bg-purple-500/10",
-    iconColor: "text-purple-400",
-    badge: "bg-slate-700 text-slate-300",
-    cta: "text-purple-400",
-  },
-};
-
-function GameCard({
-  title,
-  description,
-  icon,
-  status,
-  onClick,
-  accentColor,
-}: GameCardProps) {
-  const isActive = status === "active";
-  const styles = accentStyles[accentColor];
-
-  return (
-    <button
-      onClick={isActive ? onClick : undefined}
-      disabled={!isActive}
-      className={cn(
-        "group relative overflow-hidden rounded-2xl border transition-all duration-300",
-        "flex flex-col items-center p-8 text-center",
-        "glass-card",
-        isActive
-          ? cn(
-              "cursor-pointer hover:translate-y-[-6px]",
-              "hover:shadow-2xl",
-              styles.glow,
-              styles.border,
-            )
-          : "cursor-not-allowed opacity-50",
-      )}
-    >
-      {/* Badges */}
-      {isActive ? (
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
-          </span>
-          Live
-        </div>
-      ) : (
-        <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-semibold uppercase tracking-wider border border-slate-700">
-          Coming Soon
-        </div>
-      )}
-
-      {/* Icon */}
-      <div
-        className={cn(
-          "w-20 h-20 rounded-2xl flex items-center justify-center mb-5",
-          styles.iconBg,
-          styles.iconColor,
-          isActive && "group-hover:scale-110 transition-transform duration-300",
-        )}
-      >
-        {icon}
-      </div>
-
-      {/* Content */}
-      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm leading-relaxed mb-5 max-w-[240px]">
-        {description}
-      </p>
-
-      {/* CTA */}
-      {isActive && (
-        <div
-          className={cn(
-            "flex items-center gap-1 font-semibold text-sm transition-all group-hover:gap-2",
-            styles.cta,
-          )}
-        >
-          Play Now
-          <IconChevronRight className="w-4 h-4" />
-        </div>
-      )}
-    </button>
   );
 }
 

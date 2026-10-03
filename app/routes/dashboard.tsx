@@ -30,15 +30,15 @@ function DashboardLayout() {
 
   if (isInitializing || isProfileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-light text-dark font-sport italic text-2xl animate-pulse">
-        LOADING...
+      <div className="min-h-screen flex items-center justify-center stadium-bg text-white font-sport italic text-2xl animate-pulse">
+        LOADING MATCHDAY...
       </div>
     );
   }
 
   return (
     <div
-      className={`min-h-screen font-sans text-dark bg-light flex flex-col transition-all ${
+      className={`min-h-screen font-sans text-white stadium-bg flex flex-col transition-all ${
         betSlipSelections.length > 0 ? "lg:pr-[400px]" : ""
       }`}
     >

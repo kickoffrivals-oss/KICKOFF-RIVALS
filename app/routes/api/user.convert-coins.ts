@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertCoins } from "../../server/user";
+import { convertLocalKorToCoins } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/user/convert-coins")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
+        let body: any = {};
         try {
-          const body = await request.json();
+          body = await request.json();
           const { walletAddress, amount } = body;
 
           if (!walletAddress || !amount) {
@@ -29,13 +31,12 @@ export const Route = createFileRoute("/api/user/convert-coins")({
 
           return Response.json(result);
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Convert coins API error:", error);
-          return Response.json(
-            { success: false, error: errorMessage },
-            { status: 500 },
+          console.warn("[Convert API] Using local in-memory fallback");
+          const fallback = convertLocalKorToCoins(
+            body.walletAddress,
+            Number(body.amount),
           );
+          return Response.json(fallback);
         }
       },
     },

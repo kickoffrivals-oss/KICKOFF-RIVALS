@@ -2,6 +2,7 @@ import { useState } from "react";
 import { LEAGUES } from "../../constants";
 import { MatchCard } from "../MatchCard";
 import type { Match } from "../../types";
+import { soundFx } from "../../lib/soundFx";
 
 interface ResultsOverlayProps {
   timer: number;
@@ -14,9 +15,9 @@ export function ResultsOverlay({ timer, matches }: ResultsOverlayProps) {
   return (
     <div
       id="results-overlay"
-      className="fixed inset-0 z-100 bg-black/95 flex flex-col items-center justify-start text-white overflow-y-auto w-full"
+      className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-2xl flex flex-col items-center justify-start text-white overflow-y-auto w-full"
     >
-      <div className="w-full max-w-6xl flex flex-col items-center pt-36 pb-8 px-4 relative">
+      <div className="w-full max-w-6xl flex flex-col items-center pt-24 pb-12 px-4 relative">
         <CloseButton />
 
         <RoundEndedBanner timer={timer} />
@@ -40,19 +41,21 @@ function CloseButton() {
   return (
     <button
       onClick={() => {
+        soundFx.playClick();
         const el = document.getElementById("results-overlay");
         if (el) el.style.display = "none";
       }}
-      className="absolute top-8 right-4 p-2 bg-white/10 rounded-full hover:bg-white/20 text-white transition-all z-120"
+      className="absolute top-6 right-6 p-2.5 bg-white/10 border border-white/15 rounded-full hover:bg-white/20 text-white transition-all hover:scale-105"
+      title="Close Overlay"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -65,27 +68,27 @@ function CloseButton() {
 
 function RoundEndedBanner({ timer }: { timer: number }) {
   return (
-    <>
-      <div className="text-4xl md:text-6xl font-bold font-sport italic mb-2 animate-bounce text-center text-pitch drop-shadow-glow">
-        ROUND ENDED
+    <div className="flex flex-col items-center text-center mb-8">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-widest mb-3">
+        <span>🏆 MATCHDAY CONCLUDED</span>
       </div>
 
-      <div className="flex flex-col items-center gap-2 mb-8 bg-dark/50 p-4 rounded-xl border border-pitch/30 backdrop-blur-sm">
-        <div className="text-sm text-gray-400 font-mono uppercase tracking-widest">
-          Next Round Starts In
-        </div>
-        <div className="text-5xl font-mono font-bold text-white tabular-nums">
+      <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+        FINAL ROUND RESULTS
+      </h1>
+
+      <div className="flex items-center gap-3 px-5 py-2.5 rounded-2xl broadcast-glass border border-white/10 shadow-xl">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          Next Round In:
+        </span>
+        <span className="text-2xl font-black text-amber-400 led-number">
           {Math.floor(timer / 60)
             .toString()
             .padStart(2, "0")}
           :{(timer % 60).toString().padStart(2, "0")}
-        </div>
+        </span>
       </div>
-
-      <div className="text-xl text-brand-light font-mono tracking-widest mb-6 border-b border-brand-light/30 pb-2 w-full text-center max-w-md">
-        FINAL SCORES
-      </div>
-    </>
+    </div>
   );
 }
 
@@ -100,99 +103,68 @@ export function LeagueFilterBar({
   onSelect,
   dark = false,
 }: LeagueFilterBarProps) {
-  const activeClass = "bg-pitch text-white ring-2 ring-offset-2 ring-pitch";
-  const inactiveClass = dark
-    ? "bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white"
-    : "bg-white text-gray-500 hover:bg-gray-100 hover:text-dark";
+  const activeClass =
+    "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 border-emerald-400";
+  const inactiveClass =
+    "bg-slate-900/60 text-slate-400 hover:text-white hover:bg-slate-800/80 border-white/10";
 
   return (
-    <div className="flex gap-2 mb-6 overflow-x-auto pb-4 no-scrollbar px-4 w-full justify-start md:justify-center">
+    <div className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar px-2 w-full justify-start md:justify-center">
       <button
-        onClick={() => onSelect("all")}
-        className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors shadow-sm ${
+        onClick={() => {
+          soundFx.playClick();
+          onSelect("all");
+        }}
+        className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider whitespace-nowrap transition-all border ${
           selected === "all" ? activeClass : inactiveClass
         }`}
       >
-        ALL LEAGUES
+        All Leagues
       </button>
       {LEAGUES.map((league) => (
         <button
           key={league.id}
-          onClick={() => onSelect(league.id)}
-          className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors shadow-sm ${
+          onClick={() => {
+            soundFx.playClick();
+            onSelect(league.id);
+          }}
+          className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider whitespace-nowrap transition-all border flex items-center gap-2 ${
             selected === league.id ? activeClass : inactiveClass
           }`}
         >
-          {league.name.toUpperCase()}
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          {league.name}
         </button>
       ))}
     </div>
   );
 }
 
+interface MatchResultsGridProps {
+  matches: Match[];
+  selectedLeagueFilter: string;
+}
+
 function MatchResultsGrid({
   matches,
   selectedLeagueFilter,
-}: {
-  matches: Match[];
-  selectedLeagueFilter: string;
-}) {
-  const scoreFor = (m: Match) => ({
-    home:
-      m.homeScore !== undefined && m.homeScore !== null
-        ? m.homeScore
-        : m.result?.homeScore ?? 0,
-    away:
-      m.awayScore !== undefined && m.awayScore !== null
-        ? m.awayScore
-        : m.result?.awayScore ?? 0,
-  });
-
-  if (selectedLeagueFilter === "all") {
-    return (
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        {LEAGUES.map((league) => (
-          <div
-            key={league.id}
-            className="space-y-3 bg-white/5 p-4 rounded-xl border border-white/10"
-          >
-            <h3 className="font-bold text-center text-brand-light mb-2 border-b border-brand-light/30 pb-1">
-              {league.name}
-            </h3>
-            {matches
-              .filter((m) => m.leagueId === league.id)
-              .map((m) => (
-                <MatchCard
-                  key={m.id}
-                  match={m}
-                  minute={90}
-                  displayScore={scoreFor(m)}
-                  onBet={() => {}}
-                  onWatch={() => {}}
-                  onAddToBetSlip={() => {}}
-                />
-              ))}
-          </div>
-        ))}
-      </div>
-    );
-  }
+}: MatchResultsGridProps) {
+  const filtered =
+    selectedLeagueFilter === "all"
+      ? matches
+      : matches.filter((m) => m.leagueId === selectedLeagueFilter);
 
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-      {matches
-        .filter((m) => m.leagueId === selectedLeagueFilter)
-        .map((m) => (
-          <MatchCard
-            key={m.id}
-            match={m}
-            minute={90}
-            displayScore={scoreFor(m)}
-            onBet={() => {}}
-            onWatch={() => {}}
-            onAddToBetSlip={() => {}}
-          />
-        ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-6xl">
+      {filtered.map((m) => (
+        <MatchCard
+          key={m.id}
+          match={m}
+          onBet={() => {}}
+          onWatch={() => {}}
+          onAddToBetSlip={() => {}}
+        />
+      ))}
     </div>
   );
 }

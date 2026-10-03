@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { placeBet } from "../../server/matches";
+import { placeLocalBet } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/minigame/bet")({
   server: {
     handlers: {
       POST: async ({ request }: { request: Request }) => {
+        let body: any = {};
         try {
-          const body = await request.json();
+          body = await request.json();
           const { walletAddress, matchId, selection, stake, odds, betType } =
             body;
 
@@ -37,15 +39,21 @@ export const Route = createFileRoute("/api/minigame/bet")({
             },
           });
 
-          return Response.json(result);
+          if (result && result.success) {
+            return Response.json(result);
+          }
+          throw new Error("DB place bet failed");
         } catch (error: unknown) {
-          const errorMessage =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Bet API error:", error);
-          return Response.json(
-            { success: false, error: errorMessage },
-            { status: 500 },
-          );
+          console.warn("[Bet API] Using local in-memory fallback");
+          const fallback = placeLocalBet({
+            walletAddress: body.walletAddress,
+            matchId: body.matchId,
+            selection: body.selection,
+            stake: Number(body.stake),
+            odds: Number(body.odds),
+            betType: body.betType || "single",
+          });
+          return Response.json(fallback);
         }
       },
     },

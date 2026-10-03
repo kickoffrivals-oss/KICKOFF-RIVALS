@@ -252,9 +252,9 @@ export const getUserProfile = createServerFn({ method: "GET" })
       success: true,
       walletAddress: user.walletAddress,
       username: user.username,
-      coins: user.coins,
-      korBalance: user.doodlBalance,
-      unclaimedBalance: user.unclaimedBalance,
+      coins: user.coins ?? 0,
+      korBalance: user.doodlBalance ?? 0,
+      unclaimedBalance: user.unclaimedBalance ?? 0,
       allianceLeagueId: user.allianceLeagueId,
       allianceTeamId: user.allianceTeamId,
       unclaimedAllianceRewards: user.unclaimedAllianceRewards,
@@ -301,16 +301,20 @@ export const getUserProfile = createServerFn({ method: "GET" })
           }
 
           if (needsReset) {
-            console.log(`[QUESTS] Resetting ${q.id} for user ${user.walletAddress}`);
-            // Use both id and walletAddress/questId for maximum safety during update
-            await db.update(userQuests)
-              .set({ progress: 0, completed: false, status: "LIVE", resetAt: new Date() })
-              .where(
-                q.id && typeof q.id === 'number' 
-                  ? eq(userQuests.id, q.id) 
-                  : and(eq(userQuests.walletAddress, user.walletAddress), eq(userQuests.questId, q.questId || q.id))
-              );
-            updatedQuests.push({ ...q, progress: 0, completed: false, status: "LIVE", resetAt: new Date() });
+            try {
+              console.log(`[QUESTS] Resetting ${q.id} for user ${user.walletAddress}`);
+              await db.update(userQuests)
+                .set({ progress: 0, completed: false, status: "LIVE", resetAt: new Date() })
+                .where(
+                  q.id && typeof q.id === 'number' 
+                    ? eq(userQuests.id, q.id) 
+                    : and(eq(userQuests.walletAddress, user.walletAddress), eq(userQuests.questId, q.questId || q.id))
+                );
+              updatedQuests.push({ ...q, progress: 0, completed: false, status: "LIVE", resetAt: new Date() });
+            } catch (resetError) {
+              console.error(`[QUESTS] Failed to reset quest ${q.id}:`, resetError);
+              updatedQuests.push(q); // Keep original if reset fails to avoid crashing
+            }
           } else {
             // Check if progress reached target while in-game (fallback check)
             let completed = q.completed;
@@ -520,16 +524,13 @@ export const claimWelcomeGift = createServerFn({ method: "POST" })
   });
 
 // ==========================================
-// CONVERT COINS TO KOR
+// CONVERT KOR TO COINS
 // ==========================================
 
 const convertCoinsSchema = z.object({
   walletAddress: z.string().min(1),
-  amount: z.number().min(1000),
+  amount: z.number().min(10), // minimum 10 KOR
 });
-
-const CONVERSION_RATE = 1000; // 1000 coins = 100 KOR
-const CONVERSION_YIELD = 100;
 
 export const convertCoins = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => convertCoinsSchema.parse(data))
@@ -544,17 +545,16 @@ export const convertCoins = createServerFn({ method: "POST" })
       return { success: false, error: "User not found" };
     }
 
-    const coinsToConvert =
-      Math.floor(data.amount / CONVERSION_RATE) * CONVERSION_RATE;
+    const korToConvert = Math.floor(data.amount);
 
-    if (coinsToConvert > (user.coins || 0)) {
-      return { success: false, error: "Insufficient coins" };
+    if (korToConvert > (user.doodlBalance || 0)) {
+      return { success: false, error: "Insufficient KOR balance" };
     }
 
-    const korToAdd = (coinsToConvert / CONVERSION_RATE) * CONVERSION_YIELD;
+    const coinsToAdd = korToConvert * 10;
 
-    const newCoins = (user.coins || 0) - coinsToConvert;
-    const newKor = (user.doodlBalance || 0) + korToAdd;
+    const newKor = (user.doodlBalance || 0) - korToConvert;
+    const newCoins = (user.coins || 0) + coinsToAdd;
 
     await db
       .update(users)
@@ -569,9 +569,9 @@ export const convertCoins = createServerFn({ method: "POST" })
       id: `tx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       walletAddress: normalized,
       type: "convert",
-      amount: korToAdd,
-      currency: "kor",
-      description: `Converted ${coinsToConvert} coins to ${korToAdd} KOR`,
+      amount: coinsToAdd,
+      currency: "coins",
+      description: `Converted ${korToConvert} KOR to ${coinsToAdd} Coins`,
     });
 
     return {

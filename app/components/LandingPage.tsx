@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "../lib/utils";
 import { RivalsLogo } from "./RivalsLogo";
 import {
@@ -6,423 +6,264 @@ import {
   IconTrophy,
   IconZap,
   IconUsers,
-  IconWallet,
   IconTarget,
   IconShield,
   IconChevronRight,
   IconArrowRight,
   IconCoins,
-  IconStar,
-  IconCrown,
-  IconMedal,
   IconFlame,
   IconSparkles,
 } from "./Icons";
+import { soundFx } from "../lib/soundFx";
 
 interface LandingPageProps {
   onEnter: () => void;
 }
 
-const FLOATING_ICONS = [
-  IconFootball,
-  IconTrophy,
-  IconZap,
-  IconCoins,
-  IconStar,
-  IconCrown,
-  IconMedal,
-  IconFlame,
-  IconSparkles,
-  IconTarget,
-];
-
-function FloatingIcon({
-  Icon,
-  delay,
-  duration,
-  top,
-  left,
-  size,
-  opacity,
-}: {
-  Icon: React.ElementType;
-  delay: string;
-  duration: string;
-  top: string;
-  left: string;
-  size: string;
-  opacity: number;
-}) {
-  return (
-    <div
-      className="absolute text-emerald-500/20 animate-float"
-      style={{
-        top,
-        left,
-        animationDelay: delay,
-        animationDuration: duration,
-        opacity,
-      }}
-    >
-      <Icon className={size} />
-    </div>
-  );
-}
-
 export function LandingPage({ onEnter }: LandingPageProps) {
-  // Generate random positions for icons on mount to avoid hydration mismatch
-  const [icons, setIcons] = useState<
-    Array<{
-      Icon: React.ElementType;
-      top: string;
-      left: string;
-      size: string;
-      delay: string;
-      duration: string;
-      opacity: number;
-    }>
-  >([]);
-
-  useEffect(() => {
-    const newIcons = Array.from({ length: 15 }).map((_, i) => ({
-      Icon: FLOATING_ICONS[Math.floor(Math.random() * FLOATING_ICONS.length)],
-      top: `${Math.random() * 100}%`,
-      left: `${Math.random() * 100}%`,
-      size: `w-${Math.floor(Math.random() * 8 + 4)} h-${Math.floor(
-        Math.random() * 8 + 4
-      )}`, // random size between w-4 and w-12 roughly
-      // Actually let's use fixed pixel sizes or standardized tailwind classes to be safe
-      // changing size to class string
-      delay: `${Math.random() * 5}s`,
-      duration: `${Math.random() * 10 + 10}s`, // 10-20s float duration
-      opacity: Math.random() * 0.15 + 0.05, // 0.05 - 0.2 opacity
-    }));
-    setIcons(
-      newIcons.map((icon) => ({
-        ...icon,
-        size: ["w-6 h-6", "w-8 h-8", "w-10 h-10", "w-12 h-12", "w-16 h-16"][
-          Math.floor(Math.random() * 5)
-        ],
-      }))
-    );
-  }, []);
+  const handleLaunch = () => {
+    soundFx.playWhistle();
+    onEnter();
+  };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white overflow-x-hidden font-sans">
-      {/* Background Effects */}
+    <div className="min-h-screen stadium-bg text-white overflow-x-hidden font-sans flex flex-col justify-between relative">
+      {/* Stadium Floodlights & Volumetric Atmospheric Beams */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 grid-pattern opacity-30" />
-
-        {/* Floating Icons */}
-        {icons.map((icon, i) => (
-          <FloatingIcon key={i} {...icon} />
-        ))}
-
-        {/* Gradient orbs */}
-        <div className="absolute top-[-20%] right-[-10%] w-[700px] h-[700px] bg-emerald-500/10 rounded-full blur-[120px] animate-float" />
-        <div
-          className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/8 rounded-full blur-[100px]"
-          style={{ animationDelay: "2s" }}
-        />
-        <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] bg-emerald-500/5 rounded-full blur-[80px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-gradient-to-b from-emerald-500/15 via-blue-500/10 to-transparent blur-[100px]" />
+        <div className="absolute top-[30%] -right-20 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[140px] animate-float" />
+        <div className="absolute bottom-[10%] -left-20 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[160px]" />
       </div>
 
-      {/* Navbar */}
-      <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/5">
-        <RivalsLogo size="md" variant="full" className="text-white" />
-        <div className="hidden md:flex items-center gap-8 text-sm text-slate-400">
-          <a href="#features" className="hover:text-white transition-colors">
-            Features
+      {/* Top Broadcast Navigation */}
+      <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/10 broadcast-glass backdrop-blur-xl">
+        <div className="flex items-center gap-3">
+          <RivalsLogo size="md" variant="full" className="text-white" />
+          <span className="hidden sm:inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
+            NEXT-GEN ENGINE
+          </span>
+        </div>
+
+        <div className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-300">
+          <a href="#features" className="hover:text-emerald-400 transition-colors" onClick={() => soundFx.playClick()}>
+            Game Engine
           </a>
-          <a
-            href="#how-it-works"
-            className="hover:text-white transition-colors"
-          >
-            How It Works
+          <a href="#how-it-works" className="hover:text-emerald-400 transition-colors" onClick={() => soundFx.playClick()}>
+            How To Play
           </a>
-          <a href="#stats" className="hover:text-white transition-colors">
-            Stats
+          <a href="#tokenomics" className="hover:text-emerald-400 transition-colors" onClick={() => soundFx.playClick()}>
+            Rewards
           </a>
         </div>
-        {/*<button
-          onClick={onEnter}
-          className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl border border-emerald-500/30 text-emerald-400 text-sm font-medium hover:bg-emerald-500/10 transition-all"
+
+        <button
+          onClick={handleLaunch}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/25"
         >
-          <IconWallet className="w-4 h-4" />
-          Connect Wallet
-        </button>*/}
+          <IconZap className="w-3.5 h-3.5 fill-slate-950" />
+          <span>Launch Arena</span>
+        </button>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 flex flex-col items-center justify-center px-6 pt-20 pb-16 md:pt-32 md:pb-24">
-        {/* Live badge */}
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-8 animate-fade-in">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <span className="text-emerald-400 text-xs font-semibold tracking-wide uppercase">
-            Live Matches Available
+      <section className="relative z-10 flex flex-col items-center justify-center px-4 pt-16 pb-12 md:pt-24 md:pb-16 text-center max-w-5xl mx-auto w-full">
+        {/* Live Matchday Ticker Capsule */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/30 mb-8 shadow-xl shadow-emerald-500/10 animate-fade-in">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+          <span className="text-emerald-300 text-xs font-extrabold uppercase tracking-widest">
+            MATCHDAY ROUND IN PROGRESS • CONTINUOUS 3-PHASE SIMULATION
           </span>
         </div>
 
-        {/* Headline */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-center leading-[1.1] mb-6 max-w-4xl">
-          The Ultimate Virtual
-          <br />
-          <span className="text-gradient">Football</span> Betting League
+        {/* Hero Title */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase italic tracking-tight text-white leading-[1.05] mb-6">
+          THE NEXT-GEN VIRTUAL <br className="hidden sm:inline" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
+            FOOTBALL PREDICTION
+          </span> LEAGUE
         </h1>
 
-        <p className="text-slate-400 text-center text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
-          Bet, compete, and win in the world's most immersive virtual soccer
-          arena. Real-time simulations, instant rewards, and blockchain-powered
-          fairness.
+        <p className="text-slate-300 text-base sm:text-lg md:text-xl max-w-2xl mb-10 leading-relaxed font-medium">
+          Experience non-stop 2D pitch telemetry, dynamic combo accumulators, and instantaneous decentralized rewards in a premier sports broadcast arena.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 mb-16">
+        {/* CTA Launch Actions */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <button
-            onClick={onEnter}
+            onClick={handleLaunch}
             className={cn(
-              "group relative px-10 py-4 rounded-2xl font-bold text-lg",
-              "bg-gradient-to-r from-emerald-500 to-emerald-600",
-              "text-white shadow-lg shadow-emerald-500/25",
-              "hover:shadow-xl hover:shadow-emerald-500/40",
-              "hover:from-emerald-400 hover:to-emerald-500",
-              "transition-all duration-300 hover:scale-105 active:scale-100",
-              "animate-glow-pulse"
+              "w-full sm:w-auto px-10 py-4.5 rounded-2xl font-black text-base uppercase tracking-wider italic",
+              "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
+              "hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 hover:scale-105 active:scale-95",
+              "shadow-2xl shadow-emerald-500/35 flex items-center justify-center gap-3",
             )}
           >
-            <span className="relative z-10 flex items-center gap-2">
-              Enter Arena
-              <IconArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </span>
+            <span>ENTER STADIUM ARENA</span>
+            <IconArrowRight className="w-5 h-5 stroke-[3]" />
           </button>
+
           <a
             href="#how-it-works"
-            className="flex items-center gap-2 px-6 py-4 text-slate-400 hover:text-white transition-colors text-sm font-medium"
+            onClick={() => soundFx.playClick()}
+            className="w-full sm:w-auto px-8 py-4 rounded-2xl border border-white/10 hover:border-emerald-500/40 bg-slate-900/60 hover:bg-white/5 text-slate-300 hover:text-white text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2"
           >
-            How it works
+            <span>How Matchday Works</span>
             <IconChevronRight className="w-4 h-4" />
           </a>
         </div>
 
-        {/* Stats Bar */}
-        {/* <div id="stats" className="flex items-center gap-6 md:gap-12">
-          <StatItem value="10K+" label="Players" />
-          <div className="w-px h-10 bg-white/10" />
-          <StatItem value="1M+" label="Bets Placed" />
-          <div className="w-px h-10 bg-white/10" />
-          <StatItem value="500K+" label="KOR Won" />
-        </div> */}
+        {/* Broadcast Telemetry Strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-4xl mt-16 pt-8 border-t border-white/10">
+          <StatBox label="Active Leagues" value="4 Leagues" sub="Premier, LaLiga, Serie A, UCL" />
+          <StatBox label="Round Cycle" value="3 Minutes" sub="Betting → Live → Settle" />
+          <StatBox label="Starter Grant" value="5,000 Coins" sub="+ 1,000 KOR Tokens Free" />
+          <StatBox label="Settlement" value="Instant" sub="Provably Fair Random Seeds" />
+        </div>
       </section>
 
-      {/* Features Section */}
-      <section
-        id="features"
-        className="relative z-10 px-6 md:px-12 py-20 md:py-28"
-      >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-3 block">
-              Features
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Need to Win
-            </h2>
-            <p className="text-slate-400 max-w-xl mx-auto">
-              A complete platform built for competitive sports prediction with
-              Web3 rewards.
-            </p>
+      {/* Features Grid */}
+      <section id="features" className="relative z-10 px-4 md:px-12 py-16 max-w-6xl mx-auto w-full">
+        <div className="text-center mb-12">
+          <span className="text-emerald-400 text-xs font-black tracking-[0.25em] uppercase mb-2 block">
+            STADIUM HIGHLIGHTS
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight">
+            ENGINEERED FOR SPORTS PREDICTORS
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <FeatureCard
+            icon={<IconFootball className="w-7 h-7" />}
+            title="Live 2D Pitch Radar"
+            desc="Watch continuous tactical ball movements, possession meters, commentary logs, and instant goal alerts."
+            accent="emerald"
+          />
+          <FeatureCard
+            icon={<IconZap className="w-7 h-7" />}
+            title="Dynamic Accumulators"
+            desc="Stack multiple match picks into combo tickets with live multiplier gauges and massive return potentials."
+            accent="gold"
+          />
+          <FeatureCard
+            icon={<IconTrophy className="w-7 h-7" />}
+            title="Global Hall of Fame"
+            desc="Climb the real-time leaderboard, unlock daily check-in grants, and win seasonal prize distributions."
+            accent="blue"
+          />
+          <FeatureCard
+            icon={<IconUsers className="w-7 h-7" />}
+            title="Squad Alliances"
+            desc="Draft your favorite club, represent your league alliance, and earn collaborative victory rewards."
+            accent="purple"
+          />
+        </div>
+      </section>
+
+      {/* How It Works Steps */}
+      <section id="how-it-works" className="relative z-10 px-4 md:px-12 py-16 max-w-5xl mx-auto w-full">
+        <div className="broadcast-card rounded-3xl p-8 sm:p-12 border border-white/10 text-center shadow-2xl relative overflow-hidden">
+          <span className="text-amber-400 text-xs font-black tracking-[0.25em] uppercase mb-2 block">
+            4-STEP MATCHDAY PLAYBOOK
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight mb-10">
+            FROM ROOKIE TO CHAMPION
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            <StepItem
+              num="01"
+              title="Instant Entry"
+              desc="Enter instantly with test credentials or custom manager profiles without gas delays."
+            />
+            <StepItem
+              num="02"
+              title="Analyze Odds"
+              desc="Study team OVR ratings, head-to-head records, 1X2 lines, and Both Teams to Score (GG/NG) markets."
+            />
+            <StepItem
+              num="03"
+              title="Watch Pitch Live"
+              desc="Follow real-time 90-minute compressed simulations on the visual radar pitch with commentary."
+            />
+            <StepItem
+              num="04"
+              title="Collect Winnings"
+              desc="Receive automatic payouts credited directly to your balance as the referee blows full-time."
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <FeatureCard
-              icon={<IconFootball className="w-7 h-7" />}
-              title="Live Matches"
-              description="Real-time virtual matches with dynamic odds. Bet on the action as it unfolds, 24/7."
-              gradient="from-emerald-500/20 to-emerald-900/10"
-              delay={0}
-            />
-            <FeatureCard
-              icon={<IconZap className="w-7 h-7" />}
-              title="Instant Bets"
-              description="Place bets seamlessly and get instant results. No waiting — just action."
-              gradient="from-blue-500/20 to-blue-900/10"
-              delay={100}
-            />
-            <FeatureCard
-              icon={<IconTrophy className="w-7 h-7" />}
-              title="Win Rewards"
-              description="Earn KOR tokens and exclusive digital assets with every winning prediction."
-              gradient="from-yellow-500/20 to-yellow-900/10"
-              delay={200}
-            />
-            <FeatureCard
-              icon={<IconUsers className="w-7 h-7" />}
-              title="Alliances"
-              description="Form squads, compete in team leagues, and climb the global leaderboard."
-              gradient="from-purple-500/20 to-purple-900/10"
-              delay={300}
-            />
+          <div className="mt-10">
+            <button
+              onClick={handleLaunch}
+              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-500/20"
+            >
+              Start Playing Now
+            </button>
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section
-        id="how-it-works"
-        className="relative z-10 px-6 md:px-12 py-20 md:py-28"
-      >
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-emerald-400 text-sm font-semibold tracking-widest uppercase mb-3 block">
-              Getting Started
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              How It Works
-            </h2>
-            <p className="text-slate-400 max-w-xl mx-auto">
-              Your path to glory in four simple steps.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StepCard
-              step={1}
-              icon={<IconWallet className="w-6 h-6" />}
-              title="Connect Wallet"
-              description="Link your crypto wallet to start your journey in the virtual arena."
-            />
-            <StepCard
-              step={2}
-              icon={<IconShield className="w-6 h-6" />}
-              title="Select Your Squad"
-              description="Draft your virtual team, pick your league, and join an alliance."
-            />
-            <StepCard
-              step={3}
-              icon={<IconTarget className="w-6 h-6" />}
-              title="Predict & Win"
-              description="Analyze stats, make informed predictions, and place your bets."
-            />
-            <StepCard
-              step={4}
-              icon={<IconTrophy className="w-6 h-6" />}
-              title="Earn Rewards"
-              description="Collect your winnings in KOR tokens and unlock premium features."
-            />
-          </div>
+      {/* Broadcast Footer */}
+      <footer className="relative z-10 px-6 py-6 border-t border-white/10 bg-slate-950/80 backdrop-blur-xl text-center text-slate-500 text-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <RivalsLogo size="sm" variant="full" className="text-white" />
+          <span>© 2026 KickOff Rivals Engine</span>
         </div>
-      </section>
-
-      {/* Final CTA */}
-
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/5 px-6 md:px-12 py-10">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <RivalsLogo size="sm" variant="full" className="text-white" />
-            <p className="text-slate-500 text-xs">
-              © 2024 KickOff Rivals. All rights reserved.
-            </p>
-          </div>
-          <div className="flex items-center gap-6 text-slate-500 text-sm">
-            <a href="#" className="hover:text-white transition-colors">
-              Terms
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              FAQ
-            </a>
-          </div>
-          <p className="text-slate-600 text-xs">
-            Play responsibly. Virtual currency only.
-          </p>
+        <div>
+          Virtual Sports Entertainment Architecture • Provably Fair Settlement
         </div>
       </footer>
     </div>
   );
 }
 
-/* —— Sub-components —— */
-
-function StatItem({ value, label }: { value: string; label: string }) {
+function StatBox({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="text-center">
-      <div className="text-2xl md:text-3xl font-black text-white tracking-tight">
-        {value}
-      </div>
-      <div className="text-slate-500 text-xs md:text-sm mt-0.5">{label}</div>
+    <div className="broadcast-card rounded-2xl p-4 border border-white/5 text-center">
+      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</div>
+      <div className="text-xl sm:text-2xl font-black text-white my-0.5 led-number">{value}</div>
+      <div className="text-[10px] text-emerald-400 font-semibold truncate">{sub}</div>
     </div>
   );
 }
 
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  gradient: string;
-  delay: number;
-}
+function FeatureCard({ icon, title, desc, accent }: { icon: React.ReactNode; title: string; desc: string; accent: "emerald" | "gold" | "blue" | "purple" }) {
+  const borderCol =
+    accent === "emerald" ? "border-emerald-500/30 hover:border-emerald-400" :
+    accent === "gold" ? "border-amber-500/30 hover:border-amber-400" :
+    accent === "blue" ? "border-blue-500/30 hover:border-blue-400" :
+    "border-purple-500/30 hover:border-purple-400";
 
-function FeatureCard({
-  icon,
-  title,
-  description,
-  gradient,
-  delay,
-}: FeatureCardProps) {
+  const iconCol =
+    accent === "emerald" ? "text-emerald-400 bg-emerald-500/20" :
+    accent === "gold" ? "text-amber-400 bg-amber-500/20" :
+    accent === "blue" ? "text-blue-400 bg-blue-500/20" :
+    "text-purple-400 bg-purple-500/20";
+
   return (
-    <div
-      className="glass-card glow-border p-6 transition-all duration-300 hover:translate-y-[-4px] group"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      {/* Icon */}
-      <div
-        className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center mb-4",
-          "bg-gradient-to-br",
-          gradient,
-          "text-emerald-400 group-hover:text-white transition-colors"
-        )}
-      >
-        {icon}
+    <div className={cn("broadcast-card rounded-2xl p-5 border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between", borderCol)}>
+      <div>
+        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4 border border-white/10", iconCol)}>
+          {icon}
+        </div>
+        <h3 className="text-base font-black text-white uppercase italic tracking-tight mb-2">
+          {title}
+        </h3>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          {desc}
+        </p>
       </div>
-
-      <h3 className="text-white font-semibold text-base mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm leading-relaxed">{description}</p>
     </div>
   );
 }
 
-interface StepCardProps {
-  step: number;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function StepCard({ step, icon, title, description }: StepCardProps) {
+function StepItem({ num, title, desc }: { num: string; title: string; desc: string }) {
   return (
-    <div className="relative flex flex-col items-center text-center group">
-      {/* Step number */}
-      <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-5 group-hover:bg-emerald-500/20 group-hover:border-emerald-500/40 transition-all">
-        <span className="text-emerald-400 font-bold text-lg">{step}</span>
-      </div>
-
-      {/* Icon */}
-      <div className="text-slate-300 mb-3 group-hover:text-emerald-400 transition-colors">
-        {icon}
-      </div>
-
-      <h3 className="text-white font-semibold mb-2">{title}</h3>
-      <p className="text-slate-400 text-sm leading-relaxed max-w-[220px]">
-        {description}
-      </p>
+    <div className="bg-slate-950/60 border border-white/5 rounded-2xl p-4">
+      <div className="text-2xl font-black text-emerald-400 font-mono mb-2">{num}</div>
+      <div className="text-sm font-black text-white uppercase italic mb-1">{title}</div>
+      <div className="text-xs text-slate-400 leading-relaxed">{desc}</div>
     </div>
   );
 }
