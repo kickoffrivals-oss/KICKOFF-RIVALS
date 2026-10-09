@@ -55,7 +55,7 @@ export function MatchGrid({
 
   if (selectedLeagueFilter === "all") {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {LEAGUES.map((league) => (
           <LeagueColumn
             key={league.id}
@@ -77,7 +77,7 @@ export function MatchGrid({
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       {filteredMatches.map((m) => (
         <MatchCard
           key={m.id}
@@ -117,22 +117,25 @@ function LeagueColumn({
   onAddToBetSlip,
 }: LeagueColumnProps) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       {/* League Header Banner */}
-      <div className="flex items-center justify-between px-4 py-2.5 rounded-xl broadcast-glass border border-white/10 shadow-sm">
-        <div className="flex items-center gap-2.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-          <h3 className="font-extrabold text-sm text-white tracking-wide">
+      <div className="flex items-center justify-between px-3.5 py-2 rounded-sm bg-surface-panel border border-border-subtle">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: league.color }}
+          />
+          <h3 className="font-bold text-sm text-text-primary tracking-wide">
             {league.name}
           </h3>
         </div>
-        <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-white/5 text-slate-400 border border-white/5">
+        <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-sm bg-surface-raised text-text-muted border border-border-subtle">
           {matches.length} Matches
         </span>
       </div>
 
       {/* Match Cards List */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {matches.map((m) => (
           <MatchCard
             key={m.id}
@@ -148,3 +151,4 @@ function LeagueColumn({
     </div>
   );
 }
+

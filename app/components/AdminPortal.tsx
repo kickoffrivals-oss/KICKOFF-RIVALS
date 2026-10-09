@@ -303,33 +303,34 @@ export function AdminPortal({
     <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#0A0D12]/80 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl bg-background rounded-2xl shadow-xl max-h-[90vh] flex flex-col">
+      <div className="relative w-full max-w-2xl bg-[#13171F] rounded-[6px] border border-[#222938] shadow-2xl max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex items-center justify-between p-4 border-b border-[#222938]">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-primary/10">
-              <IconShield className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 rounded-[4px] bg-[#1B212D] border border-[#222938] flex items-center justify-center">
+              <IconShield className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
-              <h2 className="font-bold text-foreground">Admin Portal</h2>
-              <p className="text-xs text-muted-foreground">System Management</p>
+              <h2 className="font-bold text-sm text-white uppercase tracking-wider">Admin Portal</h2>
+              <p className="text-xs text-slate-400">System Management</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            className="p-1.5 rounded-[4px] bg-[#1B212D] border border-[#222938] text-slate-400 hover:text-white transition-colors"
+            aria-label="Close portal"
           >
-            <IconX className="w-5 h-5 text-muted-foreground" />
+            <IconX className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-2 mx-4 mt-4 bg-muted rounded-lg">
+        <div className="flex gap-1 p-1 mx-4 mt-3 bg-[#0A0D12] rounded-[4px] border border-[#222938]">
           {[
             { id: "overview", label: "Overview", icon: IconSettings },
             { id: "coupons", label: "Coupons", icon: IconCoins },
@@ -341,13 +342,13 @@ export function AdminPortal({
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={cn(
-                "flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2",
+                "flex-1 py-1.5 px-2 rounded-[4px] text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5",
                 activeTab === tab.id
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
+                  ? "bg-[#1B212D] text-emerald-400 border border-[#323C50]"
+                  : "text-slate-400 hover:text-white",
               )}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-3.5 h-3.5" />
               {tab.label}
             </button>
           ))}
@@ -357,82 +358,76 @@ export function AdminPortal({
         {message && (
           <div
             className={cn(
-              "mx-4 mt-4 p-3 rounded-lg flex items-center gap-2",
+              "mx-4 mt-3 p-2.5 rounded-[4px] flex items-center gap-2 text-xs font-medium border",
               message.type === "success"
-                ? "bg-green-500/10 text-green-500 border border-green-500/30"
-                : "bg-destructive/10 text-destructive border border-destructive/30",
+                ? "bg-emerald-950/20 text-emerald-400 border-emerald-500/30"
+                : "bg-red-950/20 text-red-400 border-red-500/30",
             )}
           >
             {message.type === "success" ? (
-              <IconCheck className="w-4 h-4" />
+              <IconCheck className="w-4 h-4 shrink-0" />
             ) : (
-              <IconX className="w-4 h-4" />
+              <IconX className="w-4 h-4 shrink-0" />
             )}
-            <span className="text-sm">{message.text}</span>
+            <span>{message.text}</span>
           </div>
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Overview Tab */}
           {activeTab === "overview" && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="card p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <IconCoins className="w-5 h-5 text-yellow-500" />
-                    <span className="text-sm text-muted-foreground">
-                      Active Coupons
-                    </span>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-3">
+                  <div className="flex items-center gap-1.5 mb-1 text-slate-400 text-xs font-bold uppercase">
+                    <IconCoins className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Active Coupons</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-xl font-mono font-bold text-white tabular-nums">
                     {coupons.length}
                   </p>
                 </div>
 
-                <div className="card p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <IconUsers className="w-5 h-5 text-primary" />
-                    <span className="text-sm text-muted-foreground">
-                      Active Quests
-                    </span>
+                <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-3">
+                  <div className="flex items-center gap-1.5 mb-1 text-slate-400 text-xs font-bold uppercase">
+                    <IconUsers className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Active Quests</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-xl font-mono font-bold text-white tabular-nums">
                     {quests.filter((q) => q.status === "LIVE").length}
                   </p>
                 </div>
 
-                <div className="card p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <IconTrophy className="w-5 h-5 text-blue-500" />
-                    <span className="text-sm text-muted-foreground">
-                      Current Matches
-                    </span>
+                <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-3">
+                  <div className="flex items-center gap-1.5 mb-1 text-slate-400 text-xs font-bold uppercase">
+                    <IconTrophy className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Current Matches</span>
                   </div>
-                  <p className="text-2xl font-bold text-foreground">
+                  <p className="text-xl font-mono font-bold text-white tabular-nums">
                     {matches.length}
                   </p>
                 </div>
               </div>
 
-              <div className="card p-4">
-                <h3 className="font-semibold text-foreground mb-4">
+              <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-4">
+                <h3 className="font-bold text-xs uppercase text-white tracking-wider mb-3">
                   Quick Actions
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setActiveTab("coupons")}
-                    className="btn btn-outline h-12"
+                    className="h-9 px-3 rounded-[4px] bg-[#1B212D] border border-[#222938] hover:bg-[#222938] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <IconPlus className="w-4 h-4 mr-2" />
+                    <IconPlus className="w-3.5 h-3.5 text-emerald-400" />
                     Create Coupon
                   </button>
                   <button
                     onClick={handleResetQuests}
                     disabled={isLoading}
-                    className="btn btn-outline h-12"
+                    className="h-9 px-3 rounded-[4px] bg-[#1B212D] border border-[#222938] hover:bg-[#222938] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
                   >
-                    <IconRefresh className="w-4 h-4 mr-2" />
+                    <IconRefresh className="w-3.5 h-3.5 text-slate-400" />
                     Reset Quests
                   </button>
                 </div>
@@ -442,15 +437,15 @@ export function AdminPortal({
 
           {/* Coupons Tab */}
           {activeTab === "coupons" && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Create Coupon Form */}
-              <div className="card p-4">
-                <h3 className="font-semibold text-foreground mb-4">
+              <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-4">
+                <h3 className="font-bold text-xs uppercase text-white tracking-wider mb-3">
                   Create New Coupon
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">
+                    <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">
                       Code
                     </label>
                     <input
@@ -460,13 +455,13 @@ export function AdminPortal({
                         setNewCouponCode(e.target.value.toUpperCase())
                       }
                       placeholder="WELCOME100"
-                      className="input w-full"
+                      className="w-full h-9 bg-[#13171F] border border-[#222938] rounded-[4px] px-3 text-xs font-mono font-bold text-white uppercase focus:outline-none focus:border-emerald-500"
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1 block">
+                      <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">
                         Type
                       </label>
                       <select
@@ -474,7 +469,7 @@ export function AdminPortal({
                         onChange={(e) =>
                           setNewCouponType(e.target.value as "coins" | "theme")
                         }
-                        className="input w-full"
+                        className="w-full h-9 bg-[#13171F] border border-[#222938] rounded-[4px] px-3 text-xs font-bold text-white focus:outline-none focus:border-emerald-500"
                       >
                         <option value="coins">Coins</option>
                         <option value="theme">Theme</option>
@@ -482,7 +477,7 @@ export function AdminPortal({
                     </div>
 
                     <div>
-                      <label className="text-sm text-muted-foreground mb-1 block">
+                      <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">
                         {newCouponType === "coins" ? "Amount" : "Theme ID"}
                       </label>
                       <input
@@ -492,13 +487,13 @@ export function AdminPortal({
                         placeholder={
                           newCouponType === "coins" ? "100" : "christmas"
                         }
-                        className="input w-full"
+                        className="w-full h-9 bg-[#13171F] border border-[#222938] rounded-[4px] px-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-sm text-muted-foreground mb-1 block">
+                    <label className="text-xs font-bold uppercase text-slate-400 mb-1 block">
                       Usage Limit
                     </label>
                     <input
@@ -508,42 +503,42 @@ export function AdminPortal({
                         setNewCouponLimit(parseInt(e.target.value))
                       }
                       placeholder="100"
-                      className="input w-full"
+                      className="w-full h-9 bg-[#13171F] border border-[#222938] rounded-[4px] px-3 text-xs font-mono font-bold text-white focus:outline-none focus:border-emerald-500"
                     />
                   </div>
 
                   <button
                     onClick={handleCreateCoupon}
                     disabled={isLoading || !newCouponCode.trim()}
-                    className="btn btn-primary w-full h-11"
+                    className="w-full h-9 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors disabled:opacity-40"
                   >
-                    <IconPlus className="w-4 h-4 mr-2" />
+                    <IconPlus className="w-3.5 h-3.5" />
                     Create Coupon
                   </button>
                 </div>
               </div>
 
               {/* Existing Coupons */}
-              <div className="card p-4">
-                <h3 className="font-semibold text-foreground mb-4">
+              <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-4">
+                <h3 className="font-bold text-xs uppercase text-white tracking-wider mb-3">
                   Active Coupons ({coupons.length})
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {coupons.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">
+                    <p className="text-xs text-slate-500 text-center py-6 font-bold uppercase">
                       No coupons created yet
                     </p>
                   ) : (
                     coupons.map((coupon) => (
                       <div
                         key={coupon.code}
-                        className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                        className="flex items-center justify-between p-2.5 bg-[#13171F] rounded-[4px] border border-[#222938]"
                       >
                         <div>
-                          <p className="font-mono font-bold text-foreground">
+                          <p className="font-mono font-bold text-xs text-emerald-400">
                             {coupon.code}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-slate-400 font-mono tabular-nums">
                             {coupon.type === "coins"
                               ? `${coupon.value} coins`
                               : `Theme: ${coupon.value}`}{" "}
@@ -553,9 +548,10 @@ export function AdminPortal({
                         <button
                           onClick={() => handleDeleteCoupon(coupon.code)}
                           disabled={isLoading}
-                          className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          className="p-1.5 rounded-[4px] bg-[#1B212D] text-slate-400 hover:text-red-400 border border-[#222938] transition-colors"
+                          aria-label="Delete coupon"
                         >
-                          <IconTrash className="w-4 h-4" />
+                          <IconTrash className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ))
@@ -567,49 +563,50 @@ export function AdminPortal({
 
           {/* Matches Tab */}
           {activeTab === "matches" && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-bold text-xs uppercase text-white tracking-wider">
                   Match Management
                 </h3>
                 <button
                   onClick={handleGenerateRound}
                   disabled={isLoading}
-                  className="btn btn-primary h-9 text-sm"
+                  className="h-8 px-3 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors disabled:opacity-40"
                 >
-                  <IconPlus className="w-4 h-4 mr-2" />
+                  <IconPlus className="w-3.5 h-3.5" />
                   Generate Round
                 </button>
               </div>
 
-              <div className="grid gap-3">
+              <div className="space-y-1.5">
                 {matches.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-6 text-slate-500 text-xs font-bold uppercase">
                     No active matches. Generate a round!
                   </div>
                 ) : (
                   matches.map((m) => (
                     <div
                       key={m.id}
-                      className="card p-3 flex items-center justify-between"
+                      className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-2.5 flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3">
                         <span
-                          className={`badge ${
+                          className={cn(
+                            "px-2 py-0.5 rounded-[4px] text-xs font-bold uppercase font-mono",
                             m.status === "LIVE"
-                              ? "bg-red-500/10 text-red-500"
-                              : "bg-muted"
-                          }`}
+                              ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                              : "bg-[#1B212D] text-slate-400 border border-[#222938]"
+                          )}
                         >
                           {m.status}
                         </span>
-                        <div className="text-sm">
-                          <span className="font-bold">{m.homeTeam.name}</span>{" "}
-                          vs{" "}
-                          <span className="font-bold">{m.awayTeam.name}</span>
+                        <div className="text-xs">
+                          <span className="font-bold text-white">{m.homeTeam.name}</span>{" "}
+                          <span className="text-slate-500">vs</span>{" "}
+                          <span className="font-bold text-white">{m.awayTeam.name}</span>
                         </div>
                         {m.status === "FINISHED" && (
-                          <span className="font-mono font-bold bg-muted px-2 py-1 rounded">
+                          <span className="font-mono font-bold text-xs bg-[#1B212D] px-2 py-0.5 rounded-[4px] border border-[#222938] text-emerald-400 tabular-nums">
                             {m.currentScore
                               ? `${m.currentScore.home} - ${m.currentScore.away}`
                               : "?-?"}
@@ -620,10 +617,10 @@ export function AdminPortal({
                         {m.status !== "FINISHED" && (
                           <button
                             onClick={() => handleSimulateMatch(m)}
-                            className="btn btn-xs btn-outline"
+                            className="h-7 px-2.5 rounded-[4px] bg-[#1B212D] border border-[#222938] hover:bg-[#222938] text-white font-bold text-xs uppercase flex items-center gap-1 transition-colors"
                             disabled={isLoading}
                           >
-                            <IconPlay className="w-3 h-3 mr-1" /> Sim Result
+                            <IconPlay className="w-3 h-3 text-emerald-400" /> Sim Result
                           </button>
                         )}
                       </div>
@@ -636,44 +633,44 @@ export function AdminPortal({
 
           {/* Quests Tab */}
           {activeTab === "quests" && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-bold text-xs uppercase text-white tracking-wider">
                   Quest Management
                 </h3>
                 <button
                   onClick={handleResetQuests}
                   disabled={isLoading}
-                  className="btn btn-outline h-9 text-sm"
+                  className="h-8 px-3 rounded-[4px] bg-[#1B212D] border border-[#222938] hover:bg-[#222938] text-white font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors disabled:opacity-40"
                 >
-                  <IconRefresh className="w-4 h-4 mr-2" />
+                  <IconRefresh className="w-3.5 h-3.5" />
                   Reset All
                 </button>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {quests.map((quest) => (
                   <div
                     key={quest.id}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                    className="flex items-center justify-between p-2.5 bg-[#0A0D12] rounded-[4px] border border-[#222938]"
                   >
                     <div>
-                      <p className="font-medium text-foreground">
+                      <p className="font-bold text-xs text-white">
                         {quest.title}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-400 font-mono tabular-nums">
                         {quest.frequency} • +{quest.reward} coins •{" "}
                         {quest.progress}/{quest.target}
                       </p>
                     </div>
                     <span
                       className={cn(
-                        "badge text-xs",
+                        "px-2 py-0.5 rounded-[4px] text-xs font-bold uppercase font-mono",
                         quest.completed
-                          ? "bg-primary/10 text-primary"
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                           : quest.status === "LIVE"
-                          ? "bg-green-500/10 text-green-500"
-                          : "bg-yellow-500/10 text-yellow-500",
+                          ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                          : "bg-amber-500/20 text-amber-400 border border-amber-500/30",
                       )}
                     >
                       {quest.completed ? "Completed" : quest.status}
@@ -686,23 +683,23 @@ export function AdminPortal({
 
           {/* Settings Tab */}
           {activeTab === "settings" && (
-            <div className="space-y-4">
-              <div className="card p-4">
-                <h3 className="font-semibold text-foreground mb-4">
+            <div className="space-y-3">
+              <div className="bg-[#0A0D12] rounded-[4px] border border-[#222938] p-3 space-y-2">
+                <h3 className="font-bold text-xs uppercase text-white tracking-wider mb-2">
                   Session Info
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs font-bold uppercase text-slate-400">
                       Status
                     </span>
-                    <span className="badge bg-green-500/10 text-green-500">
+                    <span className="px-2 py-0.5 rounded-[4px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold font-mono">
                       Active
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Token</span>
-                    <span className="text-sm font-mono text-foreground">
+                    <span className="text-xs font-bold uppercase text-slate-400">Token</span>
+                    <span className="text-xs font-mono text-slate-300 tabular-nums">
                       {sessionToken.slice(0, 12)}...
                     </span>
                   </div>
@@ -728,17 +725,17 @@ export function AdminPortal({
                   }
                 }}
                 disabled={isLoading}
-                className="btn btn-outline w-full h-11 text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+                className="w-full h-10 rounded-[4px] bg-[#1B212D] border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors disabled:opacity-40"
               >
-                <IconRefresh className="w-4 h-4 mr-2" />
+                <IconRefresh className="w-4 h-4" />
                 Reset Game State to Round 1
               </button>
 
               <button
                 onClick={onClose}
-                className="btn btn-outline w-full h-11 text-destructive hover:bg-destructive/10"
+                className="w-full h-10 rounded-[4px] bg-[#1B212D] border border-red-500/30 text-red-400 hover:bg-red-950/20 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
               >
-                <IconLogOut className="w-4 h-4 mr-2" />
+                <IconLogOut className="w-4 h-4" />
                 Logout from Admin
               </button>
             </div>
@@ -746,8 +743,11 @@ export function AdminPortal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border">
-          <button onClick={onClose} className="btn btn-outline w-full h-11">
+        <div className="p-3 border-t border-[#222938]">
+          <button
+            onClick={onClose}
+            className="w-full h-9 rounded-[4px] bg-[#1B212D] border border-[#222938] text-slate-300 hover:bg-[#222938] font-bold text-xs uppercase tracking-wider transition-colors"
+          >
             Close Portal
           </button>
         </div>

@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { EntryChoice } from "../components/EntryChoice";
+import { useGame } from "../contexts/GameContext";
 import { useUserStore } from "../stores/userStore";
 
 export const Route = createFileRoute("/entry")({
@@ -9,25 +9,19 @@ export const Route = createFileRoute("/entry")({
 
 function EntryRoute() {
   const navigate = useNavigate();
-  const { walletState, onboardingComplete } = useUserStore();
+  const { handleWalletConnected, handleMessageSigned } = useGame();
+  const { setOnboardingComplete } = useUserStore();
 
-  // Auto-redirect if already verified
   useEffect(() => {
-    if (walletState.isConnected && walletState.isVerified) {
-      if (onboardingComplete) {
-        navigate({ to: "/dashboard" });
-      } else {
-        navigate({ to: "/onboarding" });
-      }
-    }
-  }, [walletState.isConnected, walletState.isVerified, onboardingComplete, navigate]);
+    handleWalletConnected("0x65bc46df99bc2385128c8a67752d7cd3922de740");
+    handleMessageSigned();
+    setOnboardingComplete(true);
+    navigate({ to: "/dashboard" });
+  }, [handleWalletConnected, handleMessageSigned, setOnboardingComplete, navigate]);
 
   return (
-    <EntryChoice
-      onNewUser={() => navigate({ to: "/onboarding" })}
-      onReturningUser={() =>
-        navigate({ to: "/connect", search: { intent: "returning" } as any })
-      }
-    />
+    <div className="min-h-screen bg-[#0A0D12] flex items-center justify-center text-xs font-mono text-slate-400">
+      CONNECTING MATCHDAY SESSION...
+    </div>
   );
 }

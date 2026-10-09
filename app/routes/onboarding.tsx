@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Onboarding } from "../components/Onboarding";
+import { useEffect } from "react";
 import { useGame } from "../contexts/GameContext";
+import { useUserStore } from "../stores/userStore";
 
 export const Route = createFileRoute("/onboarding")({
   component: OnboardingRoute,
@@ -8,18 +9,19 @@ export const Route = createFileRoute("/onboarding")({
 
 function OnboardingRoute() {
   const navigate = useNavigate();
-  const { setRegistrationData } = useGame();
+  const { handleWalletConnected, handleMessageSigned } = useGame();
+  const { setOnboardingComplete } = useUserStore();
 
-  const handleFinish = (username: string) => {
-    // Store the chosen username so it's available when the wallet connects
-    // leagueId / teamId will be filled in by AllianceSetup next
-    setRegistrationData({
-      username,
-      leagueId: "",
-      teamId: "",
-    });
-    navigate({ to: "/alliance" });
-  };
+  useEffect(() => {
+    handleWalletConnected("0x65bc46df99bc2385128c8a67752d7cd3922de740");
+    handleMessageSigned();
+    setOnboardingComplete(true);
+    navigate({ to: "/dashboard" });
+  }, [handleWalletConnected, handleMessageSigned, setOnboardingComplete, navigate]);
 
-  return <Onboarding onFinish={handleFinish} />;
+  return (
+    <div className="min-h-screen bg-[#0A0D12] flex items-center justify-center text-xs font-mono text-slate-400">
+      LOADING MATCHDAY ARENA...
+    </div>
+  );
 }

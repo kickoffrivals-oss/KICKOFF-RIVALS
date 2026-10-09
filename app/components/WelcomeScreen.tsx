@@ -21,20 +21,15 @@ export function WelcomeScreen({
   onProceed,
 }: WelcomeScreenProps) {
   const [showRewards, setShowRewards] = useState(false);
-  const [animationComplete, setAnimationComplete] = useState(false);
 
   useEffect(() => {
     soundFx.playGoal();
-    const timer1 = setTimeout(() => {
+    const timer = setTimeout(() => {
       setShowRewards(true);
       soundFx.playCashout();
-    }, 400);
-    const timer2 = setTimeout(() => setAnimationComplete(true), 1000);
+    }, 200);
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   const handleStart = () => {
@@ -43,108 +38,86 @@ export function WelcomeScreen({
   };
 
   return (
-    <div className="min-h-screen stadium-bg text-white flex flex-col justify-between relative overflow-hidden">
-      {/* Floodlights & Volumetric Beam Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-amber-500/20 via-emerald-500/10 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-emerald-500/10 blur-[140px] pointer-events-none" />
-
+    <div className="min-h-screen bg-[#0A0D12] text-white flex flex-col justify-between">
       {/* Top Header */}
-      <header className="relative z-10 px-6 py-6 flex items-center justify-between border-b border-white/5">
-        <RivalsLogo size="md" variant="full" className="text-white" />
-        <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full text-xs font-bold text-amber-400">
-          <IconGift className="w-3.5 h-3.5" />
-          STARTER PACK ACTIVATED
+      <header className="px-4 sm:px-8 py-4 flex items-center justify-between border-b border-[#222938] bg-[#13171F]">
+        <div className="flex items-center gap-3">
+          <RivalsLogo size="md" variant="full" className="text-white" />
+        </div>
+        <div className="flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-[#1B212D] border border-[#222938] text-xs font-mono text-slate-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span>STEP 4 OF 4: STADIUM ACTIVATION</span>
         </div>
       </header>
 
       {/* Center Welcome Card */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
-        <div className="max-w-xl w-full">
-          <div className="broadcast-card rounded-3xl p-8 border border-white/10 relative overflow-hidden backdrop-blur-2xl shadow-2xl shadow-black/80 text-center">
-            {/* Ambient Background Aura */}
-            <div className="absolute -top-16 -right-16 w-48 h-48 bg-amber-500/20 rounded-full blur-2xl pointer-events-none" />
-
-            {/* Starter Trophy Badge */}
-            <div className="relative inline-flex items-center justify-center mb-6">
-              <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 p-[2px] shadow-2xl shadow-yellow-500/30 animate-float">
-                <div className="w-full h-full rounded-[22px] bg-slate-950 flex flex-col items-center justify-center">
-                  <IconSparkles className="w-10 h-10 text-amber-400" />
-                </div>
-              </div>
-              <span className="absolute -bottom-2 bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 font-black text-[10px] uppercase px-3 py-0.5 rounded-full shadow-md tracking-wider">
-                SIGNING BONUS
-              </span>
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+        <div className="max-w-md w-full">
+          <div className="bg-[#13171F] rounded-[6px] p-6 sm:p-7 border border-[#222938] shadow-2xl space-y-5 text-center">
+            {/* Header Icon */}
+            <div className="w-12 h-12 mx-auto rounded-[4px] bg-[#1B212D] border border-amber-500/40 flex items-center justify-center text-amber-400">
+              <IconGift className="w-6 h-6" />
             </div>
 
-            {/* Broadcast Title */}
-            <div className="mb-2">
-              <span className="text-[11px] font-black uppercase tracking-[0.3em] text-amber-400">
-                OFFICIAL PLAYER REGISTRATION
+            {/* Salutation */}
+            <div className="space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block">
+                Registration Confirmed
               </span>
-              <h1 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight mt-1">
-                WELCOME TO THE ARENA, <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-200">{username}</span>
+              <h1 className="text-2xl font-bold text-white uppercase tracking-tight">
+                Welcome, {username}
               </h1>
-              <p className="text-sm text-slate-400 max-w-md mx-auto mt-2">
-                Your virtual stadium account has been credited with your starter grant.
+              <p className="text-xs text-slate-400">
+                Your manager account is ready with your starter matchday grant.
               </p>
             </div>
 
             {/* Starter Bonus Hub */}
             {showRewards && (
-              <div className="mt-8 space-y-4 animate-slide-up">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Coins Bonus */}
-                  <div className="bg-slate-900/80 border border-amber-500/30 rounded-2xl p-5 text-center bg-gradient-to-b from-amber-500/15 to-transparent">
-                    <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                      <IconCoins className="w-6 h-6" />
-                    </div>
-                    <div className="text-3xl font-black text-amber-400 led-number">
-                      5,000
-                    </div>
-                    <div className="text-xs text-amber-300/80 font-bold uppercase tracking-wider mt-1">
-                      Starter Coins
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                {/* Coins Bonus */}
+                <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3 text-center">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                    Play Coins
+                  </span>
+                  <p className="text-xl font-mono font-bold text-white tabular-nums">
+                    5,000
+                  </p>
+                  <p className="text-xs text-slate-500 uppercase mt-0.5">
+                    Starter Stake
+                  </p>
+                </div>
 
-                  {/* KOR Tokens Bonus */}
-                  <div className="bg-slate-900/80 border border-emerald-500/30 rounded-2xl p-5 text-center bg-gradient-to-b from-emerald-500/15 to-transparent">
-                    <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                      <IconZap className="w-6 h-6" />
-                    </div>
-                    <div className="text-3xl font-black text-emerald-400 led-number">
-                      1,000
-                    </div>
-                    <div className="text-xs text-emerald-300/80 font-bold uppercase tracking-wider mt-1">
-                      KOR Tokens
-                    </div>
-                  </div>
+                {/* KOR Bonus */}
+                <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3 text-center">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                    KOR Tokens
+                  </span>
+                  <p className="text-xl font-mono font-bold text-amber-400 tabular-nums">
+                    1,000
+                  </p>
+                  <p className="text-xs text-slate-500 uppercase mt-0.5">
+                    Reward Reserve
+                  </p>
                 </div>
               </div>
             )}
 
             {/* Launch Action Button */}
-            <div className="mt-8">
-              <button
-                onClick={handleStart}
-                className={cn(
-                  "w-full h-14 rounded-2xl font-black text-base uppercase tracking-wider italic",
-                  "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
-                  "hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 hover:scale-[1.02] active:scale-98",
-                  "shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-3",
-                  !animationComplete && "opacity-90",
-                )}
-              >
-                <span>COMMENCE MATCHDAY</span>
-                <IconChevronRight className="w-5 h-5 text-slate-950 stroke-[3]" />
-              </button>
-            </div>
+            <button
+              onClick={handleStart}
+              className="w-full h-11 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+            >
+              <span>Enter Stadium Arena</span>
+              <IconChevronRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </main>
 
-      {/* Broadcast Ticker Footer */}
-      <footer className="relative z-10 px-6 py-4 text-center text-slate-500 text-xs border-t border-white/5 bg-slate-950/60 backdrop-blur-md">
-        KickOff Rivals v2.0 • Decentralized Football Simulation & Prediction Engine
+      {/* Footer */}
+      <footer className="px-4 sm:px-8 py-3.5 text-center text-slate-500 text-xs border-t border-[#222938] bg-[#0A0D12]">
+        KickOff Rivals • Official Matchday Roster Active
       </footer>
     </div>
   );

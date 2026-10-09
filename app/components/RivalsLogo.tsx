@@ -3,7 +3,7 @@ import { cn } from "../lib/utils";
 
 interface RivalsLogoProps {
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   variant?: "full" | "icon" | "text";
   to?: string;
   disableLink?: boolean;
@@ -17,17 +17,19 @@ export function RivalsLogo({
   disableLink = false,
 }: RivalsLogoProps) {
   const sizeClasses = {
-    sm: "h-6",
-    md: "h-10",
-    lg: "h-14",
-    xl: "h-20",
+    xs: "h-4 w-4",
+    sm: "h-5 w-5",
+    md: "h-6 w-6",
+    lg: "h-8 w-8",
+    xl: "h-10 w-10",
   };
 
   const textSizeClasses = {
-    sm: "text-lg",
-    md: "text-2xl",
-    lg: "text-4xl",
-    xl: "text-6xl",
+    xs: "text-xs tracking-normal",
+    sm: "text-sm tracking-tight",
+    md: "text-base tracking-tight",
+    lg: "text-lg tracking-tight",
+    xl: "text-xl tracking-tight",
   };
 
   const content = (

@@ -1,29 +1,32 @@
+import { useState } from "react";
 import type { Bet } from "../../types";
-import { IconTicket, IconTrophy, IconZap, IconCheck, IconX } from "../Icons";
+import { Check, X, Clock, Zap, Ticket, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { formatNumber } from "../../lib/utils";
+import { soundFx } from "../../lib/soundFx";
 
-// ─── Status badge style ──────────────────────────────────────────────────────
+// ─── Explicit Status Badge (Text + Icon + Semantic Color) ────────────────────
 
-function statusBadge(status: string) {
+function StatusBadge({ status }: { status: string }) {
   if (status === "won") {
     return (
-      <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm shadow-emerald-500/20">
-        <IconCheck className="w-3 h-3" />
-        WON
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#062E1E] text-semantic-win border border-semantic-win/40 text-xs font-mono font-bold uppercase tracking-wider">
+        <Check size={13} strokeWidth={2.5} />
+        <span>WON</span>
       </span>
     );
   }
   if (status === "lost") {
     return (
-      <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 shadow-sm shadow-red-500/20">
-        <IconX className="w-3 h-3" />
-        LOST
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#381014] text-semantic-loss border border-semantic-loss/40 text-xs font-mono font-bold uppercase tracking-wider">
+        <X size={13} strokeWidth={2.5} />
+        <span>LOST</span>
       </span>
     );
   }
   return (
-    <span className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
-      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-      IN PLAY
+    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[#382305] text-[#F59E0B] border border-[#F59E0B]/40 text-xs font-mono font-bold uppercase tracking-wider">
+      <Clock size={13} strokeWidth={2.5} />
+      <span>IN PLAY</span>
     </span>
   );
 }
@@ -40,47 +43,45 @@ export function SingleBetCard({ bet: b }: SingleBetCardProps) {
 
   return (
     <div
-      className={`broadcast-card rounded-xl px-4 py-3 border transition-all duration-300 relative overflow-hidden ${
+      className={`bg-surface-panel rounded-sm p-3 sm:p-3.5 border transition-colors ${
         isWon
-          ? "border-emerald-500/40 bg-gradient-to-r from-emerald-950/30 via-slate-900/80 to-slate-900/90 shadow-sm shadow-emerald-500/10"
+          ? "border-semantic-win/40 bg-surface-panel"
           : isLost
-          ? "border-red-500/20 bg-slate-900/60 opacity-80"
-          : "border-white/10 bg-slate-900/80 hover:border-emerald-500/30"
+          ? "border-border-subtle opacity-80"
+          : "border-border-subtle hover:border-border-strong"
       }`}
     >
       {/* Top Header: Title + Status Badge */}
       <div className="flex justify-between items-center gap-2 mb-2">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-            <IconTicket className="w-3.5 h-3.5" />
+          <div className="w-6 h-6 rounded-sm bg-surface-raised border border-border-subtle flex items-center justify-center text-text-muted shrink-0">
+            <Ticket size={13} strokeWidth={2} />
           </div>
-          <div className="truncate">
-            <span className="text-xs font-black text-white uppercase italic tracking-tight truncate block">
-              {b.homeTeamName && b.awayTeamName
-                ? `${b.homeTeamName} vs ${b.awayTeamName}`
-                : `Match #${b.matchId.slice(-4)}`}
-            </span>
-          </div>
+          <span className="text-xs font-bold text-text-primary uppercase tracking-tight truncate">
+            {b.homeTeamName && b.awayTeamName
+              ? `${b.homeTeamName} vs ${b.awayTeamName}`
+              : `Match #${b.matchId.slice(-4)}`}
+          </span>
         </div>
-        <div className="shrink-0">{statusBadge(b.status)}</div>
+        <StatusBadge status={b.status} />
       </div>
 
-      {/* Bottom Bar: Selection Tag + Odds + Stake + Result Return */}
-      <div className="flex items-center justify-between bg-slate-950/60 border border-white/5 rounded-lg px-3 py-1.5 text-xs">
+      {/* Bottom Row: Selection + Odds + Stake + Return */}
+      <div className="flex items-center justify-between bg-surface-page border border-border-subtle rounded-sm px-3 py-1.5 text-xs">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-slate-400 uppercase">Pick:</span>
-          <span className="font-black text-amber-400 uppercase text-xs">
+          <span className="text-xs font-semibold text-text-muted uppercase">Pick:</span>
+          <span className="font-bold text-text-primary uppercase">
             {b.selection.toUpperCase()}
           </span>
-          <span className="text-[10px] font-black text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20 led-number">
+          <span className="text-xs font-mono font-bold text-accent bg-surface-raised px-1.5 py-0.2 rounded-sm border border-border-subtle tabular-nums">
             @{Number(b.odds).toFixed(2)}
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-slate-400 text-[11px]">
-            <span className="text-[9px] uppercase font-bold text-slate-500 mr-1">Stake:</span>
-            <span className="font-extrabold text-white led-number">{b.stake} Coins</span>
+          <div className="text-text-muted text-xs">
+            <span className="uppercase text-text-muted mr-1">Stake:</span>
+            <span className="font-mono font-bold text-text-primary tabular-nums">{b.stake} Coins</span>
           </div>
           <div>
             <BetReturn bet={b} />
@@ -99,6 +100,7 @@ interface AccumulatorBetCardProps {
 }
 
 export function AccumulatorBetCard({ accId, legs }: AccumulatorBetCardProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
   const firstLeg = legs[0];
   const accStatus = legs.every((l) => l.status === "won")
     ? "won"
@@ -113,41 +115,61 @@ export function AccumulatorBetCard({ accId, legs }: AccumulatorBetCardProps) {
   const isLost = accStatus === "lost";
 
   return (
-    <div className={`broadcast-card rounded-2xl p-4.5 border transition-all duration-300 relative overflow-hidden ${
-      isWon ? "border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 via-slate-900/80 to-slate-900/90" :
-      isLost ? "border-red-500/20 bg-slate-900/60 opacity-80" :
-      "border-white/10 bg-slate-900/80 hover:border-emerald-500/30"
-    }`}>
+    <div
+      className={`bg-surface-panel rounded-sm p-3.5 border transition-colors ${
+        isWon
+          ? "border-semantic-win/40 bg-surface-panel"
+          : isLost
+          ? "border-border-subtle opacity-80"
+          : "border-border-subtle hover:border-border-strong"
+      }`}
+    >
       {/* Top Header Row */}
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start mb-2.5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-            <IconZap className="w-4 h-4" />
+          <div className="w-7 h-7 rounded-sm bg-surface-raised border border-border-subtle flex items-center justify-center text-semantic-reward">
+            <Zap size={15} strokeWidth={2} />
           </div>
           <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400">
-              ACCUMULATOR COMBO • {legs.length} LEGS
+            <div className="text-xs font-bold uppercase tracking-wider text-text-primary flex items-center gap-2 font-mono">
+              ACCUMULATOR COMBO
+              <span className="text-text-muted font-normal">({legs.length} Legs)</span>
             </div>
-            <div className="text-xs text-slate-300 font-bold">
-              Combo Multiplier: <span className="text-emerald-400 font-black led-number">@{totalOdds.toFixed(2)}</span>
+            <div className="text-xs text-text-muted">
+              Total Odds: <span className="text-text-primary font-mono font-bold tabular-nums">@{totalOdds.toFixed(2)}</span>
             </div>
           </div>
         </div>
-        {statusBadge(accStatus)}
+
+        <div className="flex items-center gap-2">
+          <StatusBadge status={accStatus} />
+          <button
+            onClick={() => {
+              soundFx.playClick();
+              setIsExpanded(!isExpanded);
+            }}
+            aria-label={isExpanded ? "Collapse accumulator legs" : "Expand accumulator legs"}
+            className="p-1 rounded-sm text-text-muted hover:text-text-primary hover:bg-surface-raised transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+        </div>
       </div>
 
-      {/* Legs List */}
-      <div className="space-y-1.5 mb-3">
-        {legs.map((leg, li) => (
-          <AccLeg key={`leg-${leg.id}-${li}`} leg={leg} />
-        ))}
-      </div>
+      {/* Collapsible Legs List */}
+      {isExpanded && (
+        <div className="space-y-1.5 mb-2.5 animate-slide-up">
+          {legs.map((leg, li) => (
+            <AccLeg key={`leg-${leg.id}-${li}`} leg={leg} />
+          ))}
+        </div>
+      )}
 
-      {/* Stake & Potential Return Row */}
-      <div className="flex justify-between items-center text-xs border-t border-white/5 pt-2.5">
-        <div className="flex items-center gap-1.5 text-slate-400">
-          <span className="text-[10px] uppercase tracking-wider font-bold">Total Stake:</span>
-          <span className="font-extrabold text-white led-number">{stake} Coins</span>
+      {/* Stake & Return Row */}
+      <div className="flex justify-between items-center text-xs border-t border-border-subtle pt-2">
+        <div className="flex items-center gap-1 text-text-muted">
+          <span className="uppercase text-text-muted">Stake:</span>
+          <span className="font-mono font-bold text-text-primary tabular-nums">{stake} Coins</span>
         </div>
         <div>
           <AccReturn status={accStatus} potentialReturn={potentialReturn} />
@@ -162,28 +184,22 @@ function AccLeg({ leg }: { leg: Bet }) {
   const isLost = leg.status === "lost";
 
   return (
-    <div className="flex items-center justify-between bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2">
-      <div className="text-xs">
-        <span className="text-slate-300 font-semibold">
+    <div className="flex items-center justify-between bg-surface-page border border-border-subtle rounded-sm px-2.5 py-1.5">
+      <div className="text-xs min-w-0 pr-2">
+        <span className="text-text-primary font-semibold truncate block">
           {leg.homeTeamName && leg.awayTeamName
             ? `${leg.homeTeamName} vs ${leg.awayTeamName}`
             : `Match #${leg.matchId.slice(-4)}`}
         </span>
-        <div className="text-[11px] font-black text-amber-400 uppercase">
+        <div className="text-xs font-bold text-accent uppercase">
           Pick: {leg.selection.toUpperCase()}
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-[11px] text-emerald-400 font-bold font-mono">
+      <div className="flex items-center gap-2 shrink-0">
+        <span className="text-xs text-text-primary font-mono font-bold tabular-nums">
           @{Number(leg.odds).toFixed(2)}
         </span>
-        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
-          isWon ? "bg-emerald-500/20 text-emerald-400" :
-          isLost ? "bg-red-500/20 text-red-400" :
-          "bg-slate-800 text-slate-400"
-        }`}>
-          {leg.status}
-        </span>
+        <StatusBadge status={leg.status} />
       </div>
     </div>
   );
@@ -192,18 +208,18 @@ function AccLeg({ leg }: { leg: Bet }) {
 function BetReturn({ bet: b }: { bet: Bet }) {
   if (b.status === "won") {
     return (
-      <span className="text-emerald-400 font-black text-xs flex items-center gap-1 led-number">
-        <IconTrophy className="w-3.5 h-3.5 text-amber-400" />
-        +{b.potentialReturn.toFixed(0)} KOR WON
+      <span className="text-semantic-win font-bold font-mono text-xs flex items-center gap-1 tabular-nums">
+        <Trophy size={13} className="text-semantic-reward" />
+        +{formatNumber(b.potentialReturn || 0)} KOR
       </span>
     );
   }
   if (b.status === "lost") {
-    return <span className="text-red-400 font-bold text-xs">0 KOR (Settled)</span>;
+    return <span className="text-semantic-loss font-mono text-xs tabular-nums">0 KOR</span>;
   }
   return (
-    <span className="text-amber-400 font-black text-xs led-number">
-      Win: {b.potentialReturn.toFixed(0)} KOR
+    <span className="text-semantic-reward font-mono font-bold text-xs tabular-nums">
+      Win: {formatNumber(b.potentialReturn || 0)} KOR
     </span>
   );
 }
@@ -217,20 +233,18 @@ function AccReturn({
 }) {
   if (status === "won") {
     return (
-      <span className="text-emerald-400 font-black text-xs flex items-center gap-1 led-number">
-        <IconTrophy className="w-3.5 h-3.5 text-amber-400" />
-        +{potentialReturn.toFixed(0)} KOR WON
+      <span className="text-semantic-win font-bold font-mono text-xs flex items-center gap-1 tabular-nums">
+        <Trophy size={13} className="text-semantic-reward" />
+        +{formatNumber(potentialReturn)} KOR
       </span>
     );
   }
   if (status === "lost") {
-    return (
-      <span className="text-red-400 font-bold text-xs">0 KOR (Settled)</span>
-    );
+    return <span className="text-semantic-loss font-mono text-xs tabular-nums">0 KOR</span>;
   }
   return (
-    <span className="text-amber-400 font-black text-xs led-number">
-      Win: {potentialReturn.toFixed(0)} KOR
+    <span className="text-semantic-reward font-mono font-bold text-xs tabular-nums">
+      Win: {formatNumber(potentialReturn)} KOR
     </span>
   );
 }
@@ -239,18 +253,19 @@ function AccReturn({
 
 export function EmptyBetsState({ tab }: { tab: "ongoing" | "ended" }) {
   return (
-    <div className="broadcast-card rounded-2xl p-12 text-center border border-white/10 my-4">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 text-2xl">
-        🎫
+    <div className="bg-surface-panel rounded-sm p-10 text-center border border-border-subtle my-4">
+      <div className="w-12 h-12 mx-auto mb-3 rounded-sm bg-surface-raised border border-border-subtle flex items-center justify-center text-text-muted">
+        <Ticket size={22} strokeWidth={1.5} />
       </div>
-      <div className="font-black text-lg text-white uppercase italic tracking-tight">
+      <div className="font-bold text-sm text-text-primary uppercase tracking-wide">
         No {tab === "ongoing" ? "Active Slips" : "Settled Slips"}
       </div>
-      <div className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+      <p className="text-xs text-text-muted mt-1 max-w-xs mx-auto">
         {tab === "ongoing"
-          ? "Place predictions from the Live Arena tab during the betting window to track slips."
-          : "Your past settled predictions and payouts will be archived here."}
-      </div>
+          ? "Lock in predictions during the betting window to track slips here."
+          : "Your past settled predictions and payouts will appear here."}
+      </p>
     </div>
   );
 }
+

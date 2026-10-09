@@ -30,16 +30,16 @@ function DashboardLayout() {
 
   if (isInitializing || isProfileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center stadium-bg text-white font-sport italic text-2xl animate-pulse">
-        LOADING MATCHDAY...
+      <div className="min-h-screen flex items-center justify-center bg-surface-page text-text-muted font-mono text-base animate-pulse">
+        INITIALIZING MATCHDAY...
       </div>
     );
   }
 
   return (
     <div
-      className={`min-h-screen font-sans text-white stadium-bg flex flex-col transition-all ${
-        betSlipSelections.length > 0 ? "lg:pr-[400px]" : ""
+      className={`min-h-screen font-sans text-text-primary bg-surface-page flex flex-col transition-all ${
+        betSlipSelections.length > 0 ? "lg:pr-[380px]" : ""
       }`}
     >
       <DashboardHeader />
@@ -50,3 +50,4 @@ function DashboardLayout() {
     </div>
   );
 }
+

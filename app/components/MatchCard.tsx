@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { cn } from "../lib/utils";
-import { Match } from "../types";
-import { IconClock, IconPlay, IconCheck, IconPlus, IconShield, IconEye } from "./Icons";
+import type { Match } from "../types";
 import { TeamLogo } from "./TeamLogo";
 import { soundFx } from "../lib/soundFx";
+import { Chip } from "./ui/Chip";
+import { Eye } from "lucide-react";
 
 interface MatchCardProps {
   match: Match;
@@ -23,7 +24,6 @@ export function MatchCard({
   match,
   minute,
   displayScore,
-  onBet,
   onWatch,
   onAddToBetSlip,
   selectedSelection,
@@ -35,7 +35,10 @@ export function MatchCard({
   const isScheduled = match.status === "SCHEDULED";
   const currentScore = displayScore || match.currentScore;
 
-  const handleOddsClick = (selection: "home" | "draw" | "away" | "gg" | "nogg", odds: number) => {
+  const handleOddsClick = (
+    selection: "home" | "draw" | "away" | "gg" | "nogg",
+    odds: number,
+  ) => {
     soundFx.playClick();
     onAddToBetSlip(match, selection, odds);
   };
@@ -43,121 +46,123 @@ export function MatchCard({
   return (
     <div
       className={cn(
-        "broadcast-card p-4.5 transition-all duration-300 relative overflow-hidden group/match",
-        isLive && "ring-1 ring-emerald-500/60 shadow-xl shadow-emerald-950/40 bg-gradient-to-b from-slate-900 via-slate-900 to-emerald-950/20",
-        isFinished && "opacity-80 bg-slate-950/80"
+        "bg-surface-panel border border-border-subtle rounded-md p-3.5 sm:p-4 transition-colors relative flex flex-col justify-between gap-3",
+        isLive && "border-semantic-live/50 bg-surface-panel",
+        isFinished && "opacity-85"
       )}
     >
-      {/* Top Banner: Status & League Indicator */}
-      <div className="flex items-center justify-between mb-3 text-xs">
+      {/* Top Bar: Status & Pitch View Trigger */}
+      <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           {isLive ? (
-            <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 font-black text-[10px] tracking-wider animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+            <Chip variant="live" dot>
               LIVE {minute !== undefined ? `${minute}'` : ""}
-            </span>
+            </Chip>
           ) : isScheduled ? (
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 font-extrabold text-[10px] tracking-wider">
-              <IconClock className="w-3 h-3" />
-              OPEN
-            </span>
+            <Chip variant="open">
+              BETTING OPEN
+            </Chip>
           ) : (
-            <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-800 border border-white/10 text-slate-400 font-bold text-[10px]">
-              <IconCheck className="w-3 h-3" />
+            <Chip variant="final">
               FINAL
-            </span>
+            </Chip>
           )}
 
           {match.isVerifiable && (
-            <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-300 text-[10px] font-bold" title="Verified by Chainlink VRF on Avalanche">
-              <IconShield className="w-3 h-3 text-blue-400" />
-              VRF
+            <span
+              className="text-xs font-mono font-medium px-1.5 py-0.5 rounded-sm bg-surface-raised border border-border-subtle text-text-muted"
+              title="Deterministic PRNG Match Seed"
+            >
+              RNG
             </span>
           )}
         </div>
 
-        {/* Watch Live Action Button */}
+        {/* Watch Live Pitch Button */}
         <button
           onClick={() => {
             soundFx.playClick();
             onWatch(match);
           }}
-          className="flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 px-2 py-1 rounded-md transition-all"
+          aria-label={`Watch pitch view for ${match.homeTeam.name} vs ${match.awayTeam.name}`}
+          className="flex items-center gap-1.5 text-xs font-semibold text-text-muted hover:text-text-primary hover:bg-surface-raised px-2 py-1 rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent"
         >
-          <IconEye className="w-3.5 h-3.5" />
+          <Eye size={14} strokeWidth={2} />
           <span>Pitch View</span>
         </button>
       </div>
 
-      {/* Teams & Score Display (EA FC Style) */}
-      <div className="grid grid-cols-7 items-center gap-2 mb-4 bg-slate-950/60 p-3 rounded-xl border border-white/5">
+      {/* Teams & Scoreboard Arena */}
+      <div className="bg-surface-page border border-border-subtle rounded-sm p-3 grid grid-cols-7 items-center gap-2">
         {/* Home Team */}
-        <div className="col-span-3 flex flex-col items-center text-center gap-1.5">
+        <div className="col-span-3 flex flex-col items-center text-center gap-1">
           <div className="relative">
             <TeamLogo
               name={match.homeTeam.name}
               color={match.homeTeam.color}
               logo={match.homeTeam.logo}
-              className="w-10 h-10 shadow-md"
+              className="w-10 h-10 rounded-full border border-border-subtle"
             />
-            <span className="absolute -bottom-1 -right-1 px-1 bg-slate-800 text-[9px] font-black rounded border border-white/10 text-slate-300">
+            <span className="absolute -bottom-1 -right-1 px-1 bg-surface-panel text-xs font-mono font-bold rounded-sm border border-border-subtle text-text-muted">
               {match.homeTeam.strength}
             </span>
           </div>
-          <span className="text-xs font-black text-slate-100 truncate max-w-[100px] leading-tight">
+          <span className="text-xs font-bold text-text-primary truncate max-w-[110px] leading-tight mt-0.5">
             {match.homeTeam.name}
           </span>
-          <span className="text-[10px] text-slate-500 font-semibold uppercase">Home</span>
+          <span className="text-xs font-semibold text-text-muted uppercase">Home</span>
         </div>
 
-        {/* Center Scoreboard / VS */}
+        {/* Center Score / VS */}
         <div className="col-span-1 flex flex-col items-center justify-center">
           {isLive || isFinished ? (
-            <div className="flex items-center gap-1 text-base sm:text-lg font-black text-white led-number bg-slate-900 px-2.5 py-1 rounded-lg border border-white/10 shadow-inner">
-              <span className={currentScore && currentScore.home > currentScore.away ? "text-emerald-400" : ""}>
+            <div className="flex items-center gap-1 text-base sm:text-lg font-black font-mono tabular-nums text-text-primary bg-surface-raised px-2 py-0.5 rounded-sm border border-border-subtle">
+              <span className={currentScore && currentScore.home > currentScore.away ? "text-accent" : ""}>
                 {currentScore?.home ?? 0}
               </span>
-              <span className="text-slate-600">:</span>
-              <span className={currentScore && currentScore.away > currentScore.home ? "text-emerald-400" : ""}>
+              <span className="text-text-muted">:</span>
+              <span className={currentScore && currentScore.away > currentScore.home ? "text-accent" : ""}>
                 {currentScore?.away ?? 0}
               </span>
             </div>
           ) : (
-            <span className="text-xs font-black text-slate-600 uppercase tracking-widest">VS</span>
+            <span className="text-xs font-black font-mono text-text-muted tracking-widest">VS</span>
           )}
         </div>
 
         {/* Away Team */}
-        <div className="col-span-3 flex flex-col items-center text-center gap-1.5">
+        <div className="col-span-3 flex flex-col items-center text-center gap-1">
           <div className="relative">
             <TeamLogo
               name={match.awayTeam.name}
               color={match.awayTeam.color}
               logo={match.awayTeam.logo}
-              className="w-10 h-10 shadow-md"
+              className="w-10 h-10 rounded-full border border-border-subtle"
             />
-            <span className="absolute -bottom-1 -right-1 px-1 bg-slate-800 text-[9px] font-black rounded border border-white/10 text-slate-300">
+            <span className="absolute -bottom-1 -right-1 px-1 bg-surface-panel text-xs font-mono font-bold rounded-sm border border-border-subtle text-text-muted">
               {match.awayTeam.strength}
             </span>
           </div>
-          <span className="text-xs font-black text-slate-100 truncate max-w-[100px] leading-tight">
+          <span className="text-xs font-bold text-text-primary truncate max-w-[110px] leading-tight mt-0.5">
             {match.awayTeam.name}
           </span>
-          <span className="text-[10px] text-slate-500 font-semibold uppercase">Away</span>
+          <span className="text-xs font-semibold text-text-muted uppercase">Away</span>
         </div>
       </div>
 
       {/* Market Selector Tabs */}
-      <div className="flex items-center justify-between mb-2 px-1">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-          Match Odds
+      <div className="flex items-center justify-between pt-1">
+        <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
+          Markets
         </span>
-        <div className="flex gap-1 bg-slate-950 p-0.5 rounded-lg border border-white/5 text-[10px]">
+        <div className="flex gap-1 bg-surface-page p-0.5 rounded-sm border border-border-subtle text-xs">
           <button
             onClick={() => setActiveTab("1X2")}
             className={cn(
-              "px-2 py-0.5 rounded font-bold transition-all",
-              activeTab === "1X2" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "text-slate-400 hover:text-white"
+              "px-2 py-0.5 rounded-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              activeTab === "1X2"
+                ? "bg-surface-raised text-text-primary border border-border-strong"
+                : "text-text-muted hover:text-text-primary"
             )}
           >
             1X2
@@ -165,30 +170,35 @@ export function MatchCard({
           <button
             onClick={() => setActiveTab("GOALS")}
             className={cn(
-              "px-2 py-0.5 rounded font-bold transition-all",
-              activeTab === "GOALS" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "text-slate-400 hover:text-white"
+              "px-2 py-0.5 rounded-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              activeTab === "GOALS"
+                ? "bg-surface-raised text-text-primary border border-border-strong"
+                : "text-text-muted hover:text-text-primary"
             )}
           >
-            GG/NoGG
+            GG / NoGG
           </button>
         </div>
       </div>
 
       {/* Odds Buttons Grid */}
       {activeTab === "1X2" ? (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-1.5">
           {/* 1 (Home) */}
           <button
             onClick={() => handleOddsClick("home", match.odds.home)}
             disabled={!isScheduled}
+            aria-label={`${match.homeTeam.name} Win at odds ${match.odds.home.toFixed(2)}`}
             className={cn(
-              "odds-btn p-2 flex flex-col items-center justify-center relative group",
-              selectedSelection === "home" && "selected",
-              !isScheduled && "opacity-50 cursor-not-allowed"
+              "p-2 flex flex-col items-center justify-center rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              selectedSelection === "home"
+                ? "bg-[#062E1E] border-accent text-accent font-bold"
+                : "bg-surface-raised border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary",
+              !isScheduled && "opacity-50 cursor-not-allowed hover:border-border-subtle hover:bg-surface-raised"
             )}
           >
-            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">1 (Home)</span>
-            <span className="text-xs font-extrabold text-white led-number">
+            <span className="text-xs font-medium text-text-muted">1 (Home)</span>
+            <span className="text-sm font-bold font-mono tabular-nums">
               {match.odds.home.toFixed(2)}
             </span>
           </button>
@@ -197,14 +207,17 @@ export function MatchCard({
           <button
             onClick={() => handleOddsClick("draw", match.odds.draw)}
             disabled={!isScheduled}
+            aria-label={`Draw at odds ${match.odds.draw.toFixed(2)}`}
             className={cn(
-              "odds-btn p-2 flex flex-col items-center justify-center relative group",
-              selectedSelection === "draw" && "selected",
-              !isScheduled && "opacity-50 cursor-not-allowed"
+              "p-2 flex flex-col items-center justify-center rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              selectedSelection === "draw"
+                ? "bg-[#062E1E] border-accent text-accent font-bold"
+                : "bg-surface-raised border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary",
+              !isScheduled && "opacity-50 cursor-not-allowed hover:border-border-subtle hover:bg-surface-raised"
             )}
           >
-            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">X (Draw)</span>
-            <span className="text-xs font-extrabold text-white led-number">
+            <span className="text-xs font-medium text-text-muted">X (Draw)</span>
+            <span className="text-sm font-bold font-mono tabular-nums">
               {match.odds.draw.toFixed(2)}
             </span>
           </button>
@@ -213,32 +226,38 @@ export function MatchCard({
           <button
             onClick={() => handleOddsClick("away", match.odds.away)}
             disabled={!isScheduled}
+            aria-label={`${match.awayTeam.name} Win at odds ${match.odds.away.toFixed(2)}`}
             className={cn(
-              "odds-btn p-2 flex flex-col items-center justify-center relative group",
-              selectedSelection === "away" && "selected",
-              !isScheduled && "opacity-50 cursor-not-allowed"
+              "p-2 flex flex-col items-center justify-center rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              selectedSelection === "away"
+                ? "bg-[#062E1E] border-accent text-accent font-bold"
+                : "bg-surface-raised border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary",
+              !isScheduled && "opacity-50 cursor-not-allowed hover:border-border-subtle hover:bg-surface-raised"
             )}
           >
-            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">2 (Away)</span>
-            <span className="text-xs font-extrabold text-white led-number">
+            <span className="text-xs font-medium text-text-muted">2 (Away)</span>
+            <span className="text-sm font-bold font-mono tabular-nums">
               {match.odds.away.toFixed(2)}
             </span>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1.5">
           {/* GG (Both Teams to Score) */}
           <button
             onClick={() => handleOddsClick("gg", match.odds.gg)}
             disabled={!isScheduled}
+            aria-label={`Both Teams to Score at odds ${match.odds.gg.toFixed(2)}`}
             className={cn(
-              "odds-btn p-2 flex flex-col items-center justify-center relative group",
-              selectedSelection === "gg" && "selected",
-              !isScheduled && "opacity-50 cursor-not-allowed"
+              "p-2 flex flex-col items-center justify-center rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              selectedSelection === "gg"
+                ? "bg-[#062E1E] border-accent text-accent font-bold"
+                : "bg-surface-raised border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary",
+              !isScheduled && "opacity-50 cursor-not-allowed hover:border-border-subtle hover:bg-surface-raised"
             )}
           >
-            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">GG (Both Score)</span>
-            <span className="text-xs font-extrabold text-white led-number">
+            <span className="text-xs font-medium text-text-muted">GG (Both Score)</span>
+            <span className="text-sm font-bold font-mono tabular-nums">
               {match.odds.gg.toFixed(2)}
             </span>
           </button>
@@ -247,14 +266,17 @@ export function MatchCard({
           <button
             onClick={() => handleOddsClick("nogg", match.odds.nogg)}
             disabled={!isScheduled}
+            aria-label={`Clean Sheet No GG at odds ${match.odds.nogg.toFixed(2)}`}
             className={cn(
-              "odds-btn p-2 flex flex-col items-center justify-center relative group",
-              selectedSelection === "nogg" && "selected",
-              !isScheduled && "opacity-50 cursor-not-allowed"
+              "p-2 flex flex-col items-center justify-center rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
+              selectedSelection === "nogg"
+                ? "bg-[#062E1E] border-accent text-accent font-bold"
+                : "bg-surface-raised border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary",
+              !isScheduled && "opacity-50 cursor-not-allowed hover:border-border-subtle hover:bg-surface-raised"
             )}
           >
-            <span className="text-[10px] font-bold text-slate-400 group-hover:text-slate-200">NoGG (Clean Sheet)</span>
-            <span className="text-xs font-extrabold text-white led-number">
+            <span className="text-xs font-medium text-text-muted">NoGG (Clean Sheet)</span>
+            <span className="text-sm font-bold font-mono tabular-nums">
               {match.odds.nogg.toFixed(2)}
             </span>
           </button>
@@ -263,3 +285,4 @@ export function MatchCard({
     </div>
   );
 }
+

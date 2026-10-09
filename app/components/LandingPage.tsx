@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "../lib/utils";
 import { RivalsLogo } from "./RivalsLogo";
 import {
@@ -13,6 +13,8 @@ import {
   IconCoins,
   IconFlame,
   IconSparkles,
+  IconClock,
+  IconCheck,
 } from "./Icons";
 import { soundFx } from "../lib/soundFx";
 
@@ -21,249 +23,356 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onEnter }: LandingPageProps) {
+  const [selectedDemoOdds, setSelectedDemoOdds] = useState<string>("1");
+
   const handleLaunch = () => {
     soundFx.playWhistle();
     onEnter();
   };
 
   return (
-    <div className="min-h-screen stadium-bg text-white overflow-x-hidden font-sans flex flex-col justify-between relative">
-      {/* Stadium Floodlights & Volumetric Atmospheric Beams */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-gradient-to-b from-emerald-500/15 via-blue-500/10 to-transparent blur-[100px]" />
-        <div className="absolute top-[30%] -right-20 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[140px] animate-float" />
-        <div className="absolute bottom-[10%] -left-20 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[160px]" />
-      </div>
-
+    <div className="min-h-screen bg-[#0A0D12] text-white overflow-x-hidden flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
       {/* Top Broadcast Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-white/10 broadcast-glass backdrop-blur-xl">
+      <nav className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-3.5 bg-[#13171F] border-b border-[#222938]">
         <div className="flex items-center gap-3">
           <RivalsLogo size="md" variant="full" className="text-white" />
-          <span className="hidden sm:inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
-            NEXT-GEN ENGINE
-          </span>
+          <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#1B212D] border border-[#222938] text-xs font-mono font-bold text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>35S ROUND CYCLE</span>
+          </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-300">
-          <a href="#features" className="hover:text-emerald-400 transition-colors" onClick={() => soundFx.playClick()}>
-            Game Engine
+        <div className="hidden md:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-slate-400">
+          <a
+            href="#markets"
+            className="hover:text-white transition-colors"
+            onClick={() => soundFx.playClick()}
+          >
+            Markets & Odds
           </a>
-          <a href="#how-it-works" className="hover:text-emerald-400 transition-colors" onClick={() => soundFx.playClick()}>
-            How To Play
+          <a
+            href="#telemetry"
+            className="hover:text-white transition-colors"
+            onClick={() => soundFx.playClick()}
+          >
+            Pitch Telemetry
           </a>
-          <a href="#tokenomics" className="hover:text-emerald-400 transition-colors" onClick={() => soundFx.playClick()}>
-            Rewards
+          <a
+            href="#how-it-works"
+            className="hover:text-white transition-colors"
+            onClick={() => soundFx.playClick()}
+          >
+            Rules & Payouts
           </a>
         </div>
 
         <button
           onClick={handleLaunch}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/25"
+          className="flex items-center gap-1.5 h-9 px-4 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors focus-visible:outline-2 focus-visible:outline-emerald-500"
         >
-          <IconZap className="w-3.5 h-3.5 fill-slate-950" />
-          <span>Launch Arena</span>
+          <span>Enter Arena</span>
+          <IconChevronRight className="w-4 h-4" />
         </button>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative z-10 flex flex-col items-center justify-center px-4 pt-16 pb-12 md:pt-24 md:pb-16 text-center max-w-5xl mx-auto w-full">
-        {/* Live Matchday Ticker Capsule */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-emerald-500/30 mb-8 shadow-xl shadow-emerald-500/10 animate-fade-in">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-          <span className="text-emerald-300 text-xs font-extrabold uppercase tracking-widest">
-            MATCHDAY ROUND IN PROGRESS • CONTINUOUS 3-PHASE SIMULATION
-          </span>
-        </div>
+      {/* Hero Section: Left Headline + Right Live Scoreboard Terminal Preview */}
+      <section className="px-4 sm:px-8 py-10 sm:py-14 max-w-7xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left Column: Left-aligned dense broadcast text */}
+          <div className="lg:col-span-7 text-left space-y-6">
+            {/* Status Pill */}
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-[#13171F] border border-[#222938] text-xs font-mono text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>ROUND #1042 IN PROGRESS • 3 LEAGUES ACTIVE</span>
+            </div>
 
-        {/* Hero Title */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase italic tracking-tight text-white leading-[1.05] mb-6">
-          THE NEXT-GEN VIRTUAL <br className="hidden sm:inline" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">
-            FOOTBALL PREDICTION
-          </span> LEAGUE
-        </h1>
+            {/* Headline */}
+            <div className="space-y-2">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black uppercase tracking-tight text-white leading-[1.05]">
+                VIRTUAL FOOTBALL <br />
+                <span className="text-emerald-400">PREDICTION LEAGUE</span>
+              </h1>
+              <p className="text-slate-400 text-sm sm:text-base max-w-xl leading-relaxed">
+                Fast-paced simulated matchdays running continuous 35-second rounds.
+                Analyze 1X2 and GG/NoGG markets, build accumulator slips, and follow
+                2D tactical radar pitch telemetry with instant coin settlements.
+              </p>
+            </div>
 
-        <p className="text-slate-300 text-base sm:text-lg md:text-xl max-w-2xl mb-10 leading-relaxed font-medium">
-          Experience non-stop 2D pitch telemetry, dynamic combo accumulators, and instantaneous decentralized rewards in a premier sports broadcast arena.
-        </p>
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <button
+                onClick={handleLaunch}
+                className="h-11 px-6 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors focus-visible:outline-2 focus-visible:outline-emerald-500"
+              >
+                <span>Launch Matchday Terminal</span>
+                <IconArrowRight className="w-4 h-4" />
+              </button>
 
-        {/* CTA Launch Actions */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <button
-            onClick={handleLaunch}
-            className={cn(
-              "w-full sm:w-auto px-10 py-4.5 rounded-2xl font-black text-base uppercase tracking-wider italic",
-              "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
-              "hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 hover:scale-105 active:scale-95",
-              "shadow-2xl shadow-emerald-500/35 flex items-center justify-center gap-3",
-            )}
-          >
-            <span>ENTER STADIUM ARENA</span>
-            <IconArrowRight className="w-5 h-5 stroke-[3]" />
-          </button>
+              <a
+                href="#how-it-works"
+                onClick={() => soundFx.playClick()}
+                className="h-11 px-5 rounded-[4px] bg-[#13171F] border border-[#222938] hover:bg-[#1B212D] text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors"
+              >
+                <span>Read Game Rules</span>
+              </a>
+            </div>
 
-          <a
-            href="#how-it-works"
-            onClick={() => soundFx.playClick()}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl border border-white/10 hover:border-emerald-500/40 bg-slate-900/60 hover:bg-white/5 text-slate-300 hover:text-white text-sm font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2"
-          >
-            <span>How Matchday Works</span>
-            <IconChevronRight className="w-4 h-4" />
-          </a>
-        </div>
+            {/* Fast Stats Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-4 border-t border-[#222938]">
+              <div className="bg-[#13171F] rounded-[4px] p-2.5 border border-[#222938]">
+                <span className="text-xs text-slate-400 uppercase font-bold block">Round Time</span>
+                <span className="text-lg font-mono font-bold text-white tabular-nums">35 Seconds</span>
+              </div>
+              <div className="bg-[#13171F] rounded-[4px] p-2.5 border border-[#222938]">
+                <span className="text-xs text-slate-400 uppercase font-bold block">Competitions</span>
+                <span className="text-lg font-mono font-bold text-white tabular-nums">3 Leagues</span>
+              </div>
+              <div className="bg-[#13171F] rounded-[4px] p-2.5 border border-[#222938]">
+                <span className="text-xs text-slate-400 uppercase font-bold block">Starter Grant</span>
+                <span className="text-lg font-mono font-bold text-amber-400 tabular-nums">5,000 Coins</span>
+              </div>
+              <div className="bg-[#13171F] rounded-[4px] p-2.5 border border-[#222938]">
+                <span className="text-xs text-slate-400 uppercase font-bold block">RNG Seed</span>
+                <span className="text-lg font-mono font-bold text-emerald-400 tabular-nums">PRNG Verified</span>
+              </div>
+            </div>
+          </div>
 
-        {/* Broadcast Telemetry Strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-4xl mt-16 pt-8 border-t border-white/10">
-          <StatBox label="Active Leagues" value="4 Leagues" sub="Premier, LaLiga, Serie A, UCL" />
-          <StatBox label="Round Cycle" value="3 Minutes" sub="Betting → Live → Settle" />
-          <StatBox label="Starter Grant" value="5,000 Coins" sub="+ 1,000 KOR Tokens Free" />
-          <StatBox label="Settlement" value="Instant" sub="Provably Fair Random Seeds" />
+          {/* Right Column: Live Matchday Scoreboard Terminal Preview */}
+          <div className="lg:col-span-5">
+            <div className="bg-[#13171F] rounded-[6px] border border-[#222938] shadow-2xl p-4 space-y-3.5">
+              {/* Terminal Header */}
+              <div className="flex items-center justify-between pb-2.5 border-b border-[#222938]">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-[4px] bg-red-500/20 border border-red-500/40 text-red-400 font-mono text-xs font-bold flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    LIVE
+                  </span>
+                  <span className="text-xs font-bold uppercase text-slate-300">Premier Division</span>
+                </div>
+                <div className="flex items-center gap-1 font-mono text-xs font-bold text-slate-400">
+                  <IconClock className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-white tabular-nums">00:24</span>
+                </div>
+              </div>
+
+              {/* Match Score Strip */}
+              <div className="bg-[#0A0D12] rounded-[4px] p-3 border border-[#222938]">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 text-left">
+                    <p className="font-bold text-sm text-white">Arsenal</p>
+                    <p className="text-xs text-slate-500 font-mono">Rating: 88</p>
+                  </div>
+                  <div className="px-3 py-1 bg-[#13171F] rounded-[4px] border border-[#222938] font-mono font-bold text-lg text-white tabular-nums">
+                    2 - 1
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="font-bold text-sm text-white">Chelsea</p>
+                    <p className="text-xs text-slate-500 font-mono">Rating: 84</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive 1X2 Odds Selector Demo */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-bold uppercase">1X2 Match Result Markets</span>
+                  <span className="text-slate-500 font-mono">Single Pick Demo</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    onClick={() => setSelectedDemoOdds("1")}
+                    className={cn(
+                      "p-2 rounded-[4px] border text-center transition-colors font-mono",
+                      selectedDemoOdds === "1"
+                        ? "bg-emerald-500 text-slate-950 border-emerald-500 font-bold"
+                        : "bg-[#0A0D12] border-[#222938] text-slate-300 hover:border-[#323C50]"
+                    )}
+                  >
+                    <span className="text-xs block opacity-70">1 (Home)</span>
+                    <span className="text-sm font-bold tabular-nums">1.85</span>
+                  </button>
+
+                  <button
+                    onClick={() => setSelectedDemoOdds("X")}
+                    className={cn(
+                      "p-2 rounded-[4px] border text-center transition-colors font-mono",
+                      selectedDemoOdds === "X"
+                        ? "bg-emerald-500 text-slate-950 border-emerald-500 font-bold"
+                        : "bg-[#0A0D12] border-[#222938] text-slate-300 hover:border-[#323C50]"
+                    )}
+                  >
+                    <span className="text-xs block opacity-70">X (Draw)</span>
+                    <span className="text-sm font-bold tabular-nums">3.40</span>
+                  </button>
+
+                  <button
+                    onClick={() => setSelectedDemoOdds("2")}
+                    className={cn(
+                      "p-2 rounded-[4px] border text-center transition-colors font-mono",
+                      selectedDemoOdds === "2"
+                        ? "bg-emerald-500 text-slate-950 border-emerald-500 font-bold"
+                        : "bg-[#0A0D12] border-[#222938] text-slate-300 hover:border-[#323C50]"
+                    )}
+                  >
+                    <span className="text-xs block opacity-70">2 (Away)</span>
+                    <span className="text-sm font-bold tabular-nums">4.10</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Mini Bet Slip Summary */}
+              <div className="bg-[#0A0D12] rounded-[4px] p-2.5 border border-[#222938] space-y-1.5 text-xs">
+                <div className="flex justify-between items-center text-slate-400">
+                  <span>Selected Stake:</span>
+                  <span className="font-mono font-bold text-white tabular-nums">1,000 Coins</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-400">
+                  <span>Potential Return:</span>
+                  <span className="font-mono font-bold text-emerald-400 tabular-nums">
+                    {selectedDemoOdds === "1"
+                      ? "1,850 Coins"
+                      : selectedDemoOdds === "X"
+                      ? "3,400 Coins"
+                      : "4,100 Coins"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Instant CTA inside card */}
+              <button
+                onClick={handleLaunch}
+                className="w-full h-10 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+              >
+                <span>Place Live Predictions</span>
+                <IconChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="relative z-10 px-4 md:px-12 py-16 max-w-6xl mx-auto w-full">
-        <div className="text-center mb-12">
-          <span className="text-emerald-400 text-xs font-black tracking-[0.25em] uppercase mb-2 block">
-            STADIUM HIGHLIGHTS
+      {/* Feature Grid / Core Markets */}
+      <section id="markets" className="px-4 sm:px-8 py-12 max-w-7xl mx-auto w-full border-t border-[#222938]">
+        <div className="mb-6">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block mb-1">
+            Core Architecture
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight">
-            ENGINEERED FOR SPORTS PREDICTORS
+          <h2 className="text-2xl font-bold text-white uppercase tracking-tight">
+            Matchday Features & Markets
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <FeatureCard
-            icon={<IconFootball className="w-7 h-7" />}
-            title="Live 2D Pitch Radar"
-            desc="Watch continuous tactical ball movements, possession meters, commentary logs, and instant goal alerts."
-            accent="emerald"
-          />
-          <FeatureCard
-            icon={<IconZap className="w-7 h-7" />}
-            title="Dynamic Accumulators"
-            desc="Stack multiple match picks into combo tickets with live multiplier gauges and massive return potentials."
-            accent="gold"
-          />
-          <FeatureCard
-            icon={<IconTrophy className="w-7 h-7" />}
-            title="Global Hall of Fame"
-            desc="Climb the real-time leaderboard, unlock daily check-in grants, and win seasonal prize distributions."
-            accent="blue"
-          />
-          <FeatureCard
-            icon={<IconUsers className="w-7 h-7" />}
-            title="Squad Alliances"
-            desc="Draft your favorite club, represent your league alliance, and earn collaborative victory rewards."
-            accent="purple"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-[#13171F] rounded-[6px] p-4 border border-[#222938] space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#1B212D] border border-[#222938] flex items-center justify-center text-emerald-400">
+              <IconFootball className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+              2D Pitch Radar
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Real-time ball and player coordinate movement on a tactical radar pitch with time-stamped commentary logs.
+            </p>
+          </div>
+
+          <div className="bg-[#13171F] rounded-[6px] p-4 border border-[#222938] space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#1B212D] border border-[#222938] flex items-center justify-center text-amber-400">
+              <IconZap className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+              Accumulator Combos
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Combine multiple match outcomes into single accumulator tickets with compounded odds multipliers.
+            </p>
+          </div>
+
+          <div className="bg-[#13171F] rounded-[6px] p-4 border border-[#222938] space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#1B212D] border border-[#222938] flex items-center justify-center text-emerald-400">
+              <IconUsers className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+              Club Alliances
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Align with top clubs in Premier Division, La Liga, or UCL to represent team standings and earn bonuses.
+            </p>
+          </div>
+
+          <div className="bg-[#13171F] rounded-[6px] p-4 border border-[#222938] space-y-2">
+            <div className="w-8 h-8 rounded-[4px] bg-[#1B212D] border border-[#222938] flex items-center justify-center text-amber-400">
+              <IconCoins className="w-4 h-4" />
+            </div>
+            <h3 className="font-bold text-sm text-white uppercase tracking-wider">
+              Instant Settlement
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Deterministic pseudo-random simulations settle bets automatically as the full-time whistle sounds.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* How It Works Steps */}
-      <section id="how-it-works" className="relative z-10 px-4 md:px-12 py-16 max-w-5xl mx-auto w-full">
-        <div className="broadcast-card rounded-3xl p-8 sm:p-12 border border-white/10 text-center shadow-2xl relative overflow-hidden">
-          <span className="text-amber-400 text-xs font-black tracking-[0.25em] uppercase mb-2 block">
-            4-STEP MATCHDAY PLAYBOOK
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-white uppercase italic tracking-tight mb-10">
-            FROM ROOKIE TO CHAMPION
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-            <StepItem
-              num="01"
-              title="Instant Entry"
-              desc="Enter instantly with test credentials or custom manager profiles without gas delays."
-            />
-            <StepItem
-              num="02"
-              title="Analyze Odds"
-              desc="Study team OVR ratings, head-to-head records, 1X2 lines, and Both Teams to Score (GG/NG) markets."
-            />
-            <StepItem
-              num="03"
-              title="Watch Pitch Live"
-              desc="Follow real-time 90-minute compressed simulations on the visual radar pitch with commentary."
-            />
-            <StepItem
-              num="04"
-              title="Collect Winnings"
-              desc="Receive automatic payouts credited directly to your balance as the referee blows full-time."
-            />
+      <section id="how-it-works" className="px-4 sm:px-8 py-12 max-w-7xl mx-auto w-full border-t border-[#222938]">
+        <div className="bg-[#13171F] rounded-[6px] p-6 sm:p-8 border border-[#222938]">
+          <div className="mb-6">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block mb-1">
+              Playbook
+            </span>
+            <h2 className="text-xl font-bold text-white uppercase tracking-tight">
+              4 Steps to Matchday Prediction
+            </h2>
           </div>
 
-          <div className="mt-10">
-            <button
-              onClick={handleLaunch}
-              className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-xs font-black uppercase tracking-wider hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-500/20"
-            >
-              Start Playing Now
-            </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
+            <div className="bg-[#0A0D12] rounded-[4px] p-3.5 border border-[#222938]">
+              <span className="text-xs font-mono font-bold text-emerald-400 block mb-1">01</span>
+              <h4 className="font-bold text-xs uppercase text-white tracking-wider mb-1">Select Access</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Connect via instant Demo Account with preloaded test Coins or register custom player nickname.
+              </p>
+            </div>
+
+            <div className="bg-[#0A0D12] rounded-[4px] p-3.5 border border-[#222938]">
+              <span className="text-xs font-mono font-bold text-emerald-400 block mb-1">02</span>
+              <h4 className="font-bold text-xs uppercase text-white tracking-wider mb-1">Analyze Odds</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Review team strength ratings, head-to-head records, 1X2 lines, and GG/NoGG markets.
+              </p>
+            </div>
+
+            <div className="bg-[#0A0D12] rounded-[4px] p-3.5 border border-[#222938]">
+              <span className="text-xs font-mono font-bold text-emerald-400 block mb-1">03</span>
+              <h4 className="font-bold text-xs uppercase text-white tracking-wider mb-1">Watch 2D Pitch</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Follow real-time 35-second compressed radar simulations with active events and goal notifications.
+              </p>
+            </div>
+
+            <div className="bg-[#0A0D12] rounded-[4px] p-3.5 border border-[#222938]">
+              <span className="text-xs font-mono font-bold text-emerald-400 block mb-1">04</span>
+              <h4 className="font-bold text-xs uppercase text-white tracking-wider mb-1">Claim Winnings</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Winning tickets credit Game Coins and KOR reward tokens directly to your balance.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Broadcast Footer */}
-      <footer className="relative z-10 px-6 py-6 border-t border-white/10 bg-slate-950/80 backdrop-blur-xl text-center text-slate-500 text-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="px-4 sm:px-8 py-5 border-t border-[#222938] bg-[#0A0D12] text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <RivalsLogo size="sm" variant="full" className="text-white" />
-          <span>© 2026 KickOff Rivals Engine</span>
+          <span>© 2026 KickOff Rivals</span>
         </div>
-        <div>
-          Virtual Sports Entertainment Architecture • Provably Fair Settlement
+        <div className="text-slate-500">
+          Virtual Sportsbook Simulation Terminal • Deterministic PRNG Settlement
         </div>
       </footer>
-    </div>
-  );
-}
-
-function StatBox({ label, value, sub }: { label: string; value: string; sub: string }) {
-  return (
-    <div className="broadcast-card rounded-2xl p-4 border border-white/5 text-center">
-      <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</div>
-      <div className="text-xl sm:text-2xl font-black text-white my-0.5 led-number">{value}</div>
-      <div className="text-[10px] text-emerald-400 font-semibold truncate">{sub}</div>
-    </div>
-  );
-}
-
-function FeatureCard({ icon, title, desc, accent }: { icon: React.ReactNode; title: string; desc: string; accent: "emerald" | "gold" | "blue" | "purple" }) {
-  const borderCol =
-    accent === "emerald" ? "border-emerald-500/30 hover:border-emerald-400" :
-    accent === "gold" ? "border-amber-500/30 hover:border-amber-400" :
-    accent === "blue" ? "border-blue-500/30 hover:border-blue-400" :
-    "border-purple-500/30 hover:border-purple-400";
-
-  const iconCol =
-    accent === "emerald" ? "text-emerald-400 bg-emerald-500/20" :
-    accent === "gold" ? "text-amber-400 bg-amber-500/20" :
-    accent === "blue" ? "text-blue-400 bg-blue-500/20" :
-    "text-purple-400 bg-purple-500/20";
-
-  return (
-    <div className={cn("broadcast-card rounded-2xl p-5 border transition-all duration-300 hover:scale-[1.02] flex flex-col justify-between", borderCol)}>
-      <div>
-        <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4 border border-white/10", iconCol)}>
-          {icon}
-        </div>
-        <h3 className="text-base font-black text-white uppercase italic tracking-tight mb-2">
-          {title}
-        </h3>
-        <p className="text-xs text-slate-400 leading-relaxed">
-          {desc}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function StepItem({ num, title, desc }: { num: string; title: string; desc: string }) {
-  return (
-    <div className="bg-slate-950/60 border border-white/5 rounded-2xl p-4">
-      <div className="text-2xl font-black text-emerald-400 font-mono mb-2">{num}</div>
-      <div className="text-sm font-black text-white uppercase italic mb-1">{title}</div>
-      <div className="text-xs text-slate-400 leading-relaxed">{desc}</div>
     </div>
   );
 }

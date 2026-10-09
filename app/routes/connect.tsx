@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ConnectWallet } from "../components/ConnectWallet";
+import { useEffect } from "react";
 import { useGame } from "../contexts/GameContext";
+import { useUserStore } from "../stores/userStore";
 
 export const Route = createFileRoute("/connect")({
   component: ConnectRoute,
@@ -8,15 +9,19 @@ export const Route = createFileRoute("/connect")({
 
 function ConnectRoute() {
   const navigate = useNavigate();
-  const { handleWalletConnected } = useGame();
-  const { intent } = Route.useSearch() as { intent?: string };
+  const { handleWalletConnected, handleMessageSigned } = useGame();
+  const { setOnboardingComplete } = useUserStore();
+
+  useEffect(() => {
+    handleWalletConnected("0x65bc46df99bc2385128c8a67752d7cd3922de740");
+    handleMessageSigned();
+    setOnboardingComplete(true);
+    navigate({ to: "/dashboard" });
+  }, [handleWalletConnected, handleMessageSigned, setOnboardingComplete, navigate]);
 
   return (
-    <ConnectWallet
-      onConnected={(address: string) => {
-        handleWalletConnected(address, intent === "returning");
-        navigate({ to: "/sign" });
-      }}
-    />
+    <div className="min-h-screen bg-[#0A0D12] flex items-center justify-center text-xs font-mono text-slate-400">
+      AUTHENTICATING SESSION...
+    </div>
   );
 }

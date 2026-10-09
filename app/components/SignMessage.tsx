@@ -34,83 +34,81 @@ export function SignMessage({
     setTimeout(() => {
       soundFx.playCashout();
       onSigned(mockSignature, timestamp);
-    }, 400);
+    }, 300);
   };
 
   return (
-    <div className="min-h-screen stadium-bg text-white flex flex-col justify-between relative overflow-hidden">
-      {/* Floodlight reflections */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-emerald-500/15 via-blue-500/10 to-transparent blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-emerald-500/10 blur-[140px] pointer-events-none" />
-
+    <div className="min-h-screen bg-[#0A0D12] text-white flex flex-col justify-between">
       {/* Header */}
-      <header className="relative z-10 px-6 py-6 flex items-center justify-between border-b border-white/5">
-        <RivalsLogo size="md" variant="full" className="text-white" />
-        <button
-          onClick={() => {
-            soundFx.playClick();
-            onCancel();
-          }}
-          className="text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 transition-all"
-        >
-          Cancel
-        </button>
+      <header className="px-4 sm:px-8 py-4 flex items-center justify-between border-b border-[#222938] bg-[#13171F]">
+        <div className="flex items-center gap-3">
+          <RivalsLogo size="md" variant="full" className="text-white" />
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-[#1B212D] border border-[#222938] text-xs font-mono text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>STEP 2 OF 4: SESSION CONFIRMATION</span>
+          </div>
+          <button
+            onClick={() => {
+              soundFx.playClick();
+              onCancel();
+            }}
+            className="text-slate-400 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-[4px] border border-[#222938] bg-[#1B212D] hover:bg-[#222938] transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
       </header>
 
       {/* Center Modal */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         <div className="max-w-md w-full">
-          <div className="broadcast-card rounded-3xl p-8 border border-white/10 relative overflow-hidden backdrop-blur-2xl shadow-2xl shadow-black/80">
-            {/* Shield Icon */}
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 p-[2px] shadow-2xl shadow-amber-500/30 animate-float">
-                <div className="w-full h-full rounded-[22px] bg-slate-950 flex items-center justify-center text-amber-400">
-                  <IconShield className="w-9 h-9" />
-                </div>
+          <div className="bg-[#13171F] rounded-[6px] p-6 sm:p-7 border border-[#222938] shadow-2xl space-y-5">
+            {/* Header Icon */}
+            <div className="text-center space-y-1.5">
+              <div className="w-10 h-10 rounded-[4px] bg-[#1B212D] border border-[#222938] flex items-center justify-center text-amber-400 mx-auto mb-2">
+                <IconShield className="w-5 h-5" />
               </div>
-            </div>
-
-            {/* Broadcast Title */}
-            <div className="text-center mb-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-400">
-                INSTANT AUTHENTICATION
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-400 block">
+                Session Initialization
               </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight mt-1">
-                CONFIRM IDENTITY
+              <h1 className="text-xl sm:text-2xl font-bold text-white uppercase tracking-tight">
+                Confirm Account Session
               </h1>
-              <p className="text-xs text-slate-400 mt-2">
-                Click below to authorize your test account session and initialize matchday balances.
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                Authorize your matchday test account session to initialize starting coin balances.
               </p>
             </div>
 
-            {/* Wallet Address Chip */}
-            <div className="bg-slate-950/80 border border-white/10 rounded-2xl p-4 mb-5 flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                Active Test Account
+            {/* Account Address Strip */}
+            <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3 flex items-center justify-between text-xs">
+              <span className="font-bold text-slate-400 uppercase tracking-wider">
+                Active Account
               </span>
-              <span className="text-emerald-400 font-mono text-xs font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+              <span className="text-emerald-400 font-mono font-bold bg-[#1B212D] px-2 py-0.5 rounded-[4px] border border-[#222938] tabular-nums">
                 {address.slice(0, 6)}...{address.slice(-4)}
               </span>
             </div>
 
             {/* Verification Details */}
-            <div className="bg-slate-900/60 border border-white/5 rounded-2xl p-4 mb-6">
-              <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3.5 space-y-2">
+              <div className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <IconZap className="w-3.5 h-3.5 text-amber-400" />
-                <span>Simulation Ready</span>
+                <span>Session Privileges</span>
               </div>
-              <ul className="space-y-2 text-xs text-slate-400">
+              <ul className="space-y-1.5 text-xs text-slate-400">
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>5,000 Coins + 1,000 KOR allocated</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span>5,000 Coins + 1,000 KOR starting allocation</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>All leagues, simulation & bet slips active</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span>Real-time 1X2 & combo slip betting enabled</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span className="font-semibold text-emerald-300">Instant 1-click authorization</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="text-slate-300">Off-chain test authentication (no gas fees)</span>
                 </li>
               </ul>
             </div>
@@ -120,27 +118,26 @@ export function SignMessage({
               onClick={handleInstantSign}
               disabled={isSigning || isProfileLoading}
               className={cn(
-                "w-full h-14 rounded-2xl font-black text-base uppercase tracking-wider italic",
-                "bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-slate-950",
-                "hover:from-emerald-400 hover:to-teal-300 transition-all duration-300 hover:scale-[1.02] active:scale-98",
-                "shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-3",
-                "disabled:opacity-60 disabled:cursor-not-allowed",
+                "w-full h-11 rounded-[4px] font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2",
+                isSigning || isProfileLoading
+                  ? "bg-[#1B212D] text-slate-500 cursor-not-allowed border border-[#222938]"
+                  : "bg-emerald-500 hover:bg-emerald-400 text-slate-950"
               )}
             >
-              {isProfileLoading ? (
+              {isSigning ? (
                 <>
-                  <IconLoader className="w-5 h-5 animate-spin" />
-                  <span>SYNCHRONIZING PROFILE...</span>
+                  <IconLoader className="w-4 h-4 animate-spin" />
+                  <span>Authorizing Session...</span>
                 </>
-              ) : isSigning ? (
+              ) : isProfileLoading ? (
                 <>
-                  <IconLoader className="w-5 h-5 animate-spin" />
-                  <span>AUTHORIZING TEST SESSION...</span>
+                  <IconLoader className="w-4 h-4 animate-spin" />
+                  <span>Loading Profile...</span>
                 </>
               ) : (
                 <>
-                  <span>CONFIRM & ENTER ARENA</span>
-                  <IconChevronRight className="w-5 h-5 stroke-[3]" />
+                  <span>Authorize & Continue</span>
+                  <IconChevronRight className="w-4 h-4" />
                 </>
               )}
             </button>
@@ -149,8 +146,8 @@ export function SignMessage({
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 px-6 py-4 text-center text-slate-500 text-xs border-t border-white/5 bg-slate-950/60 backdrop-blur-md">
-        KickOff Rivals Demo Session • Zero Gas Required
+      <footer className="px-4 sm:px-8 py-3.5 text-center text-slate-500 text-xs border-t border-[#222938] bg-[#0A0D12]">
+        KickOff Rivals • Cryptographic Session Authorization
       </footer>
     </div>
   );

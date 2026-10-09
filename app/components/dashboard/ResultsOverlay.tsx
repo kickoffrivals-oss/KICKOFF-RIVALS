@@ -3,6 +3,8 @@ import { LEAGUES } from "../../constants";
 import { MatchCard } from "../MatchCard";
 import type { Match } from "../../types";
 import { soundFx } from "../../lib/soundFx";
+import { Chip } from "../ui/Chip";
+import { X } from "lucide-react";
 
 interface ResultsOverlayProps {
   timer: number;
@@ -15,9 +17,12 @@ export function ResultsOverlay({ timer, matches }: ResultsOverlayProps) {
   return (
     <div
       id="results-overlay"
-      className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-2xl flex flex-col items-center justify-start text-white overflow-y-auto w-full"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Matchday Results"
+      className="fixed inset-0 z-50 bg-surface-page/95 flex flex-col items-center justify-start text-text-primary overflow-y-auto w-full p-4 sm:p-6"
     >
-      <div className="w-full max-w-6xl flex flex-col items-center pt-24 pb-12 px-4 relative">
+      <div className="w-full max-w-6xl flex flex-col items-center pt-16 pb-12 relative">
         <CloseButton />
 
         <RoundEndedBanner timer={timer} />
@@ -25,7 +30,6 @@ export function ResultsOverlay({ timer, matches }: ResultsOverlayProps) {
         <LeagueFilterBar
           selected={selectedLeagueFilter}
           onSelect={setSelectedLeagueFilter}
-          dark
         />
 
         <MatchResultsGrid
@@ -45,23 +49,10 @@ function CloseButton() {
         const el = document.getElementById("results-overlay");
         if (el) el.style.display = "none";
       }}
-      className="absolute top-6 right-6 p-2.5 bg-white/10 border border-white/15 rounded-full hover:bg-white/20 text-white transition-all hover:scale-105"
-      title="Close Overlay"
+      aria-label="Close results overlay"
+      className="absolute top-2 right-2 sm:top-4 sm:right-4 p-2 bg-surface-raised border border-border-subtle rounded-sm hover:border-border-strong hover:bg-surface-panel text-text-muted hover:text-text-primary transition-colors focus-visible:outline-2 focus-visible:outline-accent"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M18 6 6 18" />
-        <path d="m6 6 12 12" />
-      </svg>
+      <X size={20} strokeWidth={2} />
     </button>
   );
 }
@@ -69,19 +60,21 @@ function CloseButton() {
 function RoundEndedBanner({ timer }: { timer: number }) {
   return (
     <div className="flex flex-col items-center text-center mb-8">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-widest mb-3">
-        <span>🏆 MATCHDAY CONCLUDED</span>
+      <div className="mb-3">
+        <Chip variant="reward">
+          MATCHDAY CONCLUDED
+        </Chip>
       </div>
 
-      <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+      <h1 className="text-2xl sm:text-4xl font-black text-text-primary tracking-tight font-display mb-3">
         FINAL ROUND RESULTS
       </h1>
 
-      <div className="flex items-center gap-3 px-5 py-2.5 rounded-2xl broadcast-glass border border-white/10 shadow-xl">
-        <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+      <div className="flex items-center gap-3 px-4 py-2 rounded-md bg-surface-panel border border-border-subtle">
+        <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
           Next Round In:
         </span>
-        <span className="text-2xl font-black text-amber-400 led-number">
+        <span className="text-xl font-black text-semantic-reward font-mono tabular-nums">
           {Math.floor(timer / 60)
             .toString()
             .padStart(2, "0")}
@@ -101,25 +94,25 @@ interface LeagueFilterBarProps {
 export function LeagueFilterBar({
   selected,
   onSelect,
-  dark = false,
 }: LeagueFilterBarProps) {
   const activeClass =
-    "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 border-emerald-400";
+    "bg-[#1B212D] text-white border-emerald-500 font-bold";
   const inactiveClass =
-    "bg-slate-900/60 text-slate-400 hover:text-white hover:bg-slate-800/80 border-white/10";
+    "bg-[#13171F] text-[#94A3B8] hover:text-white hover:bg-[#1B212D] hover:border-[#323C50] border-[#222938]";
 
   return (
-    <div className="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar px-2 w-full justify-start md:justify-center">
+    <div className="flex gap-2 mb-5 overflow-x-auto pb-1 no-scrollbar px-0.5 w-full justify-start md:justify-center">
       <button
         onClick={() => {
           soundFx.playClick();
           onSelect("all");
         }}
-        className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider whitespace-nowrap transition-all border ${
+        className={`px-3.5 py-1.5 rounded-[4px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors border focus-visible:outline-2 focus-visible:outline-emerald-500 flex items-center gap-1.5 ${
           selected === "all" ? activeClass : inactiveClass
         }`}
       >
-        All Leagues
+        {selected === "all" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+        <span>All Leagues</span>
       </button>
       {LEAGUES.map((league) => (
         <button
@@ -128,12 +121,15 @@ export function LeagueFilterBar({
             soundFx.playClick();
             onSelect(league.id);
           }}
-          className={`px-4 py-2 rounded-xl text-xs font-extrabold uppercase tracking-wider whitespace-nowrap transition-all border flex items-center gap-2 ${
+          className={`px-3.5 py-1.5 rounded-[4px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors border flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-emerald-500 ${
             selected === league.id ? activeClass : inactiveClass
           }`}
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-          {league.name}
+          <span
+            className="w-2 h-2 rounded-full shrink-0"
+            style={{ backgroundColor: league.color }}
+          />
+          <span>{league.name}</span>
         </button>
       ))}
     </div>
@@ -155,7 +151,7 @@ function MatchResultsGrid({
       : matches.filter((m) => m.leagueId === selectedLeagueFilter);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-6xl">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-6xl">
       {filtered.map((m) => (
         <MatchCard
           key={m.id}
@@ -168,3 +164,4 @@ function MatchResultsGrid({
     </div>
   );
 }
+

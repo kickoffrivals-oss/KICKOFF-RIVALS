@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { cn } from "../lib/utils";
 import { Match, MatchResult } from "../types";
-import { IconX, IconPlay, IconPause, IconClock, IconShield } from "./Icons";
+import { IconX, IconPlay, IconPause, IconClock, IconShield, IconFootball } from "./Icons";
 import { TeamLogo } from "./TeamLogo";
 import { soundFx } from "../lib/soundFx";
 
@@ -37,7 +37,7 @@ export function SimulationScreen({
         minute: Math.min(85, 18 + i * 28),
         type: "goal" as const,
         teamId: match.homeTeam.id,
-        description: `GOAL! ${match.homeTeam.name} scores!`,
+        description: `Goal scored by ${match.homeTeam.name}`,
       });
     }
     for (let i = 0; i < awayScore; i++) {
@@ -45,21 +45,23 @@ export function SimulationScreen({
         minute: Math.min(88, 26 + i * 28),
         type: "goal" as const,
         teamId: match.awayTeam.id,
-        description: `GOAL! ${match.awayTeam.name} scores!`,
+        description: `Goal scored by ${match.awayTeam.name}`,
       });
     }
     return genEvents.sort((a, b) => a.minute - b.minute);
   }, [result?.events, match.events, homeScore, awayScore, match.homeTeam.id, match.homeTeam.name, match.awayTeam.id, match.awayTeam.name]);
 
-  // Filter events up to current minute
+  // Filter events up to current minute, sorted newest first
   useEffect(() => {
-    const eventsToShow = matchEvents.filter((event) => event.minute <= currentMinute);
+    const eventsToShow = matchEvents
+      .filter((event) => event.minute <= currentMinute)
+      .sort((a, b) => b.minute - a.minute); // Newest first
     setDisplayedEvents(eventsToShow);
 
-    // Detect new goals and trigger sound + celebration
+    // Detect new goals and trigger sound + restrained alert
     const goalEvents = eventsToShow.filter((e) => e.type === "goal");
     if (goalEvents.length > lastGoalCountRef.current) {
-      const recentGoal = goalEvents[goalEvents.length - 1];
+      const recentGoal = goalEvents[0];
       const isHome = recentGoal.teamId === match.homeTeam.id;
       const teamName = isHome ? match.homeTeam.name : match.awayTeam.name;
       const teamColor = isHome ? match.homeTeam.color : match.awayTeam.color;
@@ -69,18 +71,11 @@ export function SimulationScreen({
 
       const timer = setTimeout(() => {
         setLatestGoal(null);
-      }, 3500);
+      }, 2500);
       lastGoalCountRef.current = goalEvents.length;
       return () => clearTimeout(timer);
     }
   }, [currentMinute, matchEvents, match.homeTeam, match.awayTeam]);
-
-  // Auto-scroll to latest event
-  useEffect(() => {
-    if (eventsContainerRef.current) {
-      eventsContainerRef.current.scrollTop = eventsContainerRef.current.scrollHeight;
-    }
-  }, [displayedEvents]);
 
   const isMatchFinished = currentMinute >= 90;
 
@@ -89,38 +84,45 @@ export function SimulationScreen({
   const ballY = Math.cos(currentMinute * 0.3) * 30 + 50; // 20% to 80% height
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-[#0A0D12]/95 backdrop-blur-sm flex flex-col overflow-hidden text-white">
       {/* Top Broadcast TV Scorebug Banner */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-            <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-black tracking-widest uppercase">
+      <header className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-3 border-b border-[#222938] bg-[#13171F]">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span
+              className={cn(
+                "px-2 py-0.5 rounded-[4px] text-xs font-mono font-bold uppercase flex items-center gap-1.5",
+                isMatchFinished
+                  ? "bg-[#1B212D] text-slate-400 border border-[#222938]"
+                  : "bg-red-500/20 text-red-400 border border-red-500/40"
+              )}
+            >
+              {!isMatchFinished && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse motion-reduce:animate-none" />}
               {isMatchFinished ? "FULL TIME" : "LIVE SIMULATION"}
             </span>
           </div>
 
-          <div className="px-3 py-1 rounded-lg bg-slate-900 border border-white/10 font-black text-lg led-number text-amber-400">
+          <div className="px-2.5 py-0.5 rounded-[4px] bg-[#0A0D12] border border-[#222938] font-mono font-bold text-base text-amber-400 tabular-nums">
             {currentMinute > 90 ? "90" : currentMinute}'
           </div>
         </div>
 
         {/* Center Teams Scoreboard Display */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-white">{match.homeTeam.name}</span>
-            <TeamLogo name={match.homeTeam.name} color={match.homeTeam.color} logo={match.homeTeam.logo} className="w-7 h-7" />
+            <span className="text-xs font-bold uppercase text-white hidden sm:inline">{match.homeTeam.name}</span>
+            <TeamLogo name={match.homeTeam.name} color={match.homeTeam.color} logo={match.homeTeam.logo} className="w-6 h-6" />
           </div>
 
-          <div className="px-4 py-1.5 rounded-xl bg-slate-900 border border-white/15 text-xl font-black text-white led-number shadow-inner">
+          <div className="px-3 py-1 rounded-[4px] bg-[#0A0D12] border border-[#222938] text-base font-bold font-mono text-white tabular-nums">
             <span className={homeScore > awayScore ? "text-emerald-400" : ""}>{homeScore}</span>
-            <span className="text-slate-500 mx-2">:</span>
+            <span className="text-slate-500 mx-1.5">-</span>
             <span className={awayScore > homeScore ? "text-emerald-400" : ""}>{awayScore}</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <TeamLogo name={match.awayTeam.name} color={match.awayTeam.color} logo={match.awayTeam.logo} className="w-7 h-7" />
-            <span className="text-xs font-black text-white">{match.awayTeam.name}</span>
+            <TeamLogo name={match.awayTeam.name} color={match.awayTeam.color} logo={match.awayTeam.logo} className="w-6 h-6" />
+            <span className="text-xs font-bold uppercase text-white hidden sm:inline">{match.awayTeam.name}</span>
           </div>
         </div>
 
@@ -130,69 +132,60 @@ export function SimulationScreen({
             soundFx.playClick();
             onFinish();
           }}
-          className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white transition-all hover:scale-105"
-          title="Return to Match Arena"
+          className="p-1.5 rounded-[4px] bg-[#1B212D] hover:bg-[#222938] border border-[#222938] text-slate-400 hover:text-white transition-colors"
+          aria-label="Return to match arena"
         >
-          <IconX className="w-5 h-5" />
+          <IconX className="w-4 h-4" />
         </button>
       </header>
 
       {/* Main Broadcast Split-Screen Viewport */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 sm:p-6 overflow-hidden max-w-7xl mx-auto w-full">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 sm:p-6 overflow-hidden max-w-7xl mx-auto w-full">
         {/* Left: Interactive 2D Tactical Pitch Viewport (8 Columns) */}
-        <div className="lg:col-span-8 flex flex-col justify-between rounded-2xl broadcast-glass border border-white/10 p-4 relative overflow-hidden bg-gradient-to-b from-slate-900 to-emerald-950/40 shadow-2xl">
-          {/* Goal Explosion Celebration Banner */}
+        <div className="lg:col-span-8 flex flex-col justify-between rounded-[6px] bg-[#13171F] border border-[#222938] p-4 relative overflow-hidden">
+          {/* Restrained Goal Alert Banner */}
           {latestGoal && (
-            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-md animate-fade-in pointer-events-none">
-              <div className="text-5xl sm:text-7xl font-black text-amber-400 italic tracking-tighter drop-shadow-[0_0_35px_rgba(245,158,11,0.8)] animate-bounce">
-                GOOOOOAL!
-              </div>
-              <div className="mt-3 text-xl sm:text-2xl font-black text-white flex items-center gap-2 px-6 py-2 rounded-full bg-white/10 border border-white/20">
-                <span>{latestGoal.teamName}</span>
-                <span className="text-emerald-400">({latestGoal.minute}')</span>
-              </div>
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-4 py-2 rounded-[4px] bg-[#0A0D12] border border-emerald-500 shadow-lg animate-fade-in motion-reduce:animate-none">
+              <span className="px-1.5 py-0.2 rounded-[2px] bg-emerald-500 text-slate-950 text-xs font-bold uppercase font-mono">
+                GOAL
+              </span>
+              <span className="text-xs font-bold text-white uppercase">{latestGoal.teamName}</span>
+              <span className="text-xs font-mono font-bold text-emerald-400 tabular-nums">({latestGoal.minute}')</span>
             </div>
           )}
 
-          {/* 2D Football Stadium Grass Pitch */}
-          <div className="relative w-full aspect-[16/9] bg-[#0d542b] rounded-xl border-4 border-white/20 shadow-2xl overflow-hidden flex items-center justify-center">
-            {/* Pitch Grass Stripes */}
-            <div
-              className="absolute inset-0 opacity-20 pointer-events-none"
-              style={{
-                backgroundImage: "repeating-linear-gradient(0deg, #0f6132 0px, #0f6132 30px, #0d542b 30px, #0d542b 60px)",
-              }}
-            />
-
+          {/* 2D Flat Tactical Pitch */}
+          <div className="relative w-full aspect-[16/9] bg-[#0E2319] rounded-[4px] border border-[#1F4A33] overflow-hidden flex items-center justify-center">
             {/* Pitch Markings: Center Line & Circle */}
-            <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-white/30 -translate-x-1/2" />
-            <div className="w-28 h-28 rounded-full border-2 border-white/30 flex items-center justify-center pointer-events-none">
-              <div className="w-2 h-2 rounded-full bg-white/60" />
+            <div className="absolute top-0 bottom-0 left-1/2 w-px bg-[#1F4A33] -translate-x-1/2" />
+            <div className="w-24 h-24 rounded-full border border-[#1F4A33] flex items-center justify-center pointer-events-none">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#1F4A33]" />
             </div>
 
             {/* Left Penalty Box (Home) */}
-            <div className="absolute left-0 top-1/4 bottom-1/4 w-28 border-r-2 border-y-2 border-white/30 pointer-events-none" />
-            {/* Right Penalty Box (Away) */}
-            <div className="absolute right-0 top-1/4 bottom-1/4 w-28 border-l-2 border-y-2 border-white/30 pointer-events-none" />
+            <div className="absolute left-0 top-1/4 bottom-1/4 w-24 border-r border-y border-[#1F4A33] pointer-events-none" />
+            <div className="absolute left-0 top-[37.5%] bottom-[37.5%] w-10 border-r border-y border-[#1F4A33] pointer-events-none" />
 
-            {/* Dynamic Animated Ball */}
+            {/* Right Penalty Box (Away) */}
+            <div className="absolute right-0 top-1/4 bottom-1/4 w-24 border-l border-y border-[#1F4A33] pointer-events-none" />
+            <div className="absolute right-0 top-[37.5%] bottom-[37.5%] w-10 border-l border-y border-[#1F4A33] pointer-events-none" />
+
+            {/* Dynamic Ball */}
             <div
-              className="absolute w-4 h-4 rounded-full bg-white shadow-[0_0_12px_#ffffff] transition-all duration-700 ease-out -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center"
+              className="absolute w-3 h-3 rounded-full bg-white border border-slate-900 transition-all duration-300 ease-out -translate-x-1/2 -translate-y-1/2 z-20 motion-reduce:transition-none"
               style={{
                 left: `${ballX}%`,
                 top: `${ballY}%`,
               }}
-            >
-              <div className="w-2 h-2 rounded-full bg-slate-900" />
-            </div>
+            />
 
             {/* Player Puck: Home Attacker */}
             <div
-              className="absolute w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-lg transition-all duration-1000 -translate-x-1/2 -translate-y-1/2"
+              className="absolute w-5 h-5 rounded-full flex items-center justify-center text-xs font-mono font-bold text-white border border-black/40 transition-all duration-500 -translate-x-1/2 -translate-y-1/2 motion-reduce:transition-none"
               style={{
                 backgroundColor: match.homeTeam.color,
-                left: `${Math.max(20, ballX - 12)}%`,
-                top: `${Math.max(25, ballY - 10)}%`,
+                left: `${Math.max(15, ballX - 10)}%`,
+                top: `${Math.max(20, ballY - 8)}%`,
               }}
             >
               H
@@ -200,59 +193,59 @@ export function SimulationScreen({
 
             {/* Player Puck: Away Defender */}
             <div
-              className="absolute w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-lg transition-all duration-1000 -translate-x-1/2 -translate-y-1/2"
+              className="absolute w-5 h-5 rounded-full flex items-center justify-center text-xs font-mono font-bold text-white border border-black/40 transition-all duration-500 -translate-x-1/2 -translate-y-1/2 motion-reduce:transition-none"
               style={{
                 backgroundColor: match.awayTeam.color,
-                left: `${Math.min(80, ballX + 12)}%`,
-                top: `${Math.min(75, ballY + 10)}%`,
+                left: `${Math.min(85, ballX + 10)}%`,
+                top: `${Math.min(80, ballY + 8)}%`,
               }}
             >
               A
             </div>
           </div>
 
-          {/* Bottom Pitch Stats: Possession & Momentum Bar */}
-          <div className="mt-4 bg-slate-950/80 p-3 rounded-xl border border-white/5 flex flex-col gap-2">
+          {/* Bottom Pitch Stats: Possession */}
+          <div className="mt-3 bg-[#0A0D12] p-2.5 rounded-[4px] border border-[#222938] space-y-1.5">
             <div className="flex justify-between items-center text-xs font-bold text-slate-300">
               <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: match.homeTeam.color }} />
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: match.homeTeam.color }} />
                 {match.homeTeam.name} 52%
               </span>
-              <span className="text-[10px] uppercase font-black tracking-widest text-slate-500">Live Possession</span>
+              <span className="text-xs uppercase font-bold text-slate-400">Match Possession</span>
               <span className="flex items-center gap-1.5">
                 48% {match.awayTeam.name}
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: match.awayTeam.color }} />
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: match.awayTeam.color }} />
               </span>
             </div>
-            {/* Possession Gradient Track */}
-            <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
-              <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: "52%" }} />
-              <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: "48%" }} />
+            {/* Possession Track */}
+            <div className="w-full h-1.5 rounded-[2px] bg-[#1B212D] overflow-hidden flex">
+              <div className="h-full bg-emerald-500 transition-all duration-300" style={{ width: "52%" }} />
+              <div className="h-full bg-slate-500 transition-all duration-300" style={{ width: "48%" }} />
             </div>
           </div>
         </div>
 
         {/* Right: Live Match Events Timeline Commentary (4 Columns) */}
-        <div className="lg:col-span-4 flex flex-col rounded-2xl broadcast-glass border border-white/10 p-4 overflow-hidden shadow-2xl">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              Live Commentary Ticker
+        <div className="lg:col-span-4 flex flex-col rounded-[6px] bg-[#13171F] border border-[#222938] p-4 overflow-hidden">
+          <div className="flex items-center justify-between pb-2.5 border-b border-[#222938] mb-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Commentary Feed
             </h3>
-            <span className="text-[10px] font-bold text-slate-500">
+            <span className="text-xs font-mono text-slate-400 tabular-nums">
               {displayedEvents.length} Events
             </span>
           </div>
 
-          {/* Timeline Feed Container */}
+          {/* Timeline Feed Container (Newest First) */}
           <div
             ref={eventsContainerRef}
-            className="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[50vh] lg:max-h-none scrollbar-thin scrollbar-thumb-white/10"
+            className="flex-1 overflow-y-auto space-y-1.5 pr-0.5 max-h-[50vh] lg:max-h-none"
           >
             {displayedEvents.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
-                <IconClock className="w-8 h-8 mb-2 opacity-40 animate-spin" />
-                <p className="text-xs font-semibold">Match starting... telemetry initializing.</p>
+                <IconClock className="w-6 h-6 mb-2 opacity-50" />
+                <p className="text-xs font-bold uppercase">Simulation Initializing...</p>
               </div>
             ) : (
               displayedEvents.map((event, idx) => {
@@ -261,18 +254,18 @@ export function SimulationScreen({
                   <div
                     key={idx}
                     className={cn(
-                      "p-2.5 rounded-xl border transition-all text-xs flex items-start gap-2.5",
+                      "p-2 rounded-[4px] border text-xs flex items-start gap-2",
                       isGoal
-                        ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-200 font-bold"
-                        : "bg-slate-900/60 border-white/5 text-slate-300"
+                        ? "bg-[#1B212D] border-emerald-500/40 text-emerald-300 font-bold"
+                        : "bg-[#0A0D12] border-[#222938] text-slate-300"
                     )}
                   >
-                    <span className="font-black led-number text-amber-400 bg-slate-950 px-1.5 py-0.5 rounded text-[10px]">
+                    <span className="font-mono font-bold text-amber-400 bg-[#13171F] px-1.5 py-0.5 rounded-[2px] text-xs shrink-0 tabular-nums border border-[#222938]">
                       {event.minute}'
                     </span>
-                    <div className="flex-1">
-                      <p className="leading-snug">
-                        {isGoal ? "⚽ GOAL! Ball hit the back of the net!" : event.description}
+                    <div className="flex-1 min-w-0">
+                      <p className="leading-tight">
+                        {event.description}
                       </p>
                     </div>
                   </div>
@@ -285,3 +278,5 @@ export function SimulationScreen({
     </div>
   );
 }
+
+export default SimulationScreen;

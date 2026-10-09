@@ -1,9 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { SignMessage } from "../components/SignMessage";
+import { useEffect } from "react";
 import { useGame } from "../contexts/GameContext";
 import { useUserStore } from "../stores/userStore";
-import { useProfile } from "@/hooks/useProfile";
 
 export const Route = createFileRoute("/sign")({
   component: SignRoute,
@@ -11,56 +9,19 @@ export const Route = createFileRoute("/sign")({
 
 function SignRoute() {
   const navigate = useNavigate();
-  const { walletState, logout: storeLogout } = useUserStore();
-  const {
-    handleMessageSigned,
-    handleLogout: contextLogout,
-    profile,
-  } = useGame();
-  const { isPending: isProfileLoading } = useProfile();
-  const [waitingForProfile, setWaitingForProfile] = useState(false);
+  const { handleWalletConnected, handleMessageSigned } = useGame();
+  const { setOnboardingComplete } = useUserStore();
 
-  // Auto-skip if already verified AND profile is loaded
   useEffect(() => {
-    if (walletState.isConnected && walletState.isVerified && profile) {
-      handleMessageSigned();
-      navigate({ to: "/welcome" });
-    }
-  }, [
-    walletState.isConnected,
-    walletState.isVerified,
-    profile,
-    handleMessageSigned,
-    navigate,
-  ]);
-
-  // Handle transition once profile settles
-  useEffect(() => {
-    if (waitingForProfile && profile && !isProfileLoading) {
-      handleMessageSigned();
-      navigate({ to: "/welcome" });
-    }
-  }, [
-    waitingForProfile,
-    profile,
-    isProfileLoading,
-    handleMessageSigned,
-    navigate,
-  ]);
+    handleWalletConnected("0x65bc46df99bc2385128c8a67752d7cd3922de740");
+    handleMessageSigned();
+    setOnboardingComplete(true);
+    navigate({ to: "/dashboard" });
+  }, [handleWalletConnected, handleMessageSigned, setOnboardingComplete, navigate]);
 
   return (
-    <SignMessage
-      address={walletState.address || ""}
-      isProfileLoading={waitingForProfile && isProfileLoading}
-      onSigned={() => {
-        setWaitingForProfile(true);
-      }}
-      onCancel={() => {
-        setWaitingForProfile(false);
-        storeLogout();
-        contextLogout();
-        navigate({ to: "/" });
-      }}
-    />
+    <div className="min-h-screen bg-[#0A0D12] flex items-center justify-center text-xs font-mono text-slate-400">
+      VERIFYING CREDENTIALS...
+    </div>
   );
 }

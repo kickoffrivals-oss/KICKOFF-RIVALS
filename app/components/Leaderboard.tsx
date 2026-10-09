@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { cn, formatNumber, truncateAddress } from "../lib/utils";
-import { IconTrophy, IconUser, IconZap, IconAward, IconRefresh, IconCoins } from "./Icons";
 import { useGame } from "../contexts/GameContext";
 import { soundFx } from "../lib/soundFx";
+import { Trophy, Zap, Users, Award, Locate } from "lucide-react";
+import { Chip } from "./ui/Chip";
 
 interface LeaderboardEntry {
   walletAddress: string;
@@ -52,9 +53,9 @@ export function Leaderboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 h-64 text-slate-400">
-        <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-xs uppercase tracking-widest font-black text-slate-400">Loading Global Standings...</p>
+      <div className="flex flex-col items-center justify-center p-12 h-64 text-text-muted">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mb-4" />
+        <p className="text-xs uppercase tracking-wider font-bold text-text-muted font-mono">Loading Leaderboard...</p>
       </div>
     );
   }
@@ -62,41 +63,39 @@ export function Leaderboard() {
   const currentEntries = activeTab === "kor" ? entriesKor : entriesReferral;
 
   return (
-    <div className="space-y-4 pb-16 max-w-xl mx-auto w-full">
-      {/* Broadcast Standings Banner */}
-      <div className="broadcast-card rounded-2xl p-6 text-center border border-white/10 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-        <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-300 p-[2px] shadow-lg shadow-amber-500/20 animate-float">
-          <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-amber-400">
-            <IconTrophy className="w-7 h-7" />
-          </div>
+    <div className="space-y-4 pb-20 max-w-2xl mx-auto w-full p-4 sm:p-6">
+      {/* Standings Banner */}
+      <div className="bg-surface-panel border border-border-subtle rounded-md p-5 text-center">
+        <div className="w-12 h-12 mx-auto mb-3 rounded-sm bg-surface-raised border border-border-subtle flex items-center justify-center text-semantic-reward">
+          <Trophy size={24} strokeWidth={2} />
         </div>
 
-        <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em] block">
-          OFFICIAL HALL OF FAME
+        <span className="text-xs font-bold text-text-muted uppercase tracking-wider block">
+          HALL OF FAME
         </span>
-        <h1 className="text-2xl font-black text-white tracking-tight uppercase italic mt-0.5">
+        <h1 className="text-xl sm:text-2xl font-black text-text-primary font-display tracking-tight uppercase mt-0.5">
           GLOBAL LEADERBOARD
         </h1>
-        <p className="text-xs text-slate-400 max-w-xs mx-auto mt-1">
-          Top managers and prediction analysts competing for season-end KOR grants.
+        <p className="text-xs text-text-muted max-w-sm mx-auto mt-1">
+          Top prediction managers competing for season rewards and prizes.
         </p>
       </div>
 
       {/* Tab Switcher */}
-      <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+      <div className="flex bg-surface-page p-1 rounded-sm border border-border-subtle">
         <button
           onClick={() => {
             soundFx.playClick();
             setActiveTab("kor");
           }}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 ${
+          className={cn(
+            "flex-1 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-accent",
             activeTab === "kor"
-              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20"
-              : "text-slate-400 hover:text-white"
-          }`}
+              ? "bg-surface-raised text-text-primary border border-border-strong font-bold"
+              : "text-text-muted hover:text-text-primary"
+          )}
         >
-          <IconZap className="w-3.5 h-3.5" />
+          <Zap size={14} strokeWidth={2.5} />
           Highest KOR
         </button>
         <button
@@ -104,26 +103,26 @@ export function Leaderboard() {
             soundFx.playClick();
             setActiveTab("referral");
           }}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-1.5 ${
+          className={cn(
+            "flex-1 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-accent",
             activeTab === "referral"
-              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20"
-              : "text-slate-400 hover:text-white"
-          }`}
+              ? "bg-surface-raised text-text-primary border border-border-strong font-bold"
+              : "text-text-muted hover:text-text-primary"
+          )}
         >
-          <IconUser className="w-3.5 h-3.5" />
+          <Users size={14} strokeWidth={2.5} />
           Most Referrals
         </button>
       </div>
 
       {/* Entries List */}
       {currentEntries.length === 0 ? (
-        <div className="broadcast-card rounded-2xl p-12 text-center border border-white/10">
-          <p className="text-slate-400 text-xs uppercase tracking-wider font-bold">No players found on the leaderboard yet.</p>
+        <div className="bg-surface-panel rounded-sm p-12 text-center border border-border-subtle">
+          <p className="text-text-muted text-xs uppercase tracking-wider font-bold">No managers found on the leaderboard yet.</p>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {currentEntries.map((entry, index) => {
-            const isTop3 = index < 3;
             const isUser = entry.walletAddress.toLowerCase() === profile?.walletAddress?.toLowerCase();
 
             return (
@@ -131,24 +130,22 @@ export function Leaderboard() {
                 key={entry.walletAddress}
                 id={`user-rank-${entry.walletAddress}`}
                 className={cn(
-                  "broadcast-card rounded-2xl p-3.5 border transition-all duration-300 relative overflow-hidden",
-                  isUser ? "border-emerald-400/60 bg-emerald-500/10 shadow-lg shadow-emerald-500/10" :
-                  index === 0 ? "border-amber-400/40 bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900" :
-                  index === 1 ? "border-slate-300/30 bg-gradient-to-r from-slate-800/30 via-slate-900 to-slate-900" :
-                  index === 2 ? "border-amber-600/30 bg-gradient-to-r from-amber-900/20 via-slate-900 to-slate-900" :
-                  "border-white/5 bg-slate-900/80 hover:border-white/20"
+                  "bg-surface-panel rounded-sm p-3 border transition-colors",
+                  isUser
+                    ? "border-accent bg-accent/5"
+                    : "border-border-subtle hover:border-border-strong"
                 )}
               >
                 <div className="flex justify-between items-center mb-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0">
                     {/* Rank Badge */}
                     <div
                       className={cn(
-                        "w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs shrink-0 shadow-md",
-                        index === 0 ? "bg-gradient-to-tr from-amber-400 to-yellow-300 text-slate-950 shadow-amber-500/30" :
-                        index === 1 ? "bg-gradient-to-tr from-slate-200 to-slate-400 text-slate-950 shadow-slate-400/20" :
-                        index === 2 ? "bg-gradient-to-tr from-amber-600 to-amber-700 text-white shadow-amber-600/20" :
-                        "bg-slate-800 text-slate-400"
+                        "w-7 h-7 rounded-sm flex items-center justify-center font-mono font-bold text-xs shrink-0 tabular-nums",
+                        index === 0 ? "bg-[#382305] text-[#FBBF24] border border-[#F59E0B]/50" :
+                        index === 1 ? "bg-surface-raised text-text-primary border border-border-strong" :
+                        index === 2 ? "bg-surface-raised text-text-muted border border-border-subtle" :
+                        "bg-surface-page text-text-muted border border-border-subtle"
                       )}
                     >
                       #{index + 1}
@@ -156,17 +153,17 @@ export function Leaderboard() {
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-black text-white text-sm uppercase italic truncate">
+                        <span className="font-bold text-text-primary text-xs sm:text-sm uppercase truncate">
                           {entry.username}
                         </span>
                         {isUser && (
-                          <span className="text-[9px] font-black uppercase px-1.5 py-0.2 bg-emerald-500 text-slate-950 rounded">
+                          <span className="text-xs font-bold uppercase px-1.5 py-0.2 bg-accent text-surface-page rounded-xs">
                             YOU
                           </span>
                         )}
-                        {index === 0 && <IconAward className="w-4 h-4 text-amber-400 shrink-0" />}
+                        {index === 0 && <Award size={14} className="text-semantic-reward shrink-0" />}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-mono">
+                      <div className="text-xs text-text-muted font-mono">
                         {truncateAddress(entry.walletAddress)}
                       </div>
                     </div>
@@ -175,13 +172,13 @@ export function Leaderboard() {
                   {/* Value Pill */}
                   <div className="text-right">
                     {activeTab === "kor" ? (
-                      <div className="font-black text-emerald-400 text-xs bg-emerald-500/10 px-2.5 py-1 rounded-xl border border-emerald-500/20 flex items-center gap-1 led-number">
-                        <IconZap className="w-3.5 h-3.5" />
+                      <div className="font-bold font-mono text-xs text-semantic-reward bg-surface-raised px-2.5 py-1 rounded-sm border border-border-subtle flex items-center gap-1 tabular-nums">
+                        <Zap size={13} className="text-semantic-reward" />
                         {formatNumber(entry.doodlBalance)} KOR
                       </div>
                     ) : (
-                      <div className="font-black text-amber-400 text-xs bg-amber-500/10 px-2.5 py-1 rounded-xl border border-amber-500/20 flex items-center gap-1 led-number">
-                        <IconUser className="w-3.5 h-3.5" />
+                      <div className="font-bold font-mono text-xs text-text-primary bg-surface-raised px-2.5 py-1 rounded-sm border border-border-subtle flex items-center gap-1 tabular-nums">
+                        <Users size={13} className="text-text-muted" />
                         {formatNumber(entry.referralCount)} Refs
                       </div>
                     )}
@@ -189,15 +186,15 @@ export function Leaderboard() {
                 </div>
 
                 {/* Performance sub-bar */}
-                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-400 font-mono">
+                <div className="flex items-center justify-between pt-2 border-t border-border-subtle text-xs text-text-muted font-mono">
                   <div>
-                    <span className="text-emerald-400 font-bold">{entry.wins}W</span>
-                    <span className="text-slate-600 mx-1">/</span>
-                    <span className="text-red-400 font-bold">{Math.max(0, entry.totalBets - entry.wins)}L</span>
-                    <span className="text-slate-600 mx-1.5">•</span>
+                    <span className="text-semantic-win font-bold">{entry.wins}W</span>
+                    <span className="text-border-strong mx-1">/</span>
+                    <span className="text-semantic-loss font-bold">{Math.max(0, entry.totalBets - entry.wins)}L</span>
+                    <span className="text-border-strong mx-1.5">•</span>
                     <span>{entry.totalBets} Matches</span>
                   </div>
-                  <div className="text-slate-500 font-bold">
+                  <div className="text-text-muted">
                     {entry.totalBets > 0 ? `${Math.round((entry.wins / entry.totalBets) * 100)}% Win Rate` : "--"}
                   </div>
                 </div>
@@ -211,17 +208,17 @@ export function Leaderboard() {
             if (!currentUserStatsFromAPI || personalRank === null) return null;
 
             return (
-              <div className="fixed bottom-3 left-0 right-0 z-40 p-4 pointer-events-none flex justify-center">
-                <div className="broadcast-card bg-slate-950/95 text-white rounded-2xl p-3 shadow-2xl border border-emerald-500/40 w-full max-w-xl pointer-events-auto flex items-center justify-between gap-4 backdrop-blur-xl animate-slide-up">
+              <div className="fixed bottom-4 left-0 right-0 z-40 p-4 pointer-events-none flex justify-center">
+                <div className="bg-surface-panel text-text-primary rounded-md p-3 shadow-modal border border-accent w-full max-w-xl pointer-events-auto flex items-center justify-between gap-4 animate-slide-up">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black italic text-slate-950 shadow-lg shadow-emerald-500/30 shrink-0">
+                    <div className="w-9 h-9 rounded-sm bg-accent text-surface-page flex items-center justify-center font-bold font-mono shrink-0">
                       #{personalRank}
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[9px] font-black text-emerald-400 uppercase tracking-widest leading-none mb-1">
+                      <div className="text-xs font-bold text-accent uppercase tracking-wider">
                         YOUR RANK
                       </div>
-                      <div className="text-sm font-black truncate uppercase italic">
+                      <div className="text-xs sm:text-sm font-bold truncate uppercase text-text-primary">
                         {currentUserStatsFromAPI.username}
                       </div>
                     </div>
@@ -229,10 +226,10 @@ export function Leaderboard() {
 
                   <div className="flex items-center gap-3">
                     <div className="text-right hidden sm:block">
-                      <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
-                        Standing Balance
+                      <div className="text-xs font-semibold text-text-muted uppercase">
+                        Standing
                       </div>
-                      <div className="text-xs font-black text-amber-400 led-number">
+                      <div className="text-xs font-bold font-mono tabular-nums text-semantic-reward">
                         {activeTab === "kor" ? `${formatNumber(currentUserStatsFromAPI.doodlBalance)} KOR` : `${formatNumber(currentUserStatsFromAPI.referralCount)} Refs`}
                       </div>
                     </div>
@@ -243,15 +240,16 @@ export function Leaderboard() {
                         const el = document.getElementById(`user-rank-${currentUserStatsFromAPI.walletAddress}`);
                         if (el) {
                           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                          el.classList.add('ring-2', 'ring-emerald-400');
-                          setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-400'), 2000);
+                          el.classList.add('ring-2', 'ring-accent');
+                          setTimeout(() => el.classList.remove('ring-2', 'ring-accent'), 2000);
                         } else {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                       }}
-                      className="bg-emerald-500 text-slate-950 px-3.5 py-2 rounded-xl font-black text-[10px] uppercase tracking-wider italic hover:scale-105 active:scale-95 transition-all shadow-md shadow-emerald-500/20"
+                      className="bg-accent text-surface-page px-3 py-1.5 rounded-sm font-bold text-xs uppercase tracking-wider hover:bg-accent-hover transition-colors flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-accent"
                     >
-                      Locate
+                      <Locate size={14} />
+                      <span>Locate</span>
                     </button>
                   </div>
                 </div>
@@ -265,3 +263,4 @@ export function Leaderboard() {
 }
 
 export default Leaderboard;
+

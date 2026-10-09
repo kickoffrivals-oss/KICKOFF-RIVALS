@@ -30,28 +30,31 @@ interface UserState {
   setOnboardingComplete: (complete: boolean) => void;
 }
 
+export const DEFAULT_SIMULATED_ADDRESS = '0x65bc46df99bc2385128c8a67752d7cd3922de740';
+
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       // Wallet
       walletState: {
-        address: null,
-        isConnected: false,
-        isVerified: false,
-        verificationTimestamp: null,
+        address: DEFAULT_SIMULATED_ADDRESS,
+        isConnected: true,
+        isVerified: true,
+        verificationTimestamp: Date.now(),
       },
       setWalletAddress: (address) =>
-        set((state) => ({
-          walletState: {
-            ...state.walletState,
-            address,
-            isConnected: !!address,
-            // Reset verification only if switching to a DIFFERENT non-null address
-            isVerified: (state.walletState.address && address && state.walletState.address !== address)
-              ? false
-              : state.walletState.isVerified,
-          },
-        })),
+        set((state) => {
+          const target = address || DEFAULT_SIMULATED_ADDRESS;
+          return {
+            walletState: {
+              ...state.walletState,
+              address: target,
+              isConnected: true,
+              isVerified: true,
+              verificationTimestamp: Date.now(),
+            },
+          };
+        }),
       setWalletVerified: (verified) =>
         set((state) => ({
           walletState: {
@@ -63,13 +66,14 @@ export const useUserStore = create<UserState>()(
       logout: () =>
         set({
           walletState: {
-            address: null,
-            isConnected: false,
-            isVerified: false,
-            verificationTimestamp: null,
+            address: DEFAULT_SIMULATED_ADDRESS,
+            isConnected: true,
+            isVerified: true,
+            verificationTimestamp: Date.now(),
           },
           isNewUser: false,
           registrationData: null,
+          onboardingComplete: true,
         }),
 
       // Onboarding
@@ -77,7 +81,7 @@ export const useUserStore = create<UserState>()(
       setIsNewUser: (isNew) => set({ isNewUser: isNew }),
       registrationData: null,
       setRegistrationData: (data) => set({ registrationData: data }),
-      onboardingComplete: false,
+      onboardingComplete: true,
       setOnboardingComplete: (complete) => set({ onboardingComplete: complete }),
     }),
     {

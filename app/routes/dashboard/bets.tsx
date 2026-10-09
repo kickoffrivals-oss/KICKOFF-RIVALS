@@ -7,8 +7,9 @@ import {
   EmptyBetsState,
 } from "../../components/dashboard/BetCards";
 import type { Bet } from "../../types";
-import { IconTicket, IconTrophy } from "../../components/Icons";
 import { soundFx } from "../../lib/soundFx";
+import { Ticket, Trophy } from "lucide-react";
+import { formatNumber } from "../../lib/utils";
 
 export const Route = createFileRoute("/dashboard/bets")({
   component: BetsTab,
@@ -100,43 +101,44 @@ function BetsTab() {
   }
 
   return (
-    <main className="p-4 max-w-xl mx-auto w-full space-y-4">
-      {/* Broadcast Bets Header */}
-      <div className="broadcast-card rounded-2xl p-5 border border-white/10 flex items-center justify-between shadow-xl">
+    <main className="p-4 sm:p-6 max-w-2xl mx-auto w-full space-y-4">
+      {/* Bets Header */}
+      <div className="bg-surface-panel border border-border-subtle rounded-md p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 p-[2px] shadow-lg shadow-emerald-500/20">
-            <div className="w-full h-full rounded-[14px] bg-slate-950 flex items-center justify-center text-emerald-400">
-              <IconTicket className="w-6 h-6" />
-            </div>
+          <div className="w-10 h-10 rounded-sm bg-surface-raised border border-border-subtle flex items-center justify-center text-accent">
+            <Ticket size={20} strokeWidth={2} />
           </div>
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">
+            <span className="text-xs font-bold uppercase tracking-wider text-text-muted block">
               MATCHDAY PORTFOLIO
             </span>
-            <h1 className="text-xl font-black text-white uppercase italic tracking-tight">
+            <h1 className="text-base sm:text-lg font-black text-text-primary font-display tracking-tight uppercase">
               MY BET SLIPS
             </h1>
           </div>
         </div>
 
-        <div className="text-right bg-slate-950/70 border border-white/5 px-3.5 py-2 rounded-xl">
-          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+        <div className="text-right bg-surface-raised border border-border-subtle px-3 py-1.5 rounded-sm">
+          <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block">
             Total Won
           </span>
-          <span className="text-sm font-black text-amber-400 flex items-center justify-end gap-1 led-number">
-            <IconTrophy className="w-3.5 h-3.5 text-amber-400" />
-            {totalWon.toLocaleString()} KOR
+          <span className="text-sm font-black text-semantic-reward font-mono tabular-nums flex items-center justify-end gap-1">
+            <Trophy size={13} className="text-semantic-reward" />
+            {formatNumber(totalWon)} KOR
           </span>
         </div>
       </div>
 
       {/* Tab Switcher */}
-      <BetTabToggle active={betTab} onChange={(t) => {
-        soundFx.playClick();
-        setBetTab(t);
-      }} />
+      <BetTabToggle
+        active={betTab}
+        onChange={(t) => {
+          soundFx.playClick();
+          setBetTab(t);
+        }}
+      />
 
-      {/* Cards Stream in Exact Chronological Order */}
+      {/* Cards Stream */}
       <div className="space-y-2.5">
         {tickets.map((ticket) =>
           ticket.type === "single" ? (
@@ -163,15 +165,15 @@ interface BetTabToggleProps {
 
 function BetTabToggle({ active, onChange }: BetTabToggleProps) {
   return (
-    <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+    <div className="flex bg-surface-page p-1 rounded-sm border border-border-subtle">
       {(["ongoing", "ended"] as const).map((tab) => (
         <button
           key={tab}
           onClick={() => onChange(tab)}
-          className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 ${
+          className={`flex-1 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
             active === tab
-              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 shadow-md shadow-emerald-500/20"
-              : "text-slate-400 hover:text-white"
+              ? "bg-surface-raised text-text-primary border border-border-strong font-bold"
+              : "text-text-muted hover:text-text-primary"
           }`}
         >
           {tab === "ongoing" ? "Active Slips" : "Settled History"}
@@ -180,3 +182,4 @@ function BetTabToggle({ active, onChange }: BetTabToggleProps) {
     </div>
   );
 }
+

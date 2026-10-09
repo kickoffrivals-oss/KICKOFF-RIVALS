@@ -1,8 +1,9 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { cn } from "../lib/utils";
-import { Match } from "../types";
-import { IconX, IconCoins, IconCheck, IconMinus, IconPlus } from "./Icons";
+import { cn, formatNumber } from "../lib/utils";
+import type { Match } from "../types";
+import { X, Minus, Plus, Check } from "lucide-react";
+import { TeamLogo } from "./TeamLogo";
 
 interface BetModalProps {
   match: Match;
@@ -24,19 +25,28 @@ export function BetModal({
   const [selection, setSelection] = useState<
     "home" | "draw" | "away" | "gg" | "nogg" | null
   >(null);
-  const [stake, setStake] = useState<number>(10);
+  const [stake, setStake] = useState<number>(100);
   const [isLoading, setIsLoading] = useState(false);
 
-  const quickStakes = [10, 25, 50, 100, 250];
+  const quickStakes = [50, 100, 250, 500];
 
   const selectedOdds = selection ? match.odds[selection] : 0;
-  const potentialWin = stake * selectedOdds;
+  const potentialWin = Math.round(stake * selectedOdds);
   const canPlaceBet = selection && stake > 0 && stake <= balance;
 
   const handleStakeChange = (value: number) => {
     const newStake = Math.max(1, Math.min(value, balance));
     setStake(newStake);
   };
+
+  const isBettingClosed = () => {
+    if (match.status !== "LIVE") return false;
+    if (!match.liveStartTime) return false;
+    const elapsed = Date.now() - new Date(match.liveStartTime).getTime();
+    return elapsed > 10000;
+  };
+
+  const bettingClosed = isBettingClosed();
 
   const handlePlaceBet = async () => {
     if (selection && canPlaceBet && !bettingClosed) {
@@ -50,6 +60,7 @@ export function BetModal({
           toast.error("Failed to place bet. Please try again.");
         }
       } catch (error) {
+        console.error(error);
         toast.error("An error occurred.");
       } finally {
         setIsLoading(false);
@@ -60,97 +71,92 @@ export function BetModal({
   const getSelectionLabel = (sel: string) => {
     switch (sel) {
       case "home":
-        return match.homeTeam.name;
+        return `${match.homeTeam.name} Win (1)`;
       case "away":
-        return match.awayTeam.name;
+        return `${match.awayTeam.name} Win (2)`;
       case "draw":
-        return "Draw";
+        return "Draw (X)";
       case "gg":
-        return "Both Teams Score";
+        return "Both Teams Score (GG)";
       case "nogg":
-        return "No GG";
+        return "Clean Sheet (NoGG)";
       default:
         return sel;
     }
   };
 
-  const isBettingClosed = () => {
-    if (match.status !== "LIVE") return false;
-    if (!match.liveStartTime) return false;
-    const elapsed = Date.now() - new Date(match.liveStartTime).getTime();
-    return elapsed > 10000; // 10 seconds
-  };
-
-  const bettingClosed = isBettingClosed();
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-md bg-background rounded-t-2xl sm:rounded-2xl shadow-xl animate-slide-up max-h-[90vh] overflow-y-auto">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Place bet on ${match.homeTeam.name} vs ${match.awayTeam.name}`}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-page/80 backdrop-blur-xs"
+    >
+      {/* Modal Box */}
+      <div className="relative w-full max-w-md bg-surface-panel border border-border-subtle rounded-md shadow-modal flex flex-col max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="sticky top-0 bg-background flex items-center justify-between p-4 border-b border-border z-10">
+        <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-surface-raised">
           <div>
-            <h2 className="font-bold text-foreground">Place Bet</h2>
-            <p className="text-xs text-muted-foreground">
+            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">
+              PLACE BET
+            </h2>
+            <p className="text-xs text-text-muted mt-0.5">
               {match.homeTeam.name} vs {match.awayTeam.name}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-muted transition-colors"
+            aria-label="Close dialog"
+            className="p-1.5 rounded-sm hover:bg-surface-panel text-text-muted hover:text-text-primary transition-colors focus-visible:outline-2 focus-visible:outline-accent"
           >
-            <IconX className="w-5 h-5 text-muted-foreground" />
+            <X size={18} strokeWidth={2} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-4 space-y-6">
-          {/* Match Info */}
-          <div className="flex items-center justify-center gap-4">
-            <div className="flex flex-col items-center">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md"
-                style={{ backgroundColor: match.homeTeam.color }}
-              >
-                {match.homeTeam.name.charAt(0)}
-              </div>
-              <span className="text-sm font-medium text-foreground mt-2 text-center max-w-[80px] truncate">
+        {/* Content Body */}
+        <div className="p-4 space-y-4 overflow-y-auto">
+          {/* Match Teams Banner */}
+          <div className="flex items-center justify-around bg-surface-page p-3 rounded-sm border border-border-subtle">
+            <div className="flex flex-col items-center gap-1 text-center">
+              <TeamLogo
+                name={match.homeTeam.name}
+                color={match.homeTeam.color}
+                logo={match.homeTeam.logo}
+                className="w-10 h-10 rounded-full border border-border-subtle"
+              />
+              <span className="text-xs font-bold text-text-primary max-w-[100px] truncate">
                 {match.homeTeam.name}
               </span>
             </div>
 
-            <span className="text-2xl font-bold text-muted-foreground">VS</span>
+            <span className="text-xs font-mono font-bold text-text-muted uppercase tracking-widest">
+              VS
+            </span>
 
-            <div className="flex flex-col items-center">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md"
-                style={{ backgroundColor: match.awayTeam.color }}
-              >
-                {match.awayTeam.name.charAt(0)}
-              </div>
-              <span className="text-sm font-medium text-foreground mt-2 text-center max-w-[80px] truncate">
+            <div className="flex flex-col items-center gap-1 text-center">
+              <TeamLogo
+                name={match.awayTeam.name}
+                color={match.awayTeam.color}
+                logo={match.awayTeam.logo}
+                className="w-10 h-10 rounded-full border border-border-subtle"
+              />
+              <span className="text-xs font-bold text-text-primary max-w-[100px] truncate">
                 {match.awayTeam.name}
               </span>
             </div>
           </div>
 
-          {/* Selection Options */}
+          {/* Selection Grid */}
           <div>
-            <label className="text-sm font-medium text-muted-foreground mb-3 block">
-              Select Outcome
-            </label>
+            <span className="text-xs font-bold uppercase tracking-wider text-text-muted block mb-2">
+              Select Market
+            </span>
 
-            {/* Main Outcomes */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
+            {/* 1X2 */}
+            <div className="grid grid-cols-3 gap-1.5 mb-2">
               <SelectionButton
                 label="1"
-                subLabel={match.homeTeam.name}
+                subLabel="Home"
                 odds={match.odds.home}
                 selected={selection === "home"}
                 onClick={() => setSelection("home")}
@@ -164,15 +170,15 @@ export function BetModal({
               />
               <SelectionButton
                 label="2"
-                subLabel={match.awayTeam.name}
+                subLabel="Away"
                 odds={match.odds.away}
                 selected={selection === "away"}
                 onClick={() => setSelection("away")}
               />
             </div>
 
-            {/* Additional Markets */}
-            <div className="grid grid-cols-2 gap-2">
+            {/* GG/NoGG */}
+            <div className="grid grid-cols-2 gap-1.5">
               <SelectionButton
                 label="GG"
                 subLabel="Both Score"
@@ -182,7 +188,7 @@ export function BetModal({
               />
               <SelectionButton
                 label="NG"
-                subLabel="No GG"
+                subLabel="Clean Sheet"
                 odds={match.odds.nogg}
                 selected={selection === "nogg"}
                 onClick={() => setSelection("nogg")}
@@ -190,122 +196,109 @@ export function BetModal({
             </div>
           </div>
 
-          {/* Stake Input */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-muted-foreground">
+          {/* Stake Input Section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="modal-stake-input" className="text-xs font-bold uppercase tracking-wider text-text-muted">
                 Stake Amount
               </label>
-              <span className="text-xs text-muted-foreground">
-                Balance: {balance.toLocaleString()} Coins
+              <span className="text-xs text-text-muted">
+                Balance: <strong className="font-mono tabular-nums text-text-primary">{formatNumber(balance)} Coins</strong>
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-1.5">
               <button
-                onClick={() => handleStakeChange(stake - 10)}
-                disabled={stake <= 10}
-                className="btn btn-outline h-12 w-12 p-0 disabled:opacity-50"
+                onClick={() => handleStakeChange(stake - 50)}
+                disabled={stake <= 50}
+                aria-label="Decrease stake by 50"
+                className="h-10 w-10 flex items-center justify-center rounded-sm bg-surface-raised border border-border-subtle hover:border-border-strong text-text-primary disabled:opacity-40 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
               >
-                <IconMinus className="w-4 h-4" />
+                <Minus size={16} />
               </button>
 
               <div className="flex-1 relative">
                 <input
+                  id="modal-stake-input"
                   type="number"
                   value={stake}
                   onChange={(e) => handleStakeChange(Number(e.target.value))}
-                  className="input w-full h-12 text-center text-xl font-bold pr-14"
+                  className="w-full h-10 px-3 bg-surface-page border border-border-subtle rounded-sm text-center font-mono font-bold text-sm text-text-primary tabular-nums focus:outline-none focus:border-accent"
                   min={1}
                   max={balance}
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-amber-400">
-                  Coins
-                </span>
               </div>
 
               <button
-                onClick={() => handleStakeChange(stake + 10)}
+                onClick={() => handleStakeChange(stake + 50)}
                 disabled={stake >= balance}
-                className="btn btn-outline h-12 w-12 p-0 disabled:opacity-50"
+                aria-label="Increase stake by 50"
+                className="h-10 w-10 flex items-center justify-center rounded-sm bg-surface-raised border border-border-subtle hover:border-border-strong text-text-primary disabled:opacity-40 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
               >
-                <IconPlus className="w-4 h-4" />
+                <Plus size={16} />
               </button>
             </div>
 
-            {/* Quick Stakes */}
-            <div className="flex gap-2">
+            {/* Quick Stake Buttons */}
+            <div className="flex gap-1.5">
               {quickStakes.map((amount) => (
                 <button
                   key={amount}
                   onClick={() => handleStakeChange(amount)}
                   disabled={amount > balance}
                   className={cn(
-                    "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+                    "flex-1 py-1 text-xs font-mono font-bold rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
                     stake === amount
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80",
-                    amount > balance && "opacity-50 cursor-not-allowed",
+                      ? "bg-surface-raised text-text-primary border-border-strong"
+                      : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong",
+                    amount > balance && "opacity-40 cursor-not-allowed"
                   )}
                 >
-                  {amount}
+                  +{amount}
                 </button>
               ))}
               <button
                 onClick={() => handleStakeChange(balance)}
-                className={cn(
-                  "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
-                  stake === balance
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80",
-                )}
+                className="flex-1 py-1 text-xs font-mono font-bold rounded-sm bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward transition-colors focus-visible:outline-2 focus-visible:outline-accent"
               >
                 MAX
               </button>
             </div>
           </div>
 
-          {/* Bet Summary */}
+          {/* Bet Summary Box */}
           {selection && (
-            <div className="bg-muted/50 rounded-xl p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Selection</span>
-                <span className="text-sm font-medium text-foreground">
+            <div className="bg-surface-page rounded-sm p-3 border border-border-subtle space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted">Selection</span>
+                <span className="font-bold text-accent">
                   {getSelectionLabel(selection)}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Odds</span>
-                <span className="text-sm font-bold text-primary">
-                  {selectedOdds.toFixed(2)}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted">Odds</span>
+                <span className="font-mono font-bold text-text-primary">
+                  {selectedOdds.toFixed(2)}x
                 </span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Stake</span>
-                <span className="text-sm font-medium text-amber-400">
-                  {stake.toLocaleString()} Coins
-                </span>
-              </div>
-              <div className="border-t border-border pt-3 flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">
-                  Potential Win
-                </span>
-                <span className="text-lg font-bold text-primary">
-                  {potentialWin.toFixed(2)} KOR
+              <div className="flex items-center justify-between text-xs border-t border-border-subtle pt-2">
+                <span className="text-text-muted font-semibold">Potential Return</span>
+                <span className="font-mono font-bold text-sm text-semantic-reward tabular-nums">
+                  {formatNumber(potentialWin)} KOR
                 </span>
               </div>
             </div>
           )}
 
-          {/* Place Bet Button */}
+          {/* Place Bet Action Button */}
           <button
             onClick={handlePlaceBet}
-            disabled={!canPlaceBet}
+            disabled={!canPlaceBet || bettingClosed || isLoading}
             className={cn(
-              "btn w-full h-14 text-lg font-semibold",
-              canPlaceBet && !bettingClosed
-                ? "btn-primary"
-                : "btn-secondary opacity-50",
+              "w-full py-3 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 focus-visible:outline-2 focus-visible:outline-accent",
+              canPlaceBet && !bettingClosed && !isLoading
+                ? "bg-accent text-surface-page hover:bg-accent-hover active:bg-accent-active cursor-pointer"
+                : "bg-surface-raised text-text-muted border border-border-subtle cursor-not-allowed"
             )}
           >
             {!selection ? (
@@ -313,16 +306,13 @@ export function BetModal({
             ) : bettingClosed ? (
               "Betting Closed"
             ) : stake > balance ? (
-              "Insufficient Balance"
+              "Insufficient Coins"
             ) : isLoading ? (
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Placing Bet...</span>
-              </div>
+              <span>Placing Bet...</span>
             ) : (
               <>
-                <IconCheck className="w-5 h-5 mr-2" />
-                Place Bet
+                <Check size={16} strokeWidth={2.5} />
+                Confirm Bet ({formatNumber(stake)} Coins)
               </>
             )}
           </button>
@@ -351,33 +341,21 @@ function SelectionButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all",
+        "flex flex-col items-center justify-center p-2 rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
         selected
-          ? "border-primary bg-primary/10 ring-2 ring-primary/30"
-          : "border-border hover:border-primary/50 hover:bg-muted/50",
+          ? "bg-[#062E1E] border-accent text-accent font-bold"
+          : "bg-surface-page border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary"
       )}
     >
-      <span
-        className={cn(
-          "text-xs font-bold uppercase mb-1",
-          selected ? "text-primary" : "text-muted-foreground",
-        )}
-      >
-        {label}
+      <span className="text-xs font-bold uppercase mb-0.5 text-text-muted">
+        {label} ({subLabel})
       </span>
-      <span
-        className={cn(
-          "text-lg font-bold font-mono",
-          selected ? "text-primary" : "text-foreground",
-        )}
-      >
+      <span className="text-sm font-mono font-bold tabular-nums">
         {odds.toFixed(2)}
-      </span>
-      <span className="text-[10px] text-muted-foreground truncate max-w-full">
-        {subLabel}
       </span>
     </button>
   );
 }
 
 export default BetModal;
+

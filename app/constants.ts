@@ -4,19 +4,19 @@ export const LEAGUES = [
   {
     id: "l1",
     name: "Rivals Premier",
-    color: "bg-purple-100 border-purple-300",
+    color: "#38bdf8",
     logo: "/assets/rivals_premier.svg",
   },
   {
     id: "l2",
     name: "Elite LaLiga",
-    color: "bg-yellow-100 border-yellow-300",
+    color: "#f59e0b",
     logo: "/assets/elite_laliga.svg",
   },
   {
     id: "l3",
     name: "Prime Serie A",
-    color: "bg-green-100 border-green-300",
+    color: "#10b981",
     logo: "/assets/prime_serie_a.svg",
   },
 ];
