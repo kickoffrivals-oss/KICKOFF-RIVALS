@@ -118,22 +118,6 @@ function LeagueColumn({
 }: LeagueColumnProps) {
   return (
     <div className="flex flex-col gap-3">
-      {/* League Header Banner */}
-      <div className="flex items-center justify-between px-3.5 py-2 rounded-sm bg-surface-panel border border-border-subtle">
-        <div className="flex items-center gap-2">
-          <span
-            className="w-2.5 h-2.5 rounded-full shrink-0"
-            style={{ backgroundColor: league.color }}
-          />
-          <h3 className="font-bold text-sm text-text-primary tracking-wide">
-            {league.name}
-          </h3>
-        </div>
-        <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-sm bg-surface-raised text-text-muted border border-border-subtle">
-          {matches.length} Matches
-        </span>
-      </div>
-
       {/* Match Cards List */}
       <div className="space-y-3">
         {matches.map((m) => (
