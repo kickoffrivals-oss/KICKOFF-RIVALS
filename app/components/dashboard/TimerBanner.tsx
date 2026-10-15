@@ -74,7 +74,7 @@ export function TimerBanner({
         {/* Right: Round Phase Telemetry Info */}
         <div className="hidden sm:flex flex-col items-end text-right">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#94A3B8]">
-            {isLive ? "Live Simulation" : isBetting ? "35s Round Cycle" : "Settlement"}
+            {isLive ? "Live Simulation" : isBetting ? "1m Betting Window" : "Settlement"}
           </span>
           <p className="text-xs text-[#94A3B8] font-mono mt-0.5">
             {isLive

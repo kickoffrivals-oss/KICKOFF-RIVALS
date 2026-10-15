@@ -17,7 +17,7 @@ export function FloatingSupport() {
     setIsMounted(true);
     setPosition({
       x: window.innerWidth - 65,
-      y: window.innerHeight - 65
+      y: window.innerHeight - (window.innerWidth < 1024 ? 96 : 70),
     });
   }, []);
 

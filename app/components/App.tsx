@@ -1103,9 +1103,14 @@ const App: React.FC = () => {
     setBetSlipSelections((prev) => [...prev, newSelection]);
   }
 
-  function handleRemoveFromBetSlip(matchId: string) {
+  function handleRemoveFromBetSlip(matchId: string, selection?: string) {
     setBetSlipSelections((prev) =>
-      prev.filter((sel) => sel.matchId !== matchId),
+      prev.filter((sel) => {
+        if (selection) {
+          return !(sel.matchId === matchId && sel.selection === selection);
+        }
+        return sel.matchId !== matchId;
+      }),
     );
   }
 
@@ -1175,6 +1180,15 @@ const App: React.FC = () => {
         );
       } else {
         // Place accumulator bet
+        const matchIds = betSlipSelections.map((s) => s.matchId);
+        const hasDuplicates = new Set(matchIds).size !== matchIds.length;
+        if (hasDuplicates) {
+          toast.error(
+            "Accumulators cannot contain multiple selections from the same match. Please remove duplicates or switch to Singles.",
+          );
+          return false;
+        }
+
         const accumulatorId = `acc-${Date.now()}`;
         const totalOdds = betSlipSelections.reduce(
           (acc, sel) => acc * sel.odds,
@@ -1202,7 +1216,7 @@ const App: React.FC = () => {
           // Create bet entries for each selection in the accumulator
           betSlipSelections.forEach((sel) => {
             const newBet: Bet = {
-              id: `${accumulatorId}-${sel.matchId}`,
+              id: `${accumulatorId}-${sel.matchId}-${sel.selection}`,
               matchId: sel.matchId,
               selection: sel.selection,
               odds: sel.odds,

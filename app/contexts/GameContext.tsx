@@ -136,7 +136,7 @@ interface GameContextType {
     selection: "home" | "draw" | "away" | "gg" | "nogg",
     odds: number,
   ) => void;
-  handleRemoveFromBetSlip: (matchId: string) => void;
+  handleRemoveFromBetSlip: (matchId: string, selection?: string) => void;
   handleClearBetSlip: () => void;
   handlePlaceBetSlip: (
     stake: number,
@@ -580,11 +580,19 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     [betSlipSelections],
   );
 
-  const handleRemoveFromBetSlip = useCallback((matchId: string) => {
-    setBetSlipSelections((prev) =>
-      prev.filter((sel) => sel.matchId !== matchId),
-    );
-  }, []);
+  const handleRemoveFromBetSlip = useCallback(
+    (matchId: string, selection?: string) => {
+      setBetSlipSelections((prev) =>
+        prev.filter((sel) => {
+          if (selection) {
+            return !(sel.matchId === matchId && sel.selection === selection);
+          }
+          return sel.matchId !== matchId;
+        }),
+      );
+    },
+    [],
+  );
 
   const handleClearBetSlip = useCallback(() => {
     setBetSlipSelections([]);
@@ -697,6 +705,18 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
           return successful.length > 0;
         } else {
           // Accumulator Logic
+          // Check for duplicate matches in accumulator
+          const matchIdSet = new Set<string>();
+          for (const sel of betSlipSelections) {
+            if (matchIdSet.has(sel.matchId)) {
+              toast.error(
+                `Accumulator cannot contain multiple picks from the same match (${sel.match.homeTeam.name} vs ${sel.match.awayTeam.name}). Please remove one or switch to Singles.`
+              );
+              return false;
+            }
+            matchIdSet.add(sel.matchId);
+          }
+
           const accumulatorId = `acc-${Date.now()}`;
           const totalOdds = betSlipSelections.reduce(
             (acc, sel) => acc * sel.odds,
@@ -740,7 +760,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
               data.newBalance,
             );
             const newBets: Bet[] = betSlipSelections.map((sel) => ({
-              id: `${accumulatorId}-${sel.matchId}`,
+              id: `${accumulatorId}-${sel.matchId}-${sel.selection}`,
               matchId: sel.matchId,
               selection: sel.selection,
               odds: sel.odds,
