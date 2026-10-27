@@ -103,10 +103,10 @@ export function ReturningUserWelcome({
                   </p>
                 </div>
 
-                {/* KOR Balance Card */}
+                {/* Coins KOR Balance Card */}
                 <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3 text-center">
                   <span className="text-xs font-bold uppercase text-slate-400 block mb-1">
-                    KOR Tokens
+                    Coins KOR
                   </span>
                   <p className="text-xl font-mono font-bold text-amber-400 tabular-nums">
                     {Math.floor(Number(korBalance) || 0).toLocaleString()}

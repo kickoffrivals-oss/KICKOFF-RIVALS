@@ -9,10 +9,13 @@ export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
 });
 
-function DashboardLayout() {
+import { useTheme } from "../contexts/ThemeContext";
+
+export function DashboardLayout() {
   const navigate = useNavigate();
   const { profile, isLoading: isProfileLoading } = useProfile();
   const { isInitializing, setDashboardMounted, betSlipSelections } = useGame();
+  const { isNeoBrutalist } = useTheme();
 
   // Tell the context that the dashboard is mounted (starts game loop)
   useEffect(() => {
@@ -30,7 +33,7 @@ function DashboardLayout() {
 
   if (isInitializing || isProfileLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-page text-text-muted font-mono text-base animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-[#0c0a1d] text-white font-mono text-base animate-pulse">
         INITIALIZING MATCHDAY...
       </div>
     );
@@ -38,9 +41,11 @@ function DashboardLayout() {
 
   return (
     <div
-      className={`min-h-screen font-sans text-text-primary bg-surface-page flex flex-col transition-all ${
-        betSlipSelections.length > 0 ? "lg:pr-[380px]" : ""
-      }`}
+      className={`min-h-screen font-sans flex flex-col transition-colors ${
+        isNeoBrutalist
+          ? "bg-[#faf8ee] text-black bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:24px_24px]"
+          : "bg-surface-page text-text-primary"
+      } ${betSlipSelections.length > 0 ? "lg:pr-[380px]" : ""}`}
     >
       <DashboardHeader />
       {/* Tab content rendered here via nested routes */}

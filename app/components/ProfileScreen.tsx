@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSignMessage } from "wagmi";
 import { cn } from "../lib/utils";
 import type { UserStats, DailyQuest } from "../types";
 import {
@@ -94,77 +93,8 @@ export function ProfileScreen({
     "daily" | "weekly" | "social" | "partners"
   >("daily");
 
-  const { signMessageAsync } = useSignMessage();
-  const [convertKorAmount, setConvertKorAmount] = useState<number>(() => {
-    const bal = stats?.korBalance || 0;
-    if (bal >= 100) return 100;
-    if (bal >= 50) return 50;
-    return Math.max(10, Math.min(bal, 50));
-  });
-  const [isConverting, setIsConverting] = useState(false);
-  const [convertMessage, setConvertMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
-
   const [syncLoading, setSyncLoading] = useState(false);
   const [syncCooldown, setSyncCooldown] = useState(0);
-
-  const handleConvert = async () => {
-    if (convertKorAmount <= 0 || convertKorAmount > (stats?.korBalance || 0)) {
-      setConvertMessage({ type: "error", text: "Invalid KOR amount" });
-      return;
-    }
-    setIsConverting(true);
-    setConvertMessage(null);
-    try {
-      // Prompt wallet signature for converting KOR to Coins
-      try {
-        const message = `KickOff Rivals - Convert KOR to Coins
-
-Account: ${stats.walletAddress}
-Convert: ${convertKorAmount.toLocaleString()} KOR
-Receive: ${(convertKorAmount * 10).toLocaleString()} Coins
-Timestamp: ${Date.now()}
-
-Authorize converting your KOR reward tokens into Game Coins.
-This action does not cost gas.`;
-
-        await signMessageAsync({ message });
-      } catch (signErr: any) {
-        if (signErr.message?.includes("User rejected") || signErr.message?.includes("User denied")) {
-          setConvertMessage({ type: "error", text: "Signature request was cancelled" });
-          setIsConverting(false);
-          return;
-        }
-        console.warn("Wallet signing skipped or unsupported:", signErr);
-      }
-
-      const res = await fetch("/api/user/convert-coins", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          walletAddress: stats.walletAddress,
-          amount: convertKorAmount,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        soundFx.playCashout();
-        setConvertMessage({
-          type: "success",
-          text: `Converted ${convertKorAmount} KOR into ${(convertKorAmount * 10).toLocaleString()} Coins!`,
-        });
-        onSystemSync();
-      } else {
-        setConvertMessage({ type: "error", text: data.error || "Conversion failed" });
-      }
-    } catch (e: any) {
-      setConvertMessage({ type: "error", text: e.message || "Failed to convert" });
-    } finally {
-      setIsConverting(false);
-    }
-  };
 
   useEffect(() => {
     const lastSync = localStorage.getItem(`questSync_${stats?.walletAddress}`);
@@ -369,183 +299,45 @@ This action does not cost gas.`;
         </div>
       </div>
 
-      {/* Balance Hub Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Coins Panel */}
-        <div className="bg-surface-panel border border-border-subtle rounded-md p-3.5 sm:p-4">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-text-muted uppercase tracking-wider">
-              Game Coins
-            </span>
-            <IconCoins className="w-4 h-4 text-amber-400" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-text-primary font-mono tabular-nums">
-            {formatNumber(stats?.coins || 0)}
-          </p>
-          <p className="text-xs text-text-muted uppercase mt-0.5">
-            Betting Fuel
-          </p>
-        </div>
-
-        {/* KOR Tokens Panel */}
-        <div className="bg-surface-panel border border-border-subtle rounded-md p-3.5 sm:p-4">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-bold text-text-muted uppercase tracking-wider">
-              KOR Balance
-            </span>
-            <IconZap className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-semantic-reward font-mono tabular-nums">
-            {formatNumber(stats?.korBalance || 0)}
-          </p>
-          <p className="text-xs text-text-muted uppercase mt-0.5">
-            ≈ {((stats?.korBalance || 0) * 10).toLocaleString()} Coins Value
-          </p>
-        </div>
-      </div>
-
-      {/* KOR to Coins Converter Form */}
+      {/* Unified Balance Hub */}
       <div className="bg-surface-panel border border-border-subtle rounded-md p-4 sm:p-5 space-y-3">
-        <div className="flex items-center justify-between pb-2.5 border-b border-border-subtle">
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary font-mono">
-              Convert KOR to Coins
-            </h3>
-            <p className="text-xs text-text-muted">
-              Rate: <span className="font-mono font-bold text-accent">1 KOR = 10 Coins</span>
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <IconCoins className="w-5 h-5 text-amber-400" />
+            <span className="text-xs font-bold text-text-muted uppercase tracking-wider">
+              Coins KOR Unified Balance
+            </span>
           </div>
-          <span className="text-xs font-mono text-semantic-reward font-bold bg-surface-raised px-2.5 py-0.5 rounded-sm border border-border-subtle tabular-nums">
-            {formatNumber(stats?.korBalance || 0)} KOR
+          <span className="text-[11px] font-mono text-emerald-400 font-bold bg-surface-raised px-2 py-0.5 rounded-sm border border-border-subtle flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            1:1 Synchronized
           </span>
         </div>
 
-        {/* Form Controls */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <label htmlFor="profile-convert-input" className="text-text-muted uppercase tracking-wider font-bold">
-              KOR Amount
-            </label>
-            <span className="text-semantic-reward font-mono font-bold tabular-nums">
-              Yield: +{(convertKorAmount * 10).toLocaleString()} Coins
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 bg-surface-page p-1.5 rounded-sm border border-border-subtle focus-within:border-accent">
-            <button
-              onClick={() => {
-                soundFx.playClick();
-                setConvertKorAmount((prev) => Math.max(10, prev - 50));
-              }}
-              disabled={convertKorAmount <= 10}
-              aria-label="Decrease KOR amount"
-              className="w-8 h-8 rounded-sm bg-surface-raised border border-border-subtle text-text-primary flex items-center justify-center font-bold hover:border-border-strong disabled:opacity-30 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
-            >
-              -
-            </button>
-
-            <div className="flex-1 flex items-center justify-center">
-              <input
-                id="profile-convert-input"
-                type="number"
-                value={convertKorAmount || ""}
-                onChange={(e) => {
-                  const val = Math.max(0, Number(e.target.value));
-                  setConvertKorAmount(Math.min(val, stats?.korBalance || 0));
-                }}
-                min={1}
-                max={stats?.korBalance || 0}
-                placeholder="0"
-                className="w-full bg-transparent text-center font-mono font-bold text-semantic-reward text-xl focus:outline-none tabular-nums"
-              />
-              <span className="text-xs font-bold text-text-muted mr-2">KOR</span>
-            </div>
-
-            <button
-              onClick={() => {
-                soundFx.playClick();
-                setConvertKorAmount((prev) => Math.min(prev + 50, stats?.korBalance || 0));
-              }}
-              disabled={convertKorAmount + 10 > (stats?.korBalance || 0)}
-              aria-label="Increase KOR amount"
-              className="w-8 h-8 rounded-sm bg-surface-raised border border-border-subtle text-text-primary flex items-center justify-center font-bold hover:border-border-strong disabled:opacity-30 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
-            >
-              +
-            </button>
-          </div>
-
-          {/* Quick Amount Chips */}
-          <div className="flex gap-1.5">
-            {[50, 100, 250, 500].map((amt) => (
-              <button
-                key={amt}
-                onClick={() => {
-                  soundFx.playClick();
-                  setConvertKorAmount(Math.min(amt, stats?.korBalance || 0));
-                }}
-                disabled={amt > (stats?.korBalance || 0)}
-                className={cn(
-                  "flex-1 py-1 rounded-sm text-xs font-mono font-bold border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
-                  convertKorAmount === amt
-                    ? "bg-surface-raised text-text-primary border-border-strong"
-                    : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong",
-                  amt > (stats?.korBalance || 0) && "opacity-30 cursor-not-allowed"
-                )}
-              >
-                {amt}
-              </button>
-            ))}
-            <button
-              onClick={() => {
-                soundFx.playClick();
-                setConvertKorAmount(stats?.korBalance || 0);
-              }}
-              disabled={(stats?.korBalance || 0) <= 0}
-              className="flex-1 py-1 rounded-sm text-xs font-mono font-bold bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward disabled:opacity-30 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
-            >
-              MAX
-            </button>
-          </div>
+        <div className="flex items-baseline gap-2">
+          <p className="text-2xl sm:text-3xl font-black text-text-primary font-mono tabular-nums">
+            {formatNumber(stats?.korBalance ?? stats?.coins ?? 0)}
+          </p>
+          <span className="text-sm font-bold text-text-muted uppercase">Coins KOR</span>
         </div>
 
-        {/* Convert Action Button */}
-        <button
-          onClick={handleConvert}
-          disabled={
-            isConverting ||
-            (stats?.korBalance || 0) < 10 ||
-            convertKorAmount <= 0 ||
-            convertKorAmount > (stats?.korBalance || 0)
-          }
-          className={cn(
-            "w-full h-11 rounded-sm font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 focus-visible:outline-2 focus-visible:outline-accent",
-            (stats?.korBalance || 0) >= 10 && convertKorAmount > 0 && convertKorAmount <= (stats?.korBalance || 0) && !isConverting
-              ? "bg-accent text-surface-page hover:bg-accent-hover cursor-pointer"
-              : "bg-surface-raised text-text-muted border border-border-subtle cursor-not-allowed"
-          )}
-        >
-          {isConverting ? (
-            <span>Converting...</span>
-          ) : (stats?.korBalance || 0) < 10 ? (
-            "Minimum 10 KOR to Convert"
-          ) : (
-            <>
-              <IconCoins className="w-4 h-4" />
-              Convert {convertKorAmount.toLocaleString()} KOR → +{(convertKorAmount * 10).toLocaleString()} Coins
-            </>
-          )}
-        </button>
+        <p className="text-xs text-text-muted">
+          Your balance is unified and automatically synchronized across Virtual Football, Daily Aviator, and all KickOff Rivals mini-games.
+        </p>
 
-        {convertMessage && (
-          <p
-            className={cn(
-              "text-xs text-center font-semibold",
-              convertMessage.type === "success" ? "text-semantic-win" : "text-semantic-loss"
-            )}
+        <div className="pt-2 border-t border-border-subtle flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-xs text-text-muted">
+            <IconZap className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Universal in-game fuel & settlement</span>
+          </div>
+          <button
+            onClick={handleSync}
+            disabled={syncLoading || syncCooldown > 0}
+            className="text-xs font-mono font-bold text-accent hover:underline disabled:opacity-40 cursor-pointer"
           >
-            {convertMessage.text}
-          </p>
-        )}
+            {syncLoading ? "Syncing..." : syncCooldown > 0 ? `Synced (${syncCooldown}m)` : "Refresh Sync"}
+          </button>
+        </div>
       </div>
 
       {/* Unclaimed Winnings Card */}

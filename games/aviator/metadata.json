@@ -1,0 +1,5 @@
+{
+  "name": "The Daily Aviator",
+  "description": "An old-school newspaper themed betting game with a doodle aesthetic. Place your bets on the flying paper plane before it crashes! Features real-time AI-generated headlines based on flight performance.",
+  "requestFramePermissions": []
+}

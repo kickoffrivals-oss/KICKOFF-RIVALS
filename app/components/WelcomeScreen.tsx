@@ -78,7 +78,7 @@ export function WelcomeScreen({
                 {/* Coins Bonus */}
                 <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3 text-center">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Play Coins
+                    Coins KOR Stake
                   </span>
                   <p className="text-xl font-mono font-bold text-white tabular-nums">
                     5,000
@@ -91,7 +91,7 @@ export function WelcomeScreen({
                 {/* KOR Bonus */}
                 <div className="bg-[#0A0D12] border border-[#222938] rounded-[4px] p-3 text-center">
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    KOR Tokens
+                    Coins KOR Reserve
                   </span>
                   <p className="text-xl font-mono font-bold text-amber-400 tabular-nums">
                     1,000

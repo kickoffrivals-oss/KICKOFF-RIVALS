@@ -79,15 +79,19 @@ export function ReturningUserScreen({
                                 </h3>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4 divide-x divide-slate-700">
-                                <div className="text-center pr-2">
-                                    <p className="text-3xl font-bold text-yellow-400">{coins.toLocaleString()}</p>
-                                    <p className="text-xs text-slate-400 uppercase tracking-wider mt-1">Coins</p>
+                            <div className="text-center py-2">
+                                <div className="flex items-center justify-center gap-1.5 mb-1">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Coins</span>
+                                    <span className="px-1.5 py-0.5 rounded-[4px] bg-[#ff3366] text-white text-[10px] font-black leading-none">
+                                        KOR
+                                    </span>
                                 </div>
-                                <div className="text-center pl-2">
-                                    <p className="text-3xl font-bold text-primary">{korBalance.toLocaleString()}</p>
-                                    <p className="text-xs text-slate-400 uppercase tracking-wider mt-1">KOR Tokens</p>
-                                </div>
+                                <p className="text-4xl font-black font-mono text-amber-400 tabular-nums">
+                                    {(korBalance || coins || 0).toLocaleString()}
+                                </p>
+                                <p className="text-xs text-emerald-400 font-mono font-bold uppercase tracking-wider mt-1">
+                                    Unified Platform Balance
+                                </p>
                             </div>
                         </div>
                     )}

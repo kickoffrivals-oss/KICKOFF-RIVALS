@@ -119,166 +119,80 @@ export function WalletModal({
         <div className="flex-1 overflow-y-auto space-y-3 pr-0.5">
           {activeTab === "balance" && (
             <div className="space-y-3">
-              {/* Balances Grid */}
-              <div className="grid grid-cols-2 gap-2">
-                {/* KOR Balance */}
-                <div className="p-3 rounded-[4px] bg-[#0A0D12] border border-[#222938]">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">KOR Tokens</span>
-                    <IconZap className="w-4 h-4 text-emerald-400" />
+              {/* Dual Balance Cards: Coins vs KOR */}
+              <div className="grid grid-cols-2 gap-2.5">
+                {/* Coins Card */}
+                <div className="p-3.5 rounded-[8px] bg-[#0A0D12] border border-[#222938] text-center space-y-1">
+                  <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-400">
+                    <span>🪙</span>
+                    <span>COINS</span>
                   </div>
-                  <p className="text-lg font-bold font-mono text-white tabular-nums">
-                    {formatNumber(userStats?.korBalance || 0)}
+                  <p className="text-xl sm:text-2xl font-black font-mono text-white tabular-nums">
+                    {formatNumber(userStats?.coins ?? 5000)}
                   </p>
-                  <p className="text-xs text-slate-500 uppercase mt-0.5">
-                    Earned Winnings
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+                    Social Tasks & Quests
                   </p>
                 </div>
 
-                {/* Coins Balance */}
-                <div className="p-3 rounded-[4px] bg-[#0A0D12] border border-[#222938]">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Play Coins</span>
-                    <IconCoins className="w-4 h-4 text-amber-400" />
+                {/* KOR Card */}
+                <div className="p-3.5 rounded-[8px] bg-[#0A0D12] border border-[#222938] text-center space-y-1">
+                  <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-400">
+                    <span className="px-1.5 py-0.2 rounded bg-[#ff3366] text-white text-[9px] font-black">
+                      KOR
+                    </span>
+                    <span>WAGER FUEL</span>
                   </div>
-                  <p className="text-lg font-bold font-mono text-amber-400 tabular-nums">
-                    {formatNumber(userStats?.coins || 0)}
+                  <p className="text-xl sm:text-2xl font-black font-mono text-emerald-400 tabular-nums">
+                    {formatNumber(userStats?.korBalance ?? currentBalance ?? 1000)}
                   </p>
-                  <p className="text-xs text-slate-500 uppercase mt-0.5">
-                    Matchday Stakes
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wide">
+                    Bets & Winning Payouts
                   </p>
                 </div>
               </div>
 
-              {/* Conversion Card with Custom Amount Selector */}
-              <div className="p-3 rounded-[4px] border border-[#222938] bg-[#0A0D12] space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">
-                    Swap KOR to Coins
+              {/* Quick Convert Button */}
+              <button
+                type="button"
+                onClick={onSwapRequest}
+                className="w-full py-2.5 px-3 rounded-[6px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition-all cursor-pointer"
+              >
+                <span>⇄ Convert Coins to KOR</span>
+              </button>
+
+              {/* Game Stats Snapshot */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="p-2.5 rounded-[4px] bg-[#0A0D12] border border-[#222938] text-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Bets</span>
+                  <span className="text-base font-bold font-mono text-white tabular-nums">
+                    {userStats?.totalBets || 0}
                   </span>
-                  <span className="text-xs font-mono text-emerald-400 font-bold bg-[#1B212D] px-2 py-0.5 rounded-[4px] border border-[#222938] tabular-nums">
-                    1 KOR = 10 Coins
+                </div>
+                <div className="p-2.5 rounded-[4px] bg-[#0A0D12] border border-[#222938] text-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Wins</span>
+                  <span className="text-base font-bold font-mono text-emerald-400 tabular-nums">
+                    {userStats?.wins || 0}
                   </span>
                 </div>
-
-                {/* Amount Input with Steppers */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 uppercase font-bold text-xs">
-                      Enter KOR Amount
-                    </span>
-                    <span className="text-amber-400 font-mono font-bold tabular-nums text-xs">
-                      Yield: +{resultingCoins.toLocaleString()} Coins
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2 bg-[#13171F] p-1 rounded-[4px] border border-[#222938]">
-                    <button
-                      onClick={() => {
-                        soundFx.playClick();
-                        setSelectedKor((prev) => Math.max(10, prev - 50));
-                      }}
-                      disabled={selectedKor <= 10}
-                      className="w-8 h-8 rounded-[4px] bg-[#1B212D] border border-[#222938] text-white flex items-center justify-center text-sm font-bold hover:bg-[#222938] disabled:opacity-30 disabled:pointer-events-none"
-                      aria-label="Decrease KOR amount"
-                    >
-                      -
-                    </button>
-
-                    <div className="flex-1 flex items-center justify-center gap-1">
-                      <input
-                        type="number"
-                        value={selectedKor || ""}
-                        onChange={(e) => {
-                          const val = Math.max(0, Number(e.target.value));
-                          setSelectedKor(Math.min(val, userStats?.korBalance || 0));
-                        }}
-                        min={1}
-                        max={userStats?.korBalance || 0}
-                        placeholder="0"
-                        className="w-full bg-transparent text-center font-bold font-mono text-emerald-400 text-base focus:outline-none tabular-nums"
-                      />
-                      <span className="text-xs font-bold text-slate-400 mr-2">KOR</span>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        soundFx.playClick();
-                        setSelectedKor((prev) => Math.min(prev + 50, userStats?.korBalance || 0));
-                      }}
-                      disabled={selectedKor + 10 > (userStats?.korBalance || 0)}
-                      className="w-8 h-8 rounded-[4px] bg-emerald-500 text-slate-950 flex items-center justify-center text-sm font-bold hover:bg-emerald-400 disabled:opacity-30 disabled:pointer-events-none"
-                      aria-label="Increase KOR amount"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  {/* Quick Preset Chips */}
-                  <div className="flex gap-1">
-                    {[50, 100, 250, 500].map((amt) => (
-                      <button
-                        key={amt}
-                        onClick={() => {
-                          soundFx.playClick();
-                          setSelectedKor(Math.min(amt, userStats?.korBalance || 0));
-                        }}
-                        disabled={amt > (userStats?.korBalance || 0)}
-                        className={cn(
-                          "flex-1 py-1 rounded-[4px] text-xs font-mono font-bold border transition-colors tabular-nums",
-                          selectedKor === amt
-                            ? "bg-emerald-500 text-slate-950 border-emerald-500"
-                            : "bg-[#1B212D] text-slate-400 border-[#222938] hover:text-white",
-                          amt > (userStats?.korBalance || 0) && "opacity-40 cursor-not-allowed"
-                        )}
-                      >
-                        {amt}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => {
-                        soundFx.playClick();
-                        setSelectedKor(userStats?.korBalance || 0);
-                      }}
-                      disabled={(userStats?.korBalance || 0) <= 0}
-                      className="flex-1 py-1 rounded-[4px] text-xs font-bold bg-[#1B212D] text-amber-400 border border-amber-500/40 hover:bg-[#222938] disabled:opacity-40"
-                    >
-                      MAX
-                    </button>
-                  </div>
+                <div className="p-2.5 rounded-[4px] bg-[#0A0D12] border border-[#222938] text-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Best Win</span>
+                  <span className="text-base font-bold font-mono text-amber-400 tabular-nums">
+                    {formatNumber(userStats?.biggestWin || 0)} KOR
+                  </span>
                 </div>
+              </div>
 
-                {/* Conversion Summary Row */}
-                <div className="grid grid-cols-2 gap-2 bg-[#13171F] p-2.5 rounded-[4px] border border-[#222938] text-xs">
-                  <div className="text-center">
-                    <span className="text-xs font-bold text-slate-400 uppercase block">Paying</span>
-                    <span className="text-xs font-bold font-mono text-emerald-400 tabular-nums">
-                      {selectedKor.toLocaleString()} KOR
-                    </span>
-                  </div>
-                  <div className="text-center border-l border-[#222938]">
-                    <span className="text-xs font-bold text-slate-400 uppercase block">Receiving</span>
-                    <span className="text-xs font-bold font-mono text-amber-400 tabular-nums">
-                      +{resultingCoins.toLocaleString()} Coins
-                    </span>
-                  </div>
+              {/* Currency Explanation Banner */}
+              <div className="p-3 rounded-[6px] border border-[#222938] bg-[#13171F] space-y-1 text-xs">
+                <div className="flex items-center gap-1.5 font-bold text-slate-200">
+                  <span className="text-emerald-400">✓</span>
+                  <span>Currency Guidelines</span>
                 </div>
-
-                <button
-                  onClick={() => {
-                    soundFx.playCashout();
-                    onSwapRequest();
-                  }}
-                  disabled={!canConvert}
-                  className={cn(
-                    "w-full h-10 rounded-[4px] font-bold text-xs uppercase tracking-wider transition-colors",
-                    canConvert
-                      ? "bg-emerald-500 hover:bg-emerald-400 text-slate-950"
-                      : "bg-[#1B212D] text-slate-500 cursor-not-allowed border border-[#222938]",
-                  )}
-                >
-                  {canConvert ? `Confirm Swap (${selectedKor.toLocaleString()} KOR)` : "Minimum 10 KOR Required"}
-                </button>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <strong>KOR</strong> is earned by placing bets and winning matches or cashing out, or by converting Coins into KOR.
+                  <strong> Coins</strong> are earned by completing daily tasks, missions, and social challenges.
+                </p>
               </div>
             </div>
           )}

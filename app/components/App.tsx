@@ -409,12 +409,14 @@ const App: React.FC = () => {
         );
         setIsNewUser(isNew);
 
+        const syncedBal = Number(userData.korBalance ?? userData.coins ?? 1000);
+
         setUserStats((prev) => ({
           ...prev,
           walletAddress: address,
           username: userData.username || prev.username,
-          coins: Number(userData.coins) || 0,
-          korBalance: Number(userData.korBalance) || 0,
+          coins: syncedBal,
+          korBalance: syncedBal,
           level: Number(userData.level) || 1,
           xp: Number(userData.xp) || 0,
           totalBets: Number(userData.totalBets) || 0,
@@ -469,7 +471,7 @@ const App: React.FC = () => {
             });
           })(),
         }));
-        setBalance(Number(userData.korBalance) || 0);
+        setBalance(syncedBal);
       } else {
         // Fallback for failed profile fetch - don't block the user
         console.warn(
@@ -704,7 +706,7 @@ const App: React.FC = () => {
         const winnings = newBalance - oldBalance;
 
         setBalance(newBalance);
-        setUserStats((prev) => ({ ...prev, korBalance: newBalance }));
+        setUserStats((prev) => ({ ...prev, korBalance: newBalance, coins: newBalance }));
 
         if (winnings > 0) {
           console.log(`[WINNINGS] You won ${winnings} DOODL!`);
@@ -1033,7 +1035,7 @@ const App: React.FC = () => {
       if (data.success) {
         // Update local state
         setBalance(data.newBalance);
-        setUserStats((prev) => ({ ...prev, korBalance: data.newBalance }));
+        setUserStats((prev) => ({ ...prev, korBalance: data.newBalance, coins: data.newBalance }));
 
         const bet: Bet = {
           id: data.bet.id,
@@ -1166,12 +1168,14 @@ const App: React.FC = () => {
         }
 
         const totalStake = stake * betSlipSelections.length;
+        const nextBal = (s.korBalance ?? balance) - totalStake;
         setUserStats((s) => ({
           ...s,
-          korBalance: s.korBalance - totalStake,
+          korBalance: nextBal,
+          coins: nextBal,
           totalBets: s.totalBets + betSlipSelections.length,
         }));
-        setBalance((prev) => prev - totalStake);
+        setBalance(nextBal);
         addTransaction(
           "bet",
           totalStake,
@@ -1231,12 +1235,14 @@ const App: React.FC = () => {
             setActiveBets((prev) => [...prev, newBet]);
           });
 
+          const nextBal = (s.korBalance ?? balance) - stake;
           setUserStats((s) => ({
             ...s,
-            korBalance: s.korBalance - stake,
+            korBalance: nextBal,
+            coins: nextBal,
             totalBets: s.totalBets + 1,
           }));
-          setBalance((prev) => prev - stake);
+          setBalance(nextBal);
           addTransaction(
             "bet",
             stake,
@@ -1283,13 +1289,18 @@ const App: React.FC = () => {
       if (data.success) {
         console.log(`[CHECK-IN] Success! Reward: ${data.reward}`);
         // Update local stats
-        setUserStats((prev) => ({
-          ...prev,
-          coins: prev.coins + data.reward,
-          canCheckIn: false,
-          nextCheckInIn: 4,
-          lastCheckInDate: new Date(),
-        }));
+        setUserStats((prev) => {
+          const nextBal = (prev.korBalance ?? prev.coins ?? balance) + data.reward;
+          return {
+            ...prev,
+            coins: nextBal,
+            korBalance: nextBal,
+            canCheckIn: false,
+            nextCheckInIn: 4,
+            lastCheckInDate: new Date(),
+          };
+        });
+        setBalance((prev) => prev + data.reward);
 
         addTransaction(
           "bonus",
@@ -1367,7 +1378,7 @@ const App: React.FC = () => {
 
         setUserStats((prev) => {
           const newQuests = prev.quests.map((q) =>
-            q.id === id ? { ...q, progress: Math.max(q.progress, q.target || 1), status: "CLAIMABLE" } : q
+            q.id === id ? { ...q, progress: Math.max(q.progress, q.target || 1), status: "CLAIMABLE" as const } : q
           );
           console.log("QUEST_DEBUG: New status for quest:", newQuests.find(q => q.id === id)?.status);
           return {
@@ -1435,16 +1446,21 @@ const App: React.FC = () => {
         }
 
         // 2. Update local state immediately
-        setUserStats((prev) => ({
-          ...prev,
-          coins: (prev.coins || 0) + reward,
-          quests: prev.quests.map((q) => {
-            if (q.id === id) {
-              return { ...q, completed: true, status: "CLAIMED", progress: q.target || 1 };
-            }
-            return q;
-          }),
-        }));
+        setUserStats((prev) => {
+          const nextBal = (prev.korBalance ?? prev.coins ?? balance) + reward;
+          return {
+            ...prev,
+            coins: nextBal,
+            korBalance: nextBal,
+            quests: prev.quests.map((q) => {
+              if (q.id === id) {
+                return { ...q, completed: true, status: "CLAIMED", progress: q.target || 1 };
+              }
+              return q;
+            }),
+          };
+        });
+        setBalance((prev) => prev + reward);
         addTransaction(
           "redeem",
           reward,
@@ -1484,11 +1500,17 @@ const App: React.FC = () => {
 
       // Apply reward based on type
       if (result.type === "coins" && typeof result.value === "number") {
-        setUserStats((prev) => ({
-          ...prev,
-          coins: prev.coins + (result.value as number),
-        }));
-        addTransaction("redeem", result.value, "coins", `Coupon: ${code}`);
+        const reward = result.value as number;
+        setUserStats((prev) => {
+          const nextBal = (prev.korBalance ?? prev.coins ?? balance) + reward;
+          setBalance(nextBal);
+          return {
+            ...prev,
+            coins: nextBal,
+            korBalance: nextBal,
+          };
+        });
+        addTransaction("redeem", reward, "coins", `Coupon: ${code}`);
       } else if (result.type === "theme" && typeof result.value === "string") {
         // Apply theme
         setUserStats((prev) => ({

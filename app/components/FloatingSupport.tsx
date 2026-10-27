@@ -1,40 +1,48 @@
 import { useState, useRef, useEffect } from "react";
 import { IconMessage } from "./Icons";
+import { useTheme } from "../contexts/ThemeContext";
 
 export function FloatingSupport() {
   const supportUrl = "https://forms.gle/RHdMToAjVWAgxpB96"; // Production Support Link
+  const { isNeoBrutalist } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
   
-  // Position state (defaults to a neutral initial value for SSR)
+  // Custom drag position (null means default responsive CSS corner position)
+  const [hasCustomPosition, setHasCustomPosition] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLDivElement>(null);
 
-  // Initialize position on mount (avoid SSR hydration mismatch)
   useEffect(() => {
     setIsMounted(true);
-    setPosition({
-      x: window.innerWidth - 65,
-      y: window.innerHeight - (window.innerWidth < 1024 ? 96 : 70),
-    });
   }, []);
 
-  // Define event handlers
+  // Define event handlers for dragging
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
-    // Only proceed if mounted (should always be true when interacting)
     if (!isMounted) return;
     
-    e.preventDefault();
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
     const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
     
-    setDragStart({
-      x: clientX - position.x,
-      y: clientY - position.y
-    });
-    setIsDragging(false); // Reset dragging state on start
+    // Get current bounding box
+    if (buttonRef.current && !hasCustomPosition) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({ x: rect.left, y: rect.top });
+      setHasCustomPosition(true);
+      setDragStart({
+        x: clientX - rect.left,
+        y: clientY - rect.top,
+      });
+    } else {
+      setDragStart({
+        x: clientX - position.x,
+        y: clientY - position.y,
+      });
+    }
+    
+    setIsDragging(false);
   };
 
   useEffect(() => {
@@ -47,16 +55,15 @@ export function FloatingSupport() {
       const dx = clientX - dragStart.x;
       const dy = clientY - dragStart.y;
       
-      // If we move more than a few pixels, consider it a drag
       if (!isDragging && (Math.abs(dx - position.x) > 5 || Math.abs(dy - position.y) > 5)) {
         setIsDragging(true);
       }
 
       if (isDragging) {
-        // Keep within bounds
         const x = Math.max(10, Math.min(window.innerWidth - 60, dx));
         const y = Math.max(10, Math.min(window.innerHeight - 60, dy));
         setPosition({ x, y });
+        setHasCustomPosition(true);
       }
     };
 
@@ -88,18 +95,19 @@ export function FloatingSupport() {
     }
   };
 
-  // HYDRATION & HOOK RULES: 
-  // All hooks MUST be called before this conditional return.
   if (!isMounted) return null;
 
   return (
     <div 
       ref={buttonRef}
-      style={{ 
-        left: `${position.x}px`, 
-        top: `${position.y}px` 
-      }}
-      className="fixed z-[4000] touch-none"
+      style={
+        hasCustomPosition
+          ? { left: `${position.x}px`, top: `${position.y}px`, right: 'auto', bottom: 'auto' }
+          : undefined
+      }
+      className={`fixed z-[4000] touch-none select-none ${
+        !hasCustomPosition ? "bottom-4 right-3 sm:bottom-6 sm:right-6" : ""
+      }`}
       onMouseDown={handleMouseDown}
       onTouchStart={handleMouseDown}
     >
@@ -108,19 +116,40 @@ export function FloatingSupport() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="group relative flex items-center justify-center w-11 h-11 bg-foreground text-background rounded-full shadow-2xl hover:scale-110 active:scale-90 transition-transform border border-background/10 cursor-move"
+        title="Support & Feedback"
+        className={`group relative flex items-center justify-center transition-all cursor-move ${
+          isNeoBrutalist
+            ? "w-11 h-11 sm:w-12 sm:h-12 bg-[#ffe600] text-black rounded-full border-[3px] border-black shadow-[3.5px_3.5px_0_#000] hover:bg-[#fed600] hover:shadow-[4.5px_4.5px_0_#000] hover:-translate-x-[1px] hover:-translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_#000]"
+            : "w-11 h-11 bg-[#181F2C] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 border border-[#2E384D] hover:border-[#10B981]"
+        }`}
       >
-        <IconMessage className="w-5 h-5 pointer-events-none" />
+        <IconMessage className="w-5 h-5 sm:w-5.5 sm:h-5.5 pointer-events-none" />
         
         {/* Tooltip Label */}
-        <span className="absolute right-full mr-4 px-3 py-1.5 rounded-xl bg-foreground text-background text-[9px] font-black uppercase tracking-widest italic opacity-0 group-hover:opacity-100 pointer-events-none transition-all whitespace-nowrap shadow-2xl border border-background/10">
+        <span
+          className={`absolute right-full mr-3 px-2.5 sm:px-3 py-1 sm:py-1.5 opacity-0 group-hover:opacity-100 pointer-events-none transition-all whitespace-nowrap ${
+            isNeoBrutalist
+              ? "rounded-[8px] bg-white text-black text-[10px] sm:text-xs font-black uppercase tracking-wider border-2 border-black shadow-[3px_3px_0_#000]"
+              : "rounded-[6px] bg-[#0E131F] text-slate-300 text-[10px] font-bold uppercase tracking-wider border border-[#2E384D] shadow-xl"
+          }`}
+        >
           Support & Bugs
         </span>
 
         {/* Pulsing Notification Dot */}
-        <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5 pointer-events-none">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+        <span className="absolute -top-1 -right-1 flex h-3 w-3 pointer-events-none">
+          <span
+            className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+              isNeoBrutalist ? "bg-[#ff0055]" : "bg-emerald-500"
+            }`}
+          />
+          <span
+            className={`relative inline-flex rounded-full h-3 w-3 ${
+              isNeoBrutalist
+                ? "bg-[#ff0055] border-2 border-black"
+                : "bg-emerald-500"
+            }`}
+          />
         </span>
       </a>
     </div>

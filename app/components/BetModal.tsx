@@ -203,7 +203,7 @@ export function BetModal({
                 Stake Amount
               </label>
               <span className="text-xs text-text-muted">
-                Balance: <strong className="font-mono tabular-nums text-text-primary">{formatNumber(balance)} Coins</strong>
+                Balance: <strong className="font-mono tabular-nums text-text-primary">{formatNumber(balance)} Coins KOR</strong>
               </span>
             </div>
 
@@ -284,7 +284,7 @@ export function BetModal({
               <div className="flex items-center justify-between text-xs border-t border-border-subtle pt-2">
                 <span className="text-text-muted font-semibold">Potential Return</span>
                 <span className="font-mono font-bold text-sm text-semantic-reward tabular-nums">
-                  {formatNumber(potentialWin)} KOR
+                  {formatNumber(potentialWin)} Coins KOR
                 </span>
               </div>
             </div>
@@ -306,13 +306,13 @@ export function BetModal({
             ) : bettingClosed ? (
               "Betting Closed"
             ) : stake > balance ? (
-              "Insufficient Coins"
+              "Insufficient Coins KOR"
             ) : isLoading ? (
               <span>Placing Bet...</span>
             ) : (
               <>
                 <Check size={16} strokeWidth={2.5} />
-                Confirm Bet ({formatNumber(stake)} Coins)
+                Confirm Bet ({formatNumber(stake)} Coins KOR)
               </>
             )}
           </button>

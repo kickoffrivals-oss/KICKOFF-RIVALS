@@ -9,11 +9,13 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   server: {
     port: 4000,
+    strictPort: false,
   },
   resolve: {
     alias: {
       axios: path.resolve(process.cwd(), "node_modules/axios/dist/esm/axios.js"),
       "@solana/web3.js": path.resolve(process.cwd(), "mocks/empty.js"),
+      "@games": path.resolve(process.cwd(), "games"),
     },
   },
   optimizeDeps: {

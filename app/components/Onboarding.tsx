@@ -42,15 +42,15 @@ const infoSteps: OnboardingStep[] = [
   },
   {
     id: 2,
-    badge: "REWARD ECONOMY",
-    title: "Game Coins & KOR Tokens",
+    badge: "UNIFIED REWARD ECONOMY",
+    title: "Coins KOR Unified Currency",
     description:
-      "Win predictions to collect KOR token winnings. Claim 4-hourly stadium grants and swap KOR into Coins anytime at fixed 1:10 rates.",
+      "Play any game across KickOff Rivals with a single, synchronized Coins KOR balance. Win predictions, claim 4-hourly stadium grants, and level up seamlessly.",
     icon: <IconCoins className="w-8 h-8 text-amber-400" />,
     features: [
-      "5,000 Coins + 1,000 KOR Starter Grant",
+      "1,000 Coins KOR Starter Grant",
       "4-Hourly Free Stadium Bonus Grants",
-      "Instant 1 KOR = 10 Coins conversion tool",
+      "100% Synchronized Across Virtual Football & Aviator",
     ],
   },
   {

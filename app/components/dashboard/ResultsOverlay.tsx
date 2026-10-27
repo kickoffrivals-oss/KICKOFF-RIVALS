@@ -85,6 +85,8 @@ function RoundEndedBanner({ timer }: { timer: number }) {
   );
 }
 
+import { useTheme } from "../../contexts/ThemeContext";
+
 interface LeagueFilterBarProps {
   selected: string;
   onSelect: (id: string) => void;
@@ -95,10 +97,15 @@ export function LeagueFilterBar({
   selected,
   onSelect,
 }: LeagueFilterBarProps) {
-  const activeClass =
-    "bg-[#1B212D] text-white border-emerald-500 font-bold";
-  const inactiveClass =
-    "bg-[#13171F] text-[#94A3B8] hover:text-white hover:bg-[#1B212D] hover:border-[#323C50] border-[#222938]";
+  const { isNeoBrutalist } = useTheme();
+
+  const activeClass = isNeoBrutalist
+    ? "bg-[#00ff66] text-black border-2 border-black font-black shadow-[2px_2px_0_#000]"
+    : "bg-[#1B212D] text-white border-emerald-500 font-bold";
+
+  const inactiveClass = isNeoBrutalist
+    ? "bg-white text-black/80 hover:bg-[#ffe600] hover:text-black border-2 border-black shadow-[2px_2px_0_#000] font-bold"
+    : "bg-[#13171F] text-[#94A3B8] hover:text-white hover:bg-[#1B212D] hover:border-[#323C50] border-[#222938]";
 
   return (
     <div className="flex gap-2 mb-5 overflow-x-auto pb-1 no-scrollbar px-0.5 w-full justify-start md:justify-center">
@@ -107,11 +114,13 @@ export function LeagueFilterBar({
           soundFx.playClick();
           onSelect("all");
         }}
-        className={`px-3.5 py-1.5 rounded-[4px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors border focus-visible:outline-2 focus-visible:outline-emerald-500 flex items-center gap-1.5 ${
+        className={`px-3.5 py-1.5 rounded-[6px] text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all border flex items-center gap-1.5 cursor-pointer ${
           selected === "all" ? activeClass : inactiveClass
         }`}
       >
-        {selected === "all" && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
+        {selected === "all" && (
+          <span className={`w-2 h-2 rounded-full ${isNeoBrutalist ? "bg-black" : "bg-emerald-500"}`} />
+        )}
         <span>All Leagues</span>
       </button>
       {LEAGUES.map((league) => (
@@ -121,12 +130,12 @@ export function LeagueFilterBar({
             soundFx.playClick();
             onSelect(league.id);
           }}
-          className={`px-3.5 py-1.5 rounded-[4px] text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors border flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-emerald-500 ${
+          className={`px-3.5 py-1.5 rounded-[6px] text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all border flex items-center gap-2 cursor-pointer ${
             selected === league.id ? activeClass : inactiveClass
           }`}
         >
           <span
-            className="w-2 h-2 rounded-full shrink-0"
+            className="w-2.5 h-2.5 rounded-full shrink-0 border border-black"
             style={{ backgroundColor: league.color }}
           />
           <span>{league.name}</span>

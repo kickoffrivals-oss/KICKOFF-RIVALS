@@ -9,11 +9,12 @@ export const Route = createFileRoute("/play")({
 
 function PlayRoute() {
   const navigate = useNavigate();
-  const { walletState, handleWalletConnected, handleMessageSigned } = useGame();
+  const { walletState, handleWalletConnected, handleMessageSigned, balance } = useGame();
   const { setOnboardingComplete } = useUserStore();
 
   return (
     <GameSelection
+      balance={balance}
       onSelectFootball={() => {
         if (!walletState.isConnected || !walletState.isVerified) {
           handleWalletConnected("0x65bc46df99bc2385128c8a67752d7cd3922de740");
@@ -21,6 +22,9 @@ function PlayRoute() {
           setOnboardingComplete(true);
         }
         navigate({ to: "/dashboard" });
+      }}
+      onSelectAviator={() => {
+        navigate({ to: "/games/aviator" });
       }}
     />
   );

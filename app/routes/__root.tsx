@@ -47,16 +47,25 @@ export const Route = createRootRoute({
 });
 
 import { FloatingSupport } from "../components/FloatingSupport";
+import { LegalModal } from "../components/legal/LegalModal";
+import { CookieConsentBanner } from "../components/legal/CookieConsentBanner";
+import { ThemeProvider } from "../contexts/ThemeContext";
+import { GlobalThemeToggle } from "../components/ui/GlobalThemeToggle";
 
 function RootComponent() {
   return (
     <RootDocument>
       <AppKitProvider>
-        <GameProvider>
-          <Outlet />
-          <FloatingSupport />
-          <Toaster position="top-center" />
-        </GameProvider>
+        <ThemeProvider>
+          <GameProvider>
+            <Outlet />
+            <GlobalThemeToggle />
+            <FloatingSupport />
+            <CookieConsentBanner />
+            <LegalModal />
+            <Toaster position="top-center" />
+          </GameProvider>
+        </ThemeProvider>
       </AppKitProvider>
     </RootDocument>
   );

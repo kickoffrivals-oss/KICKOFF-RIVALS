@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 920" width="100%" height="100%" style="background:#0f051d; font-family:'Courier New', monospace, system-ui;">
+  <defs>
+    <!-- Synthwave Sunset Horizon Gradient -->
+    <linearGradient id="synthSunset" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="#2b0938" />
+      <stop offset="40%" stopColor="#791e6b" />
+      <stop offset="70%" stopColor="#ff007f" />
+      <stop offset="100%" stopColor="#ffb703" />
+    </linearGradient>
+    <!-- Perspective Grid Lines -->
+    <linearGradient id="neonPink" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stopColor="#ff007f" />
+      <stop offset="100%" stopColor="#7928ca" />
+    </linearGradient>
+    <filter id="retroGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Screen Bezel -->
+  <rect x="8" y="8" width="434" height="904" rx="36" fill="#120524" stroke="#ff007f" stroke-width="3" />
+  
+  <!-- Subtle CRT Scanlines -->
+  <g opacity="0.15">
+    <line x1="12" y1="50" x2="438" y2="50" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="100" x2="438" y2="100" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="150" x2="438" y2="150" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="200" x2="438" y2="200" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="250" x2="438" y2="250" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="300" x2="438" y2="300" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="350" x2="438" y2="350" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="400" x2="438" y2="400" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="450" x2="438" y2="450" stroke="#fff" stroke-width="1" />
+    <line x1="12" y1="500" x2="438" y2="500" stroke="#fff" stroke-width="1" />
+  </g>
+
+  <!-- ================= TOP ARCADE MARQUEE ================= -->
+  <g transform="translate(24, 25)">
+    <!-- Header Marquee Box -->
+    <rect x="0" y="0" width="402" height="60" rx="12" fill="#200a38" stroke="#ff007f" stroke-width="2.5" filter="url(#retroGlow)" />
+    <!-- Flashing Arcade Chaser Bulbs -->
+    <circle cx="15" cy="15" r="4" fill="#00f5d4" />
+    <circle cx="15" cy="45" r="4" fill="#ffb703" />
+    <circle cx="387" cy="15" r="4" fill="#ff007f" />
+    <circle cx="387" cy="45" r="4" fill="#00f5d4" />
+
+    <text x="201" y="32" font-size="20" font-weight="900" fill="#00f5d4" text-anchor="middle" letter-spacing="4">★ RETRO RIVALS ★</text>
+    <text x="201" y="48" font-size="10" font-weight="700" fill="#ff007f" text-anchor="middle" letter-spacing="2">INSERT COIN • 12,450 CREDITS</text>
+  </g>
+
+  <!-- ================= HIGH SCORE BANNER ================= -->
+  <g transform="translate(24, 98)">
+    <rect x="0" y="0" width="402" height="28" rx="6" fill="#1b0830" stroke="#7928ca" stroke-width="1" />
+    <text x="12" y="18" font-size="10" font-weight="800" fill="#ffb703">HIGH SCORE:</text>
+    <text x="105" y="18" font-size="10" font-weight="800" fill="#ffffff">PILOT_99 [AVIATOR] 104.20X</text>
+    <text x="390" y="18" font-size="10" font-weight="800" fill="#00f5d4" text-anchor="end">2P READY</text>
+  </g>
+
+  <!-- ================= ARCADE CABINET CARD 1: VIRTUAL FOOTBALL 98 ================= -->
+  <g transform="translate(24, 138)">
+    <!-- Cabinet Shell (Woodgrain / Neon Cyber Shell) -->
+    <rect x="0" y="0" width="402" height="210" rx="16" fill="#180730" stroke="#00f5d4" stroke-width="2.5" filter="drop-shadow(0 0 12px rgba(0,245,212,0.3))" />
+    
+    <!-- Cabinet Top Marquee -->
+    <rect x="12" y="12" width="378" height="42" rx="8" fill="#00f5d4" />
+    <text x="201" y="38" font-size="18" font-weight="900" fill="#120524" text-anchor="middle" letter-spacing="2">⚽ FOOTBALL RIVALS '98</text>
+    
+    <!-- Arcade CRT Screen Bezel -->
+    <g transform="translate(16, 64)">
+      <rect x="0" y="0" width="220" height="88" rx="8" fill="#06120e" stroke="#00ff66" stroke-width="2" />
+      <!-- Pixel Pitch Simulation -->
+      <line x1="110" y1="0" x2="110" y2="88" stroke="#00ff66" stroke-width="1.5" stroke-dasharray="4 4" />
+      <circle cx="110" cy="44" r="24" fill="none" stroke="#00ff66" stroke-width="1.5" />
+      <!-- Match Live Tag -->
+      <rect x="8" y="8" width="54" height="18" rx="4" fill="#ef4444" />
+      <text x="35" y="21" font-size="9" font-weight="900" fill="#fff" text-anchor="middle">LIVE 88'</text>
+      <!-- Score -->
+      <text x="110" y="49" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle">2 - 1</text>
+      <text x="110" y="72" font-size="9" font-weight="800" fill="#00ff66" text-anchor="middle">ODDS: 1.85 | 3.40</text>
+    </g>
+
+    <!-- Arcade Joystick & Buttons on Right -->
+    <g transform="translate(254, 70)">
+      <!-- Arcade Coin Slot -->
+      <rect x="25" y="0" width="80" height="34" rx="6" fill="#100320" stroke="#ffb703" stroke-width="1.5" />
+      <rect x="62" y="8" width="6" height="18" rx="2" fill="#ffb703" />
+      <text x="65" y="42" font-size="8" font-weight="800" fill="#ffb703" text-anchor="middle">INSERT 100 COINS</text>
+
+      <!-- Big Arcade Push Button -->
+      <g transform="translate(5, 52)">
+        <rect x="0" y="0" width="120" height="32" rx="16" fill="#00f5d4" stroke="#fff" stroke-width="2" />
+        <text x="60" y="21" font-size="12" font-weight="900" fill="#120524" text-anchor="middle" letter-spacing="1">1P PLAY ▶</text>
+      </g>
+    </g>
+
+    <!-- Footer Specs -->
+    <g transform="translate(16, 166)">
+      <rect x="0" y="0" width="370" height="30" rx="6" fill="#0c0318" />
+      <text x="12" y="20" font-size="10" font-weight="700" fill="#a78bfa">PREMIER • LALIGA • SERIE A • 35S ROUNDS</text>
+      <text x="358" y="20" font-size="10" font-weight="900" fill="#00f5d4" text-anchor="end">READY</text>
+    </g>
+  </g>
+
+  <!-- ================= ARCADE CABINET CARD 2: DAILY AVIATOR ================= -->
+  <g transform="translate(24, 362)">
+    <rect x="0" y="0" width="402" height="210" rx="16" fill="#180730" stroke="#ff007f" stroke-width="2.5" filter="drop-shadow(0 0 12px rgba(255,0,127,0.3))" />
+
+    <!-- Cabinet Top Marquee -->
+    <rect x="12" y="12" width="378" height="42" rx="8" fill="#ff007f" />
+    <text x="201" y="38" font-size="18" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="2">✈ DAILY AVIATOR '84</text>
+
+    <!-- CRT Vector Flight Screen -->
+    <g transform="translate(16, 64)">
+      <rect x="0" y="0" width="220" height="88" rx="8" fill="#0f021c" stroke="#ff007f" stroke-width="2" />
+      <!-- Glowing Vector Curve -->
+      <path d="M 15 75 Q 80 70 170 20" fill="none" stroke="#ff007f" stroke-width="3" filter="url(#retroGlow)" />
+      <!-- Pixel Plane -->
+      <polygon points="170,20 185,15 178,28" fill="#00f5d4" />
+      <!-- Large Multiplier Stamp -->
+      <text x="75" y="40" font-size="28" font-weight="900" fill="#ffb703" font-family="monospace">4.50X</text>
+      <text x="110" y="72" font-size="9" font-weight="800" fill="#00f5d4" text-anchor="middle">SOARING IN SKY</text>
+    </g>
+
+    <!-- Arcade Controls on Right -->
+    <g transform="translate(254, 70)">
+      <!-- Multiplier Jackpot -->
+      <rect x="25" y="0" width="80" height="34" rx="6" fill="#100320" stroke="#ff007f" stroke-width="1.5" />
+      <text x="65" y="21" font-size="12" font-weight="900" fill="#ff007f" text-anchor="middle">100X MAX</text>
+
+      <!-- Action Button -->
+      <g transform="translate(5, 52)">
+        <rect x="0" y="0" width="120" height="32" rx="16" fill="#ff007f" stroke="#fff" stroke-width="2" />
+        <text x="60" y="21" font-size="12" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1">TAKE OFF ▶</text>
+      </g>
+    </g>
+
+    <!-- Footer Specs -->
+    <g transform="translate(16, 166)">
+      <rect x="0" y="0" width="370" height="30" rx="6" fill="#0c0318" />
+      <text x="12" y="20" font-size="10" font-weight="700" fill="#a78bfa">PROVABLY FAIR • AUTO CASHOUT • INSTANT</text>
+      <text x="358" y="20" font-size="10" font-weight="900" fill="#ff007f" text-anchor="end">INSERT 1P</text>
+    </g>
+  </g>
+
+  <!-- ================= UPCOMING MINI CABINETS ================= -->
+  <g transform="translate(24, 586)">
+    <text x="0" y="18" font-size="13" font-weight="900" fill="#ffb703" letter-spacing="2">🕹 NEXT CARTRIDGES IN LABS</text>
+    
+    <g transform="translate(0, 30)">
+      <!-- Cab 1: Head & Tail -->
+      <rect x="0" y="0" width="126" height="130" rx="12" fill="#180730" stroke="#7928ca" stroke-width="2" />
+      <rect x="8" y="8" width="110" height="24" rx="4" fill="#7928ca" />
+      <text x="63" y="24" font-size="10" font-weight="900" fill="#fff" text-anchor="middle">HEAD &amp; TAIL</text>
+      <circle cx="63" cy="65" r="18" fill="#ffb703" />
+      <text x="63" y="70" font-size="12" font-weight="900" fill="#000" text-anchor="middle">🪙</text>
+      <text x="63" y="105" font-size="9" font-weight="800" fill="#ff007f" text-anchor="middle">COMING SOON</text>
+
+      <!-- Cab 2: Chicken Cross -->
+      <g transform="translate(138, 0)">
+        <rect x="0" y="0" width="126" height="130" rx="12" fill="#180730" stroke="#7928ca" stroke-width="2" />
+        <rect x="8" y="8" width="110" height="24" rx="4" fill="#ff007f" />
+        <text x="63" y="24" font-size="10" font-weight="900" fill="#fff" text-anchor="middle">CHICKEN RUN</text>
+        <circle cx="63" cy="65" r="18" fill="#120524" stroke="#ff007f" stroke-width="1.5" />
+        <text x="63" y="71" font-size="16" text-anchor="middle">🐔</text>
+        <text x="63" y="105" font-size="9" font-weight="800" fill="#ff007f" text-anchor="middle">COMING SOON</text>
+      </g>
+
+      <!-- Cab 3: Hoops Slam -->
+      <g transform="translate(276, 0)">
+        <rect x="0" y="0" width="126" height="130" rx="12" fill="#180730" stroke="#7928ca" stroke-width="2" />
+        <rect x="8" y="8" width="110" height="24" rx="4" fill="#ffb703" />
+        <text x="63" y="24" font-size="10" font-weight="900" fill="#000" text-anchor="middle">HOOPS SLAM</text>
+        <circle cx="63" cy="65" r="18" fill="#120524" stroke="#ffb703" stroke-width="1.5" />
+        <text x="63" y="71" font-size="16" text-anchor="middle">🏀</text>
+        <text x="63" y="105" font-size="9" font-weight="800" fill="#ffb703" text-anchor="middle">COMING SOON</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ================= RETRO BOTTOM COIN BAR ================= -->
+  <g transform="translate(24, 830)">
+    <rect x="0" y="0" width="402" height="62" rx="20" fill="#1b0832" stroke="#ff007f" stroke-width="2" />
+    <g transform="translate(20, 10)">
+      <rect x="0" y="0" width="80" height="42" rx="10" fill="#ff007f" />
+      <text x="40" y="26" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">ARCADE</text>
+    </g>
+    <g transform="translate(120, 10)">
+      <text x="40" y="26" font-size="11" font-weight="800" fill="#c4b5fd" text-anchor="middle">BETS</text>
+    </g>
+    <g transform="translate(210, 10)">
+      <text x="40" y="26" font-size="11" font-weight="800" fill="#c4b5fd" text-anchor="middle">SCORES</text>
+    </g>
+    <g transform="translate(300, 10)">
+      <text x="40" y="26" font-size="11" font-weight="800" fill="#00f5d4" text-anchor="middle">COINS</text>
+    </g>
+  </g>
+</svg>

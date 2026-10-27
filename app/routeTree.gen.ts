@@ -10,16 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignRouteImport } from './routes/sign'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PlayRouteImport } from './routes/play'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as EntryRouteImport } from './routes/entry'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as ConceptsRouteImport } from './routes/concepts'
 import { Route as AllianceRouteImport } from './routes/alliance'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as GamesAviatorRouteImport } from './routes/games/aviator'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
 import { Route as DashboardLeagueRouteImport } from './routes/dashboard/league'
 import { Route as DashboardLeaderboardRouteImport } from './routes/dashboard/leaderboard'
@@ -55,9 +60,19 @@ const WelcomeRoute = WelcomeRouteImport.update({
   path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignRoute = SignRouteImport.update({
   id: '/sign',
   path: '/sign',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayRoute = PlayRouteImport.update({
@@ -80,9 +95,19 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConceptsRoute = ConceptsRouteImport.update({
+  id: '/concepts',
+  path: '/concepts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AllianceRoute = AllianceRouteImport.update({
@@ -104,6 +129,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const GamesAviatorRoute = GamesAviatorRouteImport.update({
+  id: '/games/aviator',
+  path: '/games/aviator',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
@@ -259,12 +289,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/alliance': typeof AllianceRoute
+  '/concepts': typeof ConceptsRoute
   '/connect': typeof ConnectRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/entry': typeof EntryRoute
   '/onboarding': typeof OnboardingRoute
   '/play': typeof PlayRoute
+  '/privacy': typeof PrivacyRoute
   '/sign': typeof SignRoute
+  '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/dashboard/bets': typeof DashboardBetsRoute
@@ -272,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
   '/dashboard/league': typeof DashboardLeagueRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/games/aviator': typeof GamesAviatorRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/admin/config': typeof ApiAdminConfigRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
@@ -301,11 +336,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/alliance': typeof AllianceRoute
+  '/concepts': typeof ConceptsRoute
   '/connect': typeof ConnectRoute
+  '/cookies': typeof CookiesRoute
   '/entry': typeof EntryRoute
   '/onboarding': typeof OnboardingRoute
   '/play': typeof PlayRoute
+  '/privacy': typeof PrivacyRoute
   '/sign': typeof SignRoute
+  '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/dashboard/bets': typeof DashboardBetsRoute
@@ -313,6 +352,7 @@ export interface FileRoutesByTo {
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
   '/dashboard/league': typeof DashboardLeagueRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/games/aviator': typeof GamesAviatorRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/admin/config': typeof ApiAdminConfigRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
@@ -343,12 +383,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/alliance': typeof AllianceRoute
+  '/concepts': typeof ConceptsRoute
   '/connect': typeof ConnectRoute
+  '/cookies': typeof CookiesRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/entry': typeof EntryRoute
   '/onboarding': typeof OnboardingRoute
   '/play': typeof PlayRoute
+  '/privacy': typeof PrivacyRoute
   '/sign': typeof SignRoute
+  '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/dashboard/bets': typeof DashboardBetsRoute
@@ -356,6 +400,7 @@ export interface FileRoutesById {
   '/dashboard/leaderboard': typeof DashboardLeaderboardRoute
   '/dashboard/league': typeof DashboardLeagueRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/games/aviator': typeof GamesAviatorRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/admin/config': typeof ApiAdminConfigRoute
   '/api/admin/logout': typeof ApiAdminLogoutRoute
@@ -387,12 +432,16 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/alliance'
+    | '/concepts'
     | '/connect'
+    | '/cookies'
     | '/dashboard'
     | '/entry'
     | '/onboarding'
     | '/play'
+    | '/privacy'
     | '/sign'
+    | '/terms'
     | '/welcome'
     | '/api/leaderboard'
     | '/dashboard/bets'
@@ -400,6 +449,7 @@ export interface FileRouteTypes {
     | '/dashboard/leaderboard'
     | '/dashboard/league'
     | '/dashboard/profile'
+    | '/games/aviator'
     | '/dashboard/'
     | '/api/admin/config'
     | '/api/admin/logout'
@@ -429,11 +479,15 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/alliance'
+    | '/concepts'
     | '/connect'
+    | '/cookies'
     | '/entry'
     | '/onboarding'
     | '/play'
+    | '/privacy'
     | '/sign'
+    | '/terms'
     | '/welcome'
     | '/api/leaderboard'
     | '/dashboard/bets'
@@ -441,6 +495,7 @@ export interface FileRouteTypes {
     | '/dashboard/leaderboard'
     | '/dashboard/league'
     | '/dashboard/profile'
+    | '/games/aviator'
     | '/dashboard'
     | '/api/admin/config'
     | '/api/admin/logout'
@@ -470,12 +525,16 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/alliance'
+    | '/concepts'
     | '/connect'
+    | '/cookies'
     | '/dashboard'
     | '/entry'
     | '/onboarding'
     | '/play'
+    | '/privacy'
     | '/sign'
+    | '/terms'
     | '/welcome'
     | '/api/leaderboard'
     | '/dashboard/bets'
@@ -483,6 +542,7 @@ export interface FileRouteTypes {
     | '/dashboard/leaderboard'
     | '/dashboard/league'
     | '/dashboard/profile'
+    | '/games/aviator'
     | '/dashboard/'
     | '/api/admin/config'
     | '/api/admin/logout'
@@ -513,14 +573,19 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AllianceRoute: typeof AllianceRoute
+  ConceptsRoute: typeof ConceptsRoute
   ConnectRoute: typeof ConnectRoute
+  CookiesRoute: typeof CookiesRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   EntryRoute: typeof EntryRoute
   OnboardingRoute: typeof OnboardingRoute
   PlayRoute: typeof PlayRoute
+  PrivacyRoute: typeof PrivacyRoute
   SignRoute: typeof SignRoute
+  TermsRoute: typeof TermsRoute
   WelcomeRoute: typeof WelcomeRoute
   ApiLeaderboardRoute: typeof ApiLeaderboardRoute
+  GamesAviatorRoute: typeof GamesAviatorRoute
   ApiAdminConfigRoute: typeof ApiAdminConfigRoute
   ApiAdminLogoutRoute: typeof ApiAdminLogoutRoute
   ApiAdminValidateSessionRoute: typeof ApiAdminValidateSessionRoute
@@ -555,11 +620,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign': {
       id: '/sign'
       path: '/sign'
       fullPath: '/sign'
       preLoaderRoute: typeof SignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/play': {
@@ -590,11 +669,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/connect': {
       id: '/connect'
       path: '/connect'
       fullPath: '/connect'
       preLoaderRoute: typeof ConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/concepts': {
+      id: '/concepts'
+      path: '/concepts'
+      fullPath: '/concepts'
+      preLoaderRoute: typeof ConceptsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alliance': {
@@ -624,6 +717,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/games/aviator': {
+      id: '/games/aviator'
+      path: '/games/aviator'
+      fullPath: '/games/aviator'
+      preLoaderRoute: typeof GamesAviatorRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/profile': {
       id: '/dashboard/profile'
@@ -857,14 +957,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AllianceRoute: AllianceRoute,
+  ConceptsRoute: ConceptsRoute,
   ConnectRoute: ConnectRoute,
+  CookiesRoute: CookiesRoute,
   DashboardRoute: DashboardRouteWithChildren,
   EntryRoute: EntryRoute,
   OnboardingRoute: OnboardingRoute,
   PlayRoute: PlayRoute,
+  PrivacyRoute: PrivacyRoute,
   SignRoute: SignRoute,
+  TermsRoute: TermsRoute,
   WelcomeRoute: WelcomeRoute,
   ApiLeaderboardRoute: ApiLeaderboardRoute,
+  GamesAviatorRoute: GamesAviatorRoute,
   ApiAdminConfigRoute: ApiAdminConfigRoute,
   ApiAdminLogoutRoute: ApiAdminLogoutRoute,
   ApiAdminValidateSessionRoute: ApiAdminValidateSessionRoute,

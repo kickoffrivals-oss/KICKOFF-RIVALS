@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 920" width="100%" height="100%" style="background:#0a0b0e; font-family:'Georgia', serif, system-ui;">
+  <defs>
+    <!-- Satin Gold Gradient -->
+    <linearGradient id="goldFoil" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#d4af37" />
+      <stop offset="35%" stopColor="#fff2a8" />
+      <stop offset="70%" stopColor="#aa820a" />
+      <stop offset="100%" stopColor="#f7d070" />
+    </linearGradient>
+    <!-- Dark Titanium Metal -->
+    <linearGradient id="titaniumCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stopColor="#15171e" />
+      <stop offset="100%" stopColor="#0d0e13" />
+    </linearGradient>
+    <linearGradient id="emeraldVelvet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stopColor="#0b231a" />
+      <stop offset="100%" stopColor="#06120e" />
+    </linearGradient>
+  </defs>
+
+  <!-- Screen Frame -->
+  <rect x="8" y="8" width="434" height="904" rx="38" fill="#0a0b0e" stroke="#1f232b" stroke-width="2.5" />
+
+  <!-- Ambient Gold Light Flare -->
+  <circle cx="225" cy="180" r="160" fill="#d4af37" opacity="0.04" filter="blur(60px)" />
+
+  <!-- ================= TOP VIP HEADER ================= -->
+  <g transform="translate(24, 28)">
+    <g>
+      <text x="0" y="24" font-size="20" font-weight="400" fill="#ffffff" letter-spacing="3">RIVALS <tspan fill="url(#goldFoil)" font-weight="700">VIP</tspan></text>
+      <text x="0" y="38" font-size="9" font-weight="700" fill="#a39267" letter-spacing="2" font-family="system-ui">PRIVATE GAMING SUITE</text>
+    </g>
+
+    <!-- VIP Tier Chip -->
+    <g transform="translate(260, 4)">
+      <rect x="0" y="0" width="142" height="38" rx="8" fill="#141720" stroke="url(#goldFoil)" stroke-width="1.2" />
+      <circle cx="20" cy="19" r="8" fill="url(#goldFoil)" />
+      <text x="20" y="22" font-size="9" font-weight="900" fill="#000" text-anchor="middle" font-family="system-ui">★</text>
+      <text x="78" y="24" font-size="13" font-weight="700" fill="#ffffff" font-family="system-ui">12,450 KOR</text>
+    </g>
+  </g>
+
+  <!-- Gold Divider Ribbon -->
+  <g transform="translate(24, 82)">
+    <line x1="0" y1="0" x2="402" y2="0" stroke="url(#goldFoil)" stroke-width="1" opacity="0.4" />
+    <text x="201" y="20" font-size="10" font-weight="700" fill="#d4af37" text-anchor="middle" letter-spacing="3" font-family="system-ui">HIGH STAKES • VERIFIED PROVABLY FAIR</text>
+  </g>
+
+  <!-- ================= VIP PASS CARD 1: VIRTUAL FOOTBALL PRO ================= -->
+  <g transform="translate(24, 118)">
+    <!-- Titanium Pass Card -->
+    <rect x="0" y="0" width="402" height="190" rx="16" fill="url(#emeraldVelvet)" stroke="url(#goldFoil)" stroke-width="1.5" filter="drop-shadow(0 15px 35px rgba(0,0,0,0.6))" />
+    
+    <!-- Gold Embossed Corner Insignia -->
+    <path d="M 12 28 L 12 12 L 28 12" fill="none" stroke="url(#goldFoil)" stroke-width="2" />
+    <path d="M 390 28 L 390 12 L 374 12" fill="none" stroke="url(#goldFoil)" stroke-width="2" />
+
+    <!-- Badges Row -->
+    <g transform="translate(20, 20)">
+      <rect x="0" y="0" width="90" height="20" rx="4" fill="url(#goldFoil)" />
+      <text x="45" y="14" font-size="9" font-weight="900" fill="#000" text-anchor="middle" font-family="system-ui" letter-spacing="1">PREMIUM LIVE</text>
+
+      <text x="105" y="15" font-size="10" font-weight="600" fill="#86efac" font-family="system-ui">CONTINUOUS 35S MATCHES</text>
+    </g>
+
+    <!-- Content -->
+    <g transform="translate(20, 58)">
+      <text x="0" y="24" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="1">Virtual Football Pro</text>
+      <text x="0" y="44" font-size="12" font-weight="400" fill="#9ca3af" font-family="system-ui">
+        Premier League, LaLiga, Serie A • High roller limits
+      </text>
+
+      <!-- Odds Ribbon -->
+      <g transform="translate(0, 56)">
+        <rect x="0" y="0" width="65" height="28" rx="6" fill="#121a16" stroke="url(#goldFoil)" stroke-width="1" />
+        <text x="32" y="18" font-size="11" font-weight="700" fill="url(#goldFoil)" text-anchor="middle" font-family="system-ui">1 • 2.10</text>
+
+        <rect x="73" y="0" width="65" height="28" rx="6" fill="#121a16" stroke="#25352c" stroke-width="1" />
+        <text x="105" y="18" font-size="11" font-weight="700" fill="#9ca3af" text-anchor="middle" font-family="system-ui">X • 3.20</text>
+
+        <rect x="146" y="0" width="65" height="28" rx="6" fill="#121a16" stroke="#25352c" stroke-width="1" />
+        <text x="178" y="18" font-size="11" font-weight="700" fill="#9ca3af" text-anchor="middle" font-family="system-ui">2 • 2.85</text>
+      </g>
+    </g>
+
+    <!-- Luxury Gold Crest Graphic -->
+    <g transform="translate(330, 80)">
+      <circle cx="0" cy="0" r="32" fill="#000" stroke="url(#goldFoil)" stroke-width="1.5" />
+      <polygon points="0,-18 14,-6 8,14 -8,14 -14,-6" fill="url(#goldFoil)" />
+    </g>
+
+    <!-- Action Button -->
+    <g transform="translate(254, 134)">
+      <rect x="0" y="0" width="128" height="36" rx="6" fill="url(#goldFoil)" />
+      <text x="64" y="23" font-size="11" font-weight="900" fill="#000" text-anchor="middle" font-family="system-ui" letter-spacing="1">ENTER ARENA</text>
+    </g>
+  </g>
+
+  <!-- ================= VIP PASS CARD 2: DAILY AVIATOR ================= -->
+  <g transform="translate(24, 324)">
+    <rect x="0" y="0" width="402" height="190" rx="16" fill="url(#titaniumCard)" stroke="url(#goldFoil)" stroke-width="1.5" filter="drop-shadow(0 15px 35px rgba(0,0,0,0.6))" />
+    
+    <path d="M 12 28 L 12 12 L 28 12" fill="none" stroke="url(#goldFoil)" stroke-width="2" />
+    <path d="M 390 28 L 390 12 L 374 12" fill="none" stroke="url(#goldFoil)" stroke-width="2" />
+
+    <g transform="translate(20, 20)">
+      <rect x="0" y="0" width="90" height="20" rx="4" fill="url(#goldFoil)" />
+      <text x="45" y="14" font-size="9" font-weight="900" fill="#000" text-anchor="middle" font-family="system-ui" letter-spacing="1">MULTIPLIER</text>
+
+      <text x="105" y="15" font-size="10" font-weight="600" fill="#fcd34d" font-family="system-ui">INSTANT CASHOUT • 100X</text>
+    </g>
+
+    <g transform="translate(20, 58)">
+      <text x="0" y="24" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="1">The Daily Aviator</text>
+      <text x="0" y="44" font-size="12" font-weight="400" fill="#9ca3af" font-family="system-ui">
+        High altitude monoplane • Multi-seat private flight
+      </text>
+
+      <!-- Multiplier Badges -->
+      <g transform="translate(0, 56)">
+        <rect x="0" y="0" width="60" height="28" rx="6" fill="#1b1c24" stroke="url(#goldFoil)" stroke-width="1" />
+        <text x="30" y="18" font-size="11" font-weight="700" fill="url(#goldFoil)" text-anchor="middle" font-family="system-ui">4.50X</text>
+
+        <rect x="68" y="0" width="60" height="28" rx="6" fill="#1b1c24" stroke="#333847" stroke-width="1" />
+        <text x="98" y="18" font-size="11" font-weight="700" fill="#9ca3af" text-anchor="middle" font-family="system-ui">14.8X</text>
+
+        <rect x="136" y="0" width="60" height="28" rx="6" fill="#1b1c24" stroke="#333847" stroke-width="1" />
+        <text x="166" y="18" font-size="11" font-weight="700" fill="#9ca3af" text-anchor="middle" font-family="system-ui">52.8X</text>
+      </g>
+    </g>
+
+    <!-- Aircraft Silhouette in Gold -->
+    <g transform="translate(330, 80)">
+      <ellipse cx="0" cy="0" rx="32" ry="12" fill="none" stroke="url(#goldFoil)" stroke-width="1.5" stroke-dasharray="4 4" />
+      <polygon points="0,-12 24,0 0,12 -6,4" fill="url(#goldFoil)" />
+    </g>
+
+    <g transform="translate(254, 134)">
+      <rect x="0" y="0" width="128" height="36" rx="6" fill="url(#goldFoil)" />
+      <text x="64" y="23" font-size="11" font-weight="900" fill="#000" text-anchor="middle" font-family="system-ui" letter-spacing="1">LAUNCH FLIGHT</text>
+    </g>
+  </g>
+
+  <!-- ================= IN-LABS VIP SUITE ================= -->
+  <g transform="translate(24, 532)">
+    <text x="0" y="18" font-size="13" font-weight="400" fill="url(#goldFoil)" letter-spacing="2">PRIVATE LABS COLLECTION</text>
+    <text x="402" y="18" font-size="10" font-weight="600" fill="#6b7280" text-anchor="end" font-family="system-ui">INVITATION ONLY</text>
+
+    <g transform="translate(0, 32)">
+      <!-- Card 1 -->
+      <rect x="0" y="0" width="126" height="135" rx="10" fill="#12141a" stroke="#252b38" stroke-width="1" />
+      <circle cx="63" cy="40" r="18" fill="#181c26" stroke="url(#goldFoil)" stroke-width="1" />
+      <text x="63" y="44" font-size="12" font-weight="900" fill="url(#goldFoil)" text-anchor="middle" font-family="system-ui">H/T</text>
+      <text x="63" y="80" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Head &amp; Tail</text>
+      <text x="63" y="96" font-size="9" fill="#9ca3af" text-anchor="middle" font-family="system-ui">Coin Streak</text>
+      <text x="63" y="118" font-size="9" font-weight="700" fill="#d4af37" text-anchor="middle" font-family="system-ui">IN LABS</text>
+
+      <!-- Card 2 -->
+      <g transform="translate(138, 0)">
+        <rect x="0" y="0" width="126" height="135" rx="10" fill="#12141a" stroke="#252b38" stroke-width="1" />
+        <circle cx="63" cy="40" r="18" fill="#181c26" stroke="url(#goldFoil)" stroke-width="1" />
+        <text x="63" y="46" font-size="14" text-anchor="middle">🐔</text>
+        <text x="63" y="80" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Chicken Cross</text>
+        <text x="63" y="96" font-size="9" fill="#9ca3af" text-anchor="middle" font-family="system-ui">Step Run</text>
+        <text x="63" y="118" font-size="9" font-weight="700" fill="#d4af37" text-anchor="middle" font-family="system-ui">IN LABS</text>
+      </g>
+
+      <!-- Card 3 -->
+      <g transform="translate(276, 0)">
+        <rect x="0" y="0" width="126" height="135" rx="10" fill="#12141a" stroke="#252b38" stroke-width="1" />
+        <circle cx="63" cy="40" r="18" fill="#181c26" stroke="url(#goldFoil)" stroke-width="1" />
+        <text x="63" y="46" font-size="14" text-anchor="middle">🏀</text>
+        <text x="63" y="80" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Hoops Slam</text>
+        <text x="63" y="96" font-size="9" fill="#9ca3af" text-anchor="middle" font-family="system-ui">Hardwood 4Q</text>
+        <text x="63" y="118" font-size="9" font-weight="700" fill="#d4af37" text-anchor="middle" font-family="system-ui">IN LABS</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ================= LUXURY BOTTOM DOCK ================= -->
+  <g transform="translate(24, 830)">
+    <rect x="0" y="0" width="402" height="62" rx="14" fill="#12141c" stroke="url(#goldFoil)" stroke-width="1.2" />
+    <g transform="translate(18, 10)">
+      <rect x="0" y="0" width="86" height="42" rx="6" fill="url(#goldFoil)" />
+      <text x="43" y="26" font-size="11" font-weight="900" fill="#000" text-anchor="middle" font-family="system-ui">SUITE</text>
+    </g>
+    <g transform="translate(120, 10)">
+      <text x="40" y="26" font-size="11" font-weight="700" fill="#9ca3af" text-anchor="middle" font-family="system-ui">PORTFOLIO</text>
+    </g>
+    <g transform="translate(210, 10)">
+      <text x="40" y="26" font-size="11" font-weight="700" fill="#9ca3af" text-anchor="middle" font-family="system-ui">HONORS</text>
+    </g>
+    <g transform="translate(305, 10)">
+      <text x="40" y="26" font-size="11" font-weight="700" fill="url(#goldFoil)" text-anchor="middle" font-family="system-ui">CONCIERGE</text>
+    </g>
+  </g>
+</svg>

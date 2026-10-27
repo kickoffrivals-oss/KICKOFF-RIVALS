@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <linearGradient id="page" x2="0" y2="1"><stop stop-color="#111719"/><stop offset=".62" stop-color="#09100f"/><stop offset="1" stop-color="#080b0b"/></linearGradient>
+    <linearGradient id="hero" x2="1" y2="1"><stop stop-color="#1c352e"/><stop offset=".48" stop-color="#101d1b"/><stop offset="1" stop-color="#111515"/></linearGradient>
+    <linearGradient id="glow" x2="0" y2="1"><stop stop-color="#f8d998" stop-opacity=".34"/><stop offset="1" stop-color="#f8d998" stop-opacity="0"/></linearGradient>
+    <linearGradient id="grass" x2="0" y2="1"><stop stop-color="#327954"/><stop offset="1" stop-color="#153a2c"/></linearGradient>
+    <pattern id="seats" width="16" height="12" patternUnits="userSpaceOnUse"><path d="M0 8h10" stroke="#adc0b3" stroke-opacity=".15" stroke-width="2"/></pattern>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+  <rect width="1440" height="900" fill="url(#page)"/>
+  <rect x="0" y="0" width="1440" height="2" fill="#d7b56d"/>
+  <text x="72" y="53" fill="#f5f2e9" font-family="Arial" font-size="17" font-weight="900" letter-spacing="3">KICKOFF <tspan fill="#cda95d">RIVALS</tspan></text>
+  <text x="720" y="52" fill="#87918b" font-family="Arial" font-size="11" text-anchor="middle" letter-spacing="3">THE ARENA</text>
+  <text x="858" y="52" fill="#87918b" font-family="Arial" font-size="11" text-anchor="middle" letter-spacing="3">HOW TO PLAY</text>
+  <text x="1004" y="52" fill="#87918b" font-family="Arial" font-size="11" text-anchor="middle" letter-spacing="3">LEADERBOARD</text>
+  <rect x="1189" y="25" width="179" height="36" rx="4" fill="#17221f" stroke="#31443a"/>
+  <circle cx="1208" cy="43" r="4" fill="#77d5a3"/><text x="1221" y="47" fill="#c5d2ca" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="1.5">ARENA OPEN</text>
+  <path d="M72 83H1368" stroke="#29332f"/>
+  <text x="76" y="123" fill="#cdaa65" font-family="Arial" font-size="11" font-weight="bold" letter-spacing="3">MATCHDAY  /  ARENA SELECT</text>
+  <text x="70" y="184" fill="#f7f5ed" font-family="Georgia" font-size="52" font-weight="bold" letter-spacing="-1">Choose your next big moment.</text>
+  <text x="76" y="219" fill="#9aa69e" font-family="Arial" font-size="15">Two arenas are open now. Pick a side of the action.</text>
+  <rect x="72" y="252" width="1296" height="407" rx="7" fill="url(#hero)" stroke="#35463e"/>
+  <ellipse cx="1064" cy="430" rx="355" ry="235" fill="#d2b673" opacity=".16" filter="url(#soft)"/>
+  <path d="M752 253H1368V659H752Z" fill="url(#glow)" opacity=".4"/>
+  <path d="M752 335Q1048 247 1368 331V617Q1053 684 752 597Z" fill="#15251f" stroke="#6b7969" stroke-opacity=".55"/>
+  <path d="M772 358Q1054 282 1347 355V591Q1055 649 772 582Z" fill="url(#grass)" stroke="#c3d7b5" stroke-opacity=".62" stroke-width="2"/>
+  <path d="M772 358Q1054 282 1347 355V472Q1055 539 772 480Z" fill="#70aa6c" opacity=".09"/>
+  <path d="M772 480Q1054 539 1347 472V591Q1055 649 772 582Z" fill="#b5c98d" opacity=".07"/>
+  <path d="M1057 324V626M772 470Q1054 533 1347 472M1057 387a47 47 0 1 0 0 94a47 47 0 1 0 0-94M772 403h69v151h-69M1347 399h-70v153h70" fill="none" stroke="#d7e1c9" stroke-opacity=".7" stroke-width="2"/>
+  <circle cx="1057" cy="438" r="4" fill="#f3e5bd"/>
+  <circle cx="968" cy="423" r="7" fill="#f3e5bd"/><circle cx="1112" cy="468" r="7" fill="#cda95d"/><circle cx="1217" cy="417" r="6" fill="#f3e5bd"/>
+  <path d="M968 423Q1012 365 1057 438T1112 468Q1170 498 1217 417" fill="none" stroke="#f5e6bf" stroke-width="2" stroke-dasharray="5 7" opacity=".8"/>
+  <text x="1110" y="342" fill="#d0c6a6" font-family="Arial" font-size="9" letter-spacing="3">LIVE PITCH FEED  /  3 LEAGUES</text>
+  <text x="1110" y="611" fill="#d5e1d0" font-family="Arial" font-size="10" letter-spacing="2">KICKOFF RIVALS  •  90:00</text>
+  <text x="112" y="300" fill="#b8d0bd" font-family="Arial" font-size="11" font-weight="bold" letter-spacing="3">01  /  THE MAIN EVENT</text>
+  <text x="104" y="368" fill="#fbfaf4" font-family="Arial" font-size="38" font-weight="900" letter-spacing="-1">VIRTUAL</text>
+  <text x="104" y="412" fill="#fbfaf4" font-family="Arial" font-size="38" font-weight="900" letter-spacing="-1">FOOTBALL PRO</text>
+  <text x="108" y="449" fill="#a8b8ad" font-family="Arial" font-size="14">Three leagues. A new match every minute.</text>
+  <rect x="108" y="480" width="202" height="49" rx="3" fill="#d3b16b"/>
+  <text x="131" y="510" fill="#161916" font-family="Arial" font-size="12" font-weight="900" letter-spacing="1.2">ENTER THE ARENA  →</text>
+  <text x="108" y="570" fill="#76867c" font-family="Arial" font-size="10" letter-spacing="2">PREMIER LEAGUE</text><text x="258" y="570" fill="#76867c" font-family="Arial" font-size="10" letter-spacing="2">LALIGA</text><text x="352" y="570" fill="#76867c" font-family="Arial" font-size="10" letter-spacing="2">SERIE A</text>
+  <path d="M108 587H655" stroke="#3c4a42"/>
+  <circle cx="115" cy="618" r="4" fill="#75d19c"/><text x="129" y="622" fill="#bbc6bd" font-family="Arial" font-size="11" letter-spacing="1">AVAILABLE NOW</text>
+  <text x="72" y="710" fill="#cdaa65" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="3">ANOTHER WAY TO PLAY</text>
+  <text x="72" y="746" fill="#f5f2e9" font-family="Georgia" font-size="27" font-weight="bold">The Daily Aviator</text>
+  <text x="72" y="773" fill="#909b93" font-family="Arial" font-size="13">Multiplier crash  /  Cash out before the flight ends.</text>
+  <rect x="1038" y="702" width="330" height="73" rx="4" fill="#171c1a" stroke="#8b6840"/>
+  <path d="M1061 753L1097 727L1127 744L1177 717" fill="none" stroke="#dbab61" stroke-width="3"/>
+  <path d="M1061 753L1097 727L1127 744L1177 717V765H1061Z" fill="#dbab61" opacity=".12"/>
+  <text x="1205" y="731" fill="#d9b370" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="2">PLAY AVIATOR</text>
+  <text x="1205" y="755" fill="#f5f2e9" font-family="Arial" font-size="14" font-weight="bold">LAUNCH FLIGHT  →</text>
+  <text x="72" y="849" fill="#59625c" font-family="Arial" font-size="10" letter-spacing="2">CONCEPT 01  /  STADIUM HERO  •  CINEMATIC FOCAL POINT, ONE PRIMARY GAME</text>
+</svg>

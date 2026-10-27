@@ -732,9 +732,10 @@ export const placeBet = createServerFn({ method: "POST" })
         return { success: false, error: "User not found" };
       }
 
-      // Check balance (Coins)
-      if ((user.coins || 0) < data.stake) {
-        return { success: false, error: "Insufficient Coins balance" };
+      // Check balance (Coins KOR)
+      const currentBalance = (user.doodlBalance ?? user.coins ?? 0);
+      if (currentBalance < data.stake) {
+        return { success: false, error: "Insufficient Coins KOR balance" };
       }
 
       // Check match exists and is open for betting
@@ -775,12 +776,13 @@ export const placeBet = createServerFn({ method: "POST" })
         txHash: `0x${Math.random().toString(16).substring(2)}`,
       });
 
-      // Deduct coins balance immediately upon placing bet
-      const newCoins = (user.coins || 0) - data.stake;
+      // Deduct coins & doodlBalance immediately upon placing bet
+      const newBalance = currentBalance - data.stake;
       await db
         .update(users)
         .set({
-          coins: newCoins,
+          coins: newBalance,
+          doodlBalance: newBalance,
           totalBets: (user.totalBets || 0) + 1,
         })
         .where(eq(users.walletAddress, normalized));
@@ -839,9 +841,10 @@ export const placeAccumulatorBet = createServerFn({ method: "POST" })
         return { success: false, error: "User not found" };
       }
 
-      // Check balance (Coins)
-      if ((user.coins || 0) < data.stake) {
-        return { success: false, error: "Insufficient Coins balance" };
+      // Check balance (Coins KOR)
+      const currentBalance = (user.doodlBalance ?? user.coins ?? 0);
+      if (currentBalance < data.stake) {
+        return { success: false, error: "Insufficient Coins KOR balance" };
       }
 
       const potentialReturn = Math.floor(data.stake * data.totalOdds);
@@ -863,14 +866,15 @@ export const placeAccumulatorBet = createServerFn({ method: "POST" })
 
       await db.insert(bets).values(betValues);
 
-      // Deduct coins balance immediately upon placing bet
-      const newCoins = (user.coins || 0) - data.stake;
-      console.log(`[ACCUMULATOR] Deducting stake ${data.stake} from ${user.coins} coins. New Balance: ${newCoins}`);
+      // Deduct coins & doodlBalance immediately upon placing bet
+      const newBalance = currentBalance - data.stake;
+      console.log(`[ACCUMULATOR] Deducting stake ${data.stake} from ${currentBalance} Coins KOR. New Balance: ${newBalance}`);
 
       await db
         .update(users)
         .set({
-          coins: newCoins,
+          coins: newBalance,
+          doodlBalance: newBalance,
           totalBets: (user.totalBets || 0) + 1,
         })
         .where(eq(users.walletAddress, normalized));
@@ -987,6 +991,7 @@ export const settleBets = createServerFn({ method: "POST" })
                   .update(users)
                   .set({
                     doodlBalance: sql`${users.doodlBalance} + ${potentialReturn}`,
+                    coins: sql`${users.doodlBalance} + ${potentialReturn}`,
                     wins: sql`${users.wins} + 1`,
                     biggestWin: sql`CASE WHEN ${potentialReturn} > ${users.biggestWin} THEN ${potentialReturn} ELSE ${users.biggestWin} END`,
                     bestOddsWon: sql`CASE WHEN ${effectiveOdds} > ${users.bestOddsWon} THEN ${effectiveOdds} ELSE ${users.bestOddsWon} END`,
@@ -1013,8 +1018,8 @@ export const settleBets = createServerFn({ method: "POST" })
                   walletAddress: bet.walletAddress,
                   type: "win",
                   amount: potentialReturn,
-                  currency: "kor",
-                  description: `Accumulator win (${allBetsInAccumulator.length} legs) — +${potentialReturn} KOR`,
+                  currency: "Coins KOR",
+                  description: `Accumulator win (${allBetsInAccumulator.length} legs) — +${potentialReturn} Coins KOR`,
                 });
               }
             }
@@ -1025,6 +1030,7 @@ export const settleBets = createServerFn({ method: "POST" })
               .update(users)
               .set({
                 doodlBalance: sql`${users.doodlBalance} + ${bet.potentialReturn}`,
+                coins: sql`${users.doodlBalance} + ${bet.potentialReturn}`,
                 wins: sql`${users.wins} + 1`,
                 biggestWin: sql`CASE WHEN ${bet.potentialReturn} > ${users.biggestWin} THEN ${bet.potentialReturn} ELSE ${users.biggestWin} END`,
                 bestOddsWon: sql`CASE WHEN ${odds} > ${users.bestOddsWon} THEN ${odds} ELSE ${users.bestOddsWon} END`,

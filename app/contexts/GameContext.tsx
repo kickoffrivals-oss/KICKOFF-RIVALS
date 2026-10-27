@@ -74,9 +74,14 @@ interface GameContextType {
     } | null,
   ) => void;
 
-  // Balance
+  // Balances: KOR (wagering & wins) vs Coins (social tasks & missions)
   balance: number;
   setBalance: React.Dispatch<React.SetStateAction<number>>;
+  korBalance: number;
+  setKorBalance: React.Dispatch<React.SetStateAction<number>>;
+  coins: number;
+  setCoins: React.Dispatch<React.SetStateAction<number>>;
+  convertCoinsToKor: (coinsAmount: number) => Promise<boolean>;
 
   // Game State
   gameState: GameState;
@@ -257,7 +262,23 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
   // Balance (Local state for game loop UI)
-  const [balance, setBalance] = useState(INITIAL_BALANCE);
+  const [balance, setBalance] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("kor_balance");
+      if (saved) {
+        const val = parseFloat(saved);
+        if (!isNaN(val)) return val;
+      }
+    }
+    return INITIAL_BALANCE;
+  });
+
+  // Persist balance changes to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("kor_balance", balance.toString());
+    }
+  }, [balance]);
 
   // Sync state balance with profile's korBalance
   useEffect(() => {
@@ -268,6 +289,35 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [profile?.korBalance, balance]);
+
+  // Coins Balance (Earned by completing social tasks & in-game missions)
+  const [coins, setCoins] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("coins_balance");
+      if (saved) {
+        const val = parseFloat(saved);
+        if (!isNaN(val)) return val;
+      }
+    }
+    return 5000;
+  });
+
+  // Persist Coins balance changes to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("coins_balance", coins.toString());
+    }
+  }, [coins]);
+
+  // Sync state coins with profile's coins
+  useEffect(() => {
+    if (profile?.coins !== undefined) {
+      const pCoins = Number(profile.coins);
+      if (pCoins !== coins) {
+        setCoins(pCoins);
+      }
+    }
+  }, [profile?.coins, coins]);
 
 
   // Game State
@@ -897,26 +947,27 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(`quest_completed_${id}`, "true");
           }
 
-          // 2. OPTIMISTIC UPDATE: Update profile cache instantly
+          // 2. OPTIMISTIC UPDATE: Update profile cache instantly with Coins
           queryClient.setQueryData(
             ["profile", profile.walletAddress],
             (old: any) => {
               if (!old) return old;
               return {
                 ...old,
-                korBalance: (old.korBalance || 0) + reward,
+                coins: (old.coins || 0) + reward,
                 quests: (old.quests || []).map((q: any) =>
                   q.id === id ? { ...q, completed: true } : q,
                 ),
               };
             },
           );
+          setCoins((prev) => prev + reward);
 
-          // 3. Add to local transactions list
+          // 3. Add to local transactions list as coins
           addTransaction(
             "redeem",
             reward,
-            "kor",
+            "coins",
             `Quest Reward: ${quest.title}`,
           );
 
@@ -934,6 +985,32 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [profile, refreshProfileQuery, addTransaction, queryClient],
+  );
+
+  const handleConvertCoinsToKor = useCallback(
+    async (coinsAmount: number): Promise<boolean> => {
+      const amount = Math.floor(coinsAmount);
+      if (amount < 10) {
+        toast.error("Minimum conversion is 10 Coins");
+        return false;
+      }
+      if (amount > coins) {
+        toast.error("Insufficient Coins balance");
+        return false;
+      }
+      const korEarned = Math.floor(amount / 10);
+      setCoins((prev) => Math.max(0, prev - amount));
+      setBalance((prev) => prev + korEarned);
+      addTransaction(
+        "convert",
+        amount,
+        "coins",
+        `Converted ${amount.toLocaleString()} Coins to ${korEarned.toLocaleString()} KOR`
+      );
+      toast.success(`🎉 Converted ${amount.toLocaleString()} Coins to +${korEarned.toLocaleString()} KOR!`);
+      return true;
+    },
+    [coins, addTransaction]
   );
 
   const handleRedeem = useCallback(
@@ -1431,6 +1508,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         setRegistrationData,
         balance,
         setBalance,
+        korBalance: balance,
+        setKorBalance: setBalance,
+        coins,
+        setCoins,
+        convertCoinsToKor: handleConvertCoinsToKor,
         gameState,
         setGameState,
         timer,

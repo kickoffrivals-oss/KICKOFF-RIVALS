@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { cn, formatNumber } from "../lib/utils";
 import type { BetSlipSelection } from "../types";
 import { soundFx } from "../lib/soundFx";
+import { useTheme } from "../contexts/ThemeContext";
 import {
   X,
   Trash2,
@@ -35,6 +36,7 @@ export function BetSlip({
   onClearAll,
   onPlaceBet,
 }: BetSlipProps) {
+  const { isNeoBrutalist } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [stake, setStake] = useState(100);
@@ -58,7 +60,7 @@ export function BetSlip({
   const conflictingMatchNames = conflictingMatchIds.map((id) => {
     const sel = selections.find((s) => s.matchId === id);
     return sel
-      ? `${sel.match.homeTeam.shortName || sel.match.homeTeam.name} vs ${sel.match.awayTeam.shortName || sel.match.awayTeam.name}`
+      ? `${(sel.match.homeTeam as any).shortName || sel.match.homeTeam.name} vs ${(sel.match.awayTeam as any).shortName || sel.match.awayTeam.name}`
       : id;
   });
 
@@ -153,7 +155,10 @@ export function BetSlip({
       {/* Mobile Backdrop Overlay when sheet is expanded */}
       {isExpanded && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/60 z-[95] backdrop-blur-[2px] transition-opacity"
+          className={cn(
+            "lg:hidden fixed inset-0 z-[95] backdrop-blur-[2px] transition-opacity",
+            isNeoBrutalist ? "bg-black/60" : "bg-black/60"
+          )}
           onClick={() => setIsExpanded(false)}
           aria-hidden="true"
         />
@@ -162,26 +167,55 @@ export function BetSlip({
       <aside
         aria-label="Betting Slip"
         className={cn(
-          "fixed z-[100] bg-surface-panel border-border-subtle flex flex-col transition-all duration-300 shadow-modal",
+          "fixed z-[100] flex flex-col transition-all duration-300",
+          isNeoBrutalist
+            ? "bg-[#fffef0] text-black shadow-[-4px_0_0_#000]"
+            : "bg-surface-panel border-border-subtle text-text-primary shadow-modal",
           // Mobile bottom sheet
-          "bottom-0 left-0 right-0 border-t rounded-t-xl overflow-hidden",
+          "bottom-0 left-0 right-0 overflow-hidden",
+          isNeoBrutalist
+            ? "border-t-[3.5px] border-black rounded-t-xl"
+            : "border-t rounded-t-xl",
           isExpanded ? "max-h-[85vh] h-[85vh]" : "max-h-[70px] h-[70px]",
           // Desktop fixed right sidebar
-          "lg:top-16 lg:bottom-0 lg:left-auto lg:right-0 lg:w-[380px] lg:h-[calc(100vh-64px)] lg:max-h-none lg:border-l lg:border-t-0 lg:rounded-none",
+          "lg:top-16 lg:bottom-0 lg:left-auto lg:right-0 lg:w-[380px] lg:h-[calc(100vh-64px)] lg:max-h-none lg:rounded-none",
+          isNeoBrutalist
+            ? "lg:border-l-[3.5px] lg:border-black lg:border-t-0"
+            : "lg:border-l lg:border-t-0"
         )}
       >
         {/* Mobile Top Header (Tappable bar to expand / collapse) */}
         <div
           onClick={toggleExpand}
-          className="lg:cursor-default cursor-pointer select-none border-b border-border-subtle bg-surface-raised flex flex-col transition-colors hover:bg-surface-page/50"
+          className={cn(
+            "lg:cursor-default cursor-pointer select-none flex flex-col transition-colors",
+            isNeoBrutalist
+              ? "bg-[#ffe600] border-b-[2.5px] border-black text-black"
+              : "border-b border-border-subtle bg-surface-raised hover:bg-surface-page/50"
+          )}
         >
-          {/* Mobile Pull Arrow Key Indicator (replaces dash with arrow key) */}
+          {/* Mobile Pull Arrow Key Indicator */}
           <div className="lg:hidden w-full flex justify-center pt-1.5 pb-0.5">
-            <div className="flex items-center justify-center w-8 h-4 rounded-full bg-surface-panel border border-border-strong text-accent transition-transform hover:scale-110">
+            <div
+              className={cn(
+                "flex items-center justify-center w-8 h-4 rounded-full transition-transform hover:scale-110",
+                isNeoBrutalist
+                  ? "bg-white border-2 border-black text-black shadow-[1px_1px_0_#000]"
+                  : "bg-surface-panel border border-border-strong text-accent"
+              )}
+            >
               {isExpanded ? (
-                <ChevronDown size={14} strokeWidth={2.5} className="text-text-muted" />
+                <ChevronDown
+                  size={14}
+                  strokeWidth={2.5}
+                  className={isNeoBrutalist ? "text-black" : "text-text-muted"}
+                />
               ) : (
-                <ChevronUp size={14} strokeWidth={2.5} className="text-accent animate-pulse" />
+                <ChevronUp
+                  size={14}
+                  strokeWidth={2.5}
+                  className={isNeoBrutalist ? "text-black animate-pulse" : "text-accent animate-pulse"}
+                />
               )}
             </div>
           </div>
@@ -189,16 +223,34 @@ export function BetSlip({
           {/* Header Content Row */}
           <div className="flex items-center justify-between px-3.5 pb-2.5 pt-1 lg:py-3">
             <div className="flex items-center gap-2">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-primary flex items-center gap-2 font-mono">
+              <h2
+                className={cn(
+                  "text-xs font-black uppercase tracking-wider flex items-center gap-2 font-mono",
+                  isNeoBrutalist ? "text-black" : "text-text-primary"
+                )}
+              >
                 BET SLIP
-                <Chip variant="accent">
-                  {selections.length} {selections.length === 1 ? "Pick" : "Picks"}
-                </Chip>
+                {isNeoBrutalist ? (
+                  <span className="px-2 py-0.5 rounded-[4px] bg-black text-[#ffe600] text-[11px] font-black font-mono border border-black shadow-[1px_1px_0_#000]">
+                    {selections.length} {selections.length === 1 ? "Pick" : "Picks"}
+                  </span>
+                ) : (
+                  <Chip variant="accent">
+                    {selections.length} {selections.length === 1 ? "Pick" : "Picks"}
+                  </Chip>
+                )}
               </h2>
 
               {/* Same-Match Warning Tag in header if conflict exists */}
               {hasDuplicateMatches && betType === "accumulator" && (
-                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-xs bg-semantic-loss/20 text-semantic-loss border border-semantic-loss/30">
+                <span
+                  className={cn(
+                    "hidden sm:inline-flex items-center gap-1 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-xs",
+                    isNeoBrutalist
+                      ? "bg-[#ff0055] text-white border border-black shadow-[1px_1px_0_#000]"
+                      : "bg-semantic-loss/20 text-semantic-loss border border-semantic-loss/30"
+                  )}
+                >
                   <AlertTriangle size={11} />
                   Conflict
                 </span>
@@ -208,9 +260,14 @@ export function BetSlip({
             <div className="flex items-center gap-2">
               {/* Quick summary preview when collapsed on mobile */}
               {!isExpanded && (
-                <div className="lg:hidden flex items-center gap-1.5 text-xs font-mono font-bold text-text-muted mr-1">
+                <div
+                  className={cn(
+                    "lg:hidden flex items-center gap-1.5 text-xs font-mono font-black mr-1",
+                    isNeoBrutalist ? "text-black" : "text-text-muted"
+                  )}
+                >
                   <span>{totalOdds.toFixed(2)}x</span>
-                  <span className="text-semantic-reward">
+                  <span className={isNeoBrutalist ? "text-black font-black" : "text-semantic-reward"}>
                     • {formatNumber(potentialWin)}
                   </span>
                 </div>
@@ -223,7 +280,12 @@ export function BetSlip({
                   e.stopPropagation();
                   toggleExpand();
                 }}
-                className="lg:hidden flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-sm bg-surface-panel border border-border-subtle text-text-primary hover:border-border-strong transition-colors"
+                className={cn(
+                  "lg:hidden flex items-center gap-1 text-xs font-bold px-2 py-1 rounded transition-all cursor-pointer",
+                  isNeoBrutalist
+                    ? "bg-white border-2 border-black text-black shadow-[2px_2px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                    : "bg-surface-panel border border-border-subtle text-text-primary hover:border-border-strong"
+                )}
                 aria-label={
                   isExpanded
                     ? "Collapse bet slip"
@@ -252,9 +314,14 @@ export function BetSlip({
                   onClearAll();
                 }}
                 aria-label="Clear all selections"
-                className="text-xs font-semibold text-text-muted hover:text-semantic-loss p-1.5 rounded-sm hover:bg-surface-panel transition-colors flex items-center gap-1 focus-visible:outline-2 focus-visible:outline-accent"
+                className={cn(
+                  "text-xs font-bold p-1.5 rounded transition-all flex items-center gap-1 cursor-pointer",
+                  isNeoBrutalist
+                    ? "text-black hover:bg-black hover:text-white border border-transparent hover:border-black"
+                    : "text-text-muted hover:text-semantic-loss hover:bg-surface-panel focus-visible:outline-2 focus-visible:outline-accent"
+                )}
               >
-                <Trash2 size={14} strokeWidth={2} />
+                <Trash2 size={14} strokeWidth={2.5} />
                 <span className="hidden sm:inline">Clear</span>
               </button>
             </div>
@@ -262,8 +329,22 @@ export function BetSlip({
         </div>
 
         {/* Single vs Accumulator Segmented Controls */}
-        <div className="p-3 bg-surface-panel border-b border-border-subtle shrink-0">
-          <div className="grid grid-cols-2 gap-1 bg-surface-page p-1 rounded-sm border border-border-subtle">
+        <div
+          className={cn(
+            "p-3 shrink-0",
+            isNeoBrutalist
+              ? "bg-[#fffef0] border-b-2 border-black"
+              : "bg-surface-panel border-b border-border-subtle"
+          )}
+        >
+          <div
+            className={cn(
+              "grid grid-cols-2 gap-1.5 p-1 rounded",
+              isNeoBrutalist
+                ? "bg-white border-2 border-black shadow-[2px_2px_0_#000]"
+                : "bg-surface-page border border-border-subtle"
+            )}
+          >
             <button
               type="button"
               onClick={() => {
@@ -271,10 +352,14 @@ export function BetSlip({
                 setBetType("single");
               }}
               className={cn(
-                "py-1.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-accent",
-                betType === "single"
+                "py-1.5 text-xs font-bold uppercase tracking-wider rounded transition-all cursor-pointer",
+                isNeoBrutalist
+                  ? betType === "single"
+                    ? "bg-[#ffe600] text-black border-2 border-black font-black shadow-[1px_1px_0_#000]"
+                    : "text-black/70 hover:text-black font-bold"
+                  : betType === "single"
                   ? "bg-surface-raised text-text-primary border border-border-strong"
-                  : "text-text-muted hover:text-text-primary",
+                  : "text-text-muted hover:text-text-primary"
               )}
             >
               Singles ({selections.length})
@@ -287,20 +372,26 @@ export function BetSlip({
               }}
               disabled={selections.length < 2}
               className={cn(
-                "py-1.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors flex items-center justify-center gap-1.5 focus-visible:outline-2 focus-visible:outline-accent",
-                betType === "accumulator"
+                "py-1.5 text-xs font-bold uppercase tracking-wider rounded transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+                isNeoBrutalist
+                  ? betType === "accumulator"
+                    ? hasDuplicateMatches
+                      ? "bg-[#ff0055] text-white border-2 border-black font-black"
+                      : "bg-[#00f0ff] text-black border-2 border-black font-black shadow-[1px_1px_0_#000]"
+                    : "text-black/70 hover:text-black font-bold"
+                  : betType === "accumulator"
                   ? hasDuplicateMatches
                     ? "bg-semantic-loss/20 text-semantic-loss border border-semantic-loss/40 font-extrabold"
                     : "bg-accent text-surface-page font-extrabold"
                   : "text-text-muted hover:text-text-primary",
-                selections.length < 2 && "opacity-40 cursor-not-allowed",
+                selections.length < 2 && "opacity-40 cursor-not-allowed"
               )}
             >
               <Zap size={13} strokeWidth={2.5} />
               <span>Acca Combo</span>
               {hasDuplicateMatches && (
                 <span
-                  className="w-2 h-2 rounded-full bg-semantic-loss shrink-0"
+                  className="w-2 h-2 rounded-full bg-red-600 shrink-0"
                   title="Conflict: 2+ picks from same match"
                 />
               )}
@@ -309,18 +400,30 @@ export function BetSlip({
 
           {/* Accumulator Conflict Warning Banner */}
           {isAccumulatorInvalid && (
-            <div className="mt-2.5 p-2.5 rounded-sm bg-semantic-loss/10 border border-semantic-loss/30 flex items-start gap-2 animate-in fade-in duration-200">
+            <div
+              className={cn(
+                "mt-2.5 p-2.5 rounded flex items-start gap-2",
+                isNeoBrutalist
+                  ? "bg-[#ffebee] border-2 border-[#ff0055] text-black shadow-[2px_2px_0_#ff0055]"
+                  : "bg-semantic-loss/10 border border-semantic-loss/30"
+              )}
+            >
               <AlertTriangle
                 size={16}
-                className="text-semantic-loss shrink-0 mt-0.5"
+                className={isNeoBrutalist ? "text-[#ff0055] shrink-0 mt-0.5" : "text-semantic-loss shrink-0 mt-0.5"}
               />
               <div className="flex flex-col gap-1 text-xs flex-1">
-                <span className="font-bold text-semantic-loss uppercase tracking-wide">
+                <span
+                  className={cn(
+                    "font-black uppercase tracking-wide",
+                    isNeoBrutalist ? "text-[#ff0055]" : "text-semantic-loss"
+                  )}
+                >
                   Cannot Place Accumulator
                 </span>
-                <p className="text-text-muted leading-tight text-[11px]">
+                <p className={isNeoBrutalist ? "text-black/80 leading-tight text-[11px]" : "text-text-muted leading-tight text-[11px]"}>
                   You selected multiple outcomes from the same match (
-                  <span className="text-text-primary font-semibold">
+                  <span className="font-bold underline">
                     {conflictingMatchNames.join(", ")}
                   </span>
                   ). Accumulators require picks from separate matches.
@@ -332,11 +435,16 @@ export function BetSlip({
                       soundFx.playClick();
                       setBetType("single");
                     }}
-                    className="px-2 py-0.5 rounded-xs bg-surface-raised text-text-primary font-bold text-[11px] border border-border-strong hover:bg-surface-page transition-colors"
+                    className={cn(
+                      "px-2 py-0.5 rounded text-[11px] font-bold transition-all",
+                      isNeoBrutalist
+                        ? "bg-white text-black border-2 border-black shadow-[1px_1px_0_#000] hover:bg-[#ffe600]"
+                        : "bg-surface-raised text-text-primary border border-border-strong hover:bg-surface-page"
+                    )}
                   >
                     Switch to Singles
                   </button>
-                  <span className="text-[10px] text-text-muted">
+                  <span className={cn("text-[10px]", isNeoBrutalist ? "text-black/60" : "text-text-muted")}>
                     or remove duplicate picks below
                   </span>
                 </div>
@@ -346,7 +454,12 @@ export function BetSlip({
         </div>
 
         {/* Selections List */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
+        <div
+          className={cn(
+            "flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar",
+            isNeoBrutalist ? "bg-[#faf8ee]" : "bg-transparent"
+          )}
+        >
           {selections.map((sel) => {
             const isConflicting =
               betType === "accumulator" &&
@@ -356,27 +469,49 @@ export function BetSlip({
               <div
                 key={`${sel.matchId}-${sel.selection}`}
                 className={cn(
-                  "p-2.5 rounded-sm bg-surface-page border transition-colors flex items-center justify-between",
-                  isConflicting
-                    ? "border-semantic-loss/50 bg-semantic-loss/5 hover:border-semantic-loss"
-                    : "border-border-subtle hover:border-border-strong",
+                  "p-2.5 rounded transition-all flex items-center justify-between",
+                  isNeoBrutalist
+                    ? isConflicting
+                      ? "bg-[#fff0f2] border-2 border-[#ff0055] shadow-[2px_2px_0_#ff0055]"
+                      : "bg-white border-2 border-black shadow-[2px_2px_0_#000]"
+                    : isConflicting
+                    ? "border-semantic-loss/50 bg-semantic-loss/5 hover:border-semantic-loss border"
+                    : "bg-surface-page border border-border-subtle hover:border-border-strong"
                 )}
               >
                 <div className="flex flex-col gap-0.5 flex-1 min-w-0 mr-2">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-xs font-medium text-text-muted truncate">
+                    <span
+                      className={cn(
+                        "text-xs truncate",
+                        isNeoBrutalist ? "text-black/70 font-bold" : "text-text-muted font-medium"
+                      )}
+                    >
                       {sel.match.homeTeam.name} vs {sel.match.awayTeam.name}
                     </span>
                     {isConflicting && (
-                      <span className="px-1.5 py-0.2 rounded-xs bg-semantic-loss/20 text-semantic-loss text-[10px] font-bold uppercase tracking-wider border border-semantic-loss/30">
+                      <span
+                        className={cn(
+                          "px-1.5 py-0.2 rounded-xs text-[10px] font-bold uppercase tracking-wider",
+                          isNeoBrutalist
+                            ? "bg-[#ff0055] text-white border border-black"
+                            : "bg-semantic-loss/20 text-semantic-loss border border-semantic-loss/30"
+                        )}
+                      >
                         Same Match Conflict
                       </span>
                     )}
                   </div>
                   <span
                     className={cn(
-                      "text-xs font-bold",
-                      isConflicting ? "text-semantic-loss" : "text-accent",
+                      "text-xs font-black",
+                      isNeoBrutalist
+                        ? isConflicting
+                          ? "text-[#ff0055]"
+                          : "text-black"
+                        : isConflicting
+                        ? "text-semantic-loss"
+                        : "text-accent"
                     )}
                   >
                     {getSelectionLabel(sel)}
@@ -384,7 +519,14 @@ export function BetSlip({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-sm bg-surface-raised text-text-primary text-xs font-mono font-bold tabular-nums border border-border-subtle">
+                  <span
+                    className={cn(
+                      "px-2 py-0.5 rounded text-xs font-mono font-black tabular-nums border",
+                      isNeoBrutalist
+                        ? "bg-[#ffe600] text-black border-black shadow-[1px_1px_0_#000]"
+                        : "bg-surface-raised text-text-primary border-border-subtle"
+                    )}
+                  >
                     {sel.odds.toFixed(2)}x
                   </span>
                   <button
@@ -395,9 +537,14 @@ export function BetSlip({
                       onRemoveSelection(sel.matchId, sel.selection);
                     }}
                     aria-label={`Remove pick for ${sel.match.homeTeam.name} vs ${sel.match.awayTeam.name}`}
-                    className="p-1 rounded-sm text-text-muted hover:text-semantic-loss hover:bg-surface-raised transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+                    className={cn(
+                      "p-1 rounded transition-colors cursor-pointer",
+                      isNeoBrutalist
+                        ? "text-black hover:text-[#ff0055] hover:bg-black/10"
+                        : "text-text-muted hover:text-semantic-loss hover:bg-surface-raised focus-visible:outline-2 focus-visible:outline-accent"
+                    )}
                   >
-                    <X size={14} strokeWidth={2} />
+                    <X size={14} strokeWidth={2.5} />
                   </button>
                 </div>
               </div>
@@ -406,19 +553,42 @@ export function BetSlip({
         </div>
 
         {/* Bottom Summary & Stake Controls */}
-        <div className="p-3.5 bg-surface-panel border-t border-border-subtle flex flex-col gap-2.5 shrink-0">
+        <div
+          className={cn(
+            "p-3.5 flex flex-col gap-2.5 shrink-0",
+            isNeoBrutalist
+              ? "bg-[#fffef0] border-t-2 border-black"
+              : "bg-surface-panel border-t border-border-subtle"
+          )}
+        >
           {/* Total Odds & Estimated Payout */}
-          <div className="flex justify-between items-center bg-surface-page p-2.5 rounded-sm border border-border-subtle">
+          <div
+            className={cn(
+              "flex justify-between items-center p-2.5 rounded border",
+              isNeoBrutalist
+                ? "bg-white border-2 border-black shadow-[3px_3px_0_#000]"
+                : "bg-surface-page border-border-subtle"
+            )}
+          >
             <div className="flex flex-col">
-              <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
+              <span
+                className={cn(
+                  "text-xs font-bold uppercase tracking-wider",
+                  isNeoBrutalist ? "text-black/60 font-black" : "text-text-muted"
+                )}
+              >
                 {betType === "accumulator" ? "Combo Multiplier" : "Total Odds"}
               </span>
               <span
                 className={cn(
                   "text-lg font-black font-mono tabular-nums",
                   isAccumulatorInvalid
-                    ? "text-semantic-loss text-sm uppercase font-bold"
-                    : "text-text-primary",
+                    ? isNeoBrutalist
+                      ? "text-[#ff0055] text-sm uppercase font-black"
+                      : "text-semantic-loss text-sm uppercase font-bold"
+                    : isNeoBrutalist
+                    ? "text-black"
+                    : "text-text-primary"
                 )}
               >
                 {isAccumulatorInvalid ? "Invalid" : `${totalOdds.toFixed(2)}x`}
@@ -426,10 +596,20 @@ export function BetSlip({
             </div>
 
             <div className="flex flex-col items-end text-right">
-              <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
+              <span
+                className={cn(
+                  "text-xs font-bold uppercase tracking-wider",
+                  isNeoBrutalist ? "text-black/60 font-black" : "text-text-muted"
+                )}
+              >
                 Potential Return
               </span>
-              <span className="text-lg font-black font-mono tabular-nums text-semantic-reward">
+              <span
+                className={cn(
+                  "text-lg font-black font-mono tabular-nums",
+                  isNeoBrutalist ? "text-[#00aa44]" : "text-semantic-reward"
+                )}
+              >
                 {isAccumulatorInvalid
                   ? "—"
                   : `${formatNumber(potentialWin)} KOR`}
@@ -448,10 +628,14 @@ export function BetSlip({
                   setStake(amount);
                 }}
                 className={cn(
-                  "flex-1 py-1 rounded-sm text-xs font-mono font-bold border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
-                  stake === amount
+                  "flex-1 py-1 rounded text-xs font-mono font-bold border transition-all cursor-pointer",
+                  isNeoBrutalist
+                    ? stake === amount
+                      ? "bg-[#ffe600] text-black border-2 border-black font-black shadow-[1.5px_1.5px_0_#000]"
+                      : "bg-white text-black border-2 border-black hover:bg-[#fff7b3] font-black shadow-[1px_1px_0_#000]"
+                    : stake === amount
                     ? "bg-surface-raised text-text-primary border-border-strong"
-                    : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong",
+                    : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong"
                 )}
               >
                 +{amount}
@@ -463,18 +647,36 @@ export function BetSlip({
                 soundFx.playClick();
                 setStake(balance);
               }}
-              className="flex-1 py-1 rounded-sm text-xs font-mono font-bold bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+              className={cn(
+                "flex-1 py-1 rounded text-xs font-mono font-black border transition-all cursor-pointer",
+                isNeoBrutalist
+                  ? "bg-[#00ff66] text-black border-2 border-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#12e069]"
+                  : "bg-surface-page text-semantic-reward border-border-subtle hover:border-semantic-reward"
+              )}
             >
               MAX
             </button>
           </div>
 
           {/* Stake Input with Real Label */}
-          <div className="flex items-center gap-2 bg-surface-page px-3 py-1.5 rounded-sm border border-border-subtle focus-within:border-accent">
-            <Coins size={16} className="text-semantic-reward shrink-0" />
+          <div
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded border transition-all",
+              isNeoBrutalist
+                ? "bg-white border-2 border-black shadow-[2px_2px_0_#000]"
+                : "bg-surface-page border-border-subtle focus-within:border-accent"
+            )}
+          >
+            <Coins
+              size={16}
+              className={isNeoBrutalist ? "text-amber-500 shrink-0" : "text-semantic-reward shrink-0"}
+            />
             <label
               htmlFor="betslip-stake-input"
-              className="text-xs font-semibold text-text-muted"
+              className={cn(
+                "text-xs font-semibold",
+                isNeoBrutalist ? "text-black/70 font-black" : "text-text-muted"
+              )}
             >
               Stake:
             </label>
@@ -483,18 +685,38 @@ export function BetSlip({
               type="number"
               value={stake}
               onChange={(e) => setStake(Math.max(0, Number(e.target.value)))}
-              className="flex-1 bg-transparent text-right font-mono font-bold text-text-primary text-sm focus:outline-none tabular-nums"
+              className={cn(
+                "flex-1 bg-transparent text-right font-mono font-bold text-sm focus:outline-none tabular-nums",
+                isNeoBrutalist ? "text-black font-black" : "text-text-primary"
+              )}
               min={1}
               max={balance}
             />
-            <span className="text-xs font-bold text-text-muted">Coins</span>
+            <span
+              className={cn(
+                "text-xs font-bold",
+                isNeoBrutalist ? "text-black font-black" : "text-text-muted"
+              )}
+            >
+              KOR
+            </span>
           </div>
 
           {/* Balance Reminder */}
-          <div className="flex justify-between items-center text-xs text-text-muted px-1">
+          <div
+            className={cn(
+              "flex justify-between items-center text-xs px-1",
+              isNeoBrutalist ? "text-black/70 font-bold" : "text-text-muted"
+            )}
+          >
             <span>Available:</span>
-            <span className="font-mono tabular-nums text-text-primary font-bold">
-              {formatNumber(balance)} Coins
+            <span
+              className={cn(
+                "font-mono tabular-nums font-bold",
+                isNeoBrutalist ? "text-black font-black" : "text-text-primary"
+              )}
+            >
+              {formatNumber(balance)} KOR
             </span>
           </div>
 
@@ -504,12 +726,18 @@ export function BetSlip({
             onClick={handlePlaceBet}
             disabled={!isBettingOpen || !canPlaceBet || isLoading}
             className={cn(
-              "w-full py-3 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 focus-visible:outline-2 focus-visible:outline-accent",
-              isBettingOpen && canPlaceBet && !isLoading
+              "w-full py-3 rounded font-bold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2",
+              isNeoBrutalist
+                ? isBettingOpen && canPlaceBet && !isLoading
+                  ? "bg-[#00ff66] hover:bg-[#14eb6c] text-black font-black border-[3px] border-black shadow-[4px_4px_0_#000] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
+                  : isAccumulatorInvalid
+                  ? "bg-[#ff0055] text-white border-2 border-black cursor-not-allowed font-black"
+                  : "bg-slate-200 text-slate-500 border-2 border-black/40 cursor-not-allowed font-bold"
+                : isBettingOpen && canPlaceBet && !isLoading
                 ? "bg-accent text-surface-page hover:bg-accent-hover active:bg-accent-active cursor-pointer"
                 : isAccumulatorInvalid
                 ? "bg-semantic-loss/20 text-semantic-loss border border-semantic-loss/40 cursor-not-allowed"
-                : "bg-surface-raised text-text-muted border border-border-subtle cursor-not-allowed",
+                : "bg-surface-raised text-text-muted border border-border-subtle cursor-not-allowed"
             )}
           >
             {isLoading ? (
@@ -522,11 +750,11 @@ export function BetSlip({
                 <span>Conflict: 2+ Picks From Same Match</span>
               </>
             ) : !canPlaceBet ? (
-              "Insufficient Coins"
+              "Insufficient KOR"
             ) : (
               <>
                 <Check size={16} strokeWidth={2.5} />
-                Lock In Bet ({formatNumber(stake)} Coins)
+                Lock In Bet ({formatNumber(stake)} KOR)
               </>
             )}
           </button>

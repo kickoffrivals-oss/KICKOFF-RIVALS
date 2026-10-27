@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <defs>
+    <linearGradient id="bg" x2="0" y2="1"><stop stop-color="#111619"/><stop offset="1" stop-color="#090d0f"/></linearGradient>
+    <linearGradient id="panel" x2="1" y2="1"><stop stop-color="#1a2225"/><stop offset="1" stop-color="#111719"/></linearGradient>
+    <linearGradient id="field" x2="0" y2="1"><stop stop-color="#347550"/><stop offset="1" stop-color="#173d2c"/></linearGradient>
+    <pattern id="stripes" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M0 0H25V50H0Z" fill="#fff" opacity=".03"/></pattern>
+  </defs>
+  <rect width="1440" height="900" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1440" height="70" fill="#151c1f"/>
+  <text x="55" y="43" fill="#eeeae1" font-family="Arial" font-size="16" font-weight="900" letter-spacing="2">KICKOFF <tspan fill="#d3ad67">RIVALS</tspan></text>
+  <path d="M241 20V50" stroke="#394346"/>
+  <text x="269" y="42" fill="#d2d9d5" font-family="Arial" font-size="11" letter-spacing="2">ARENA DESK</text>
+  <text x="1382" y="42" fill="#91a099" font-family="Arial" font-size="10" text-anchor="end" letter-spacing="2">PLAYER  /  DISPATCH ACTIVE</text>
+  <rect x="0" y="70" width="1440" height="43" fill="#0d1214"/>
+  <circle cx="61" cy="91" r="4" fill="#d0ae69"/><text x="75" y="95" fill="#d0ae69" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="2">LIVE ARENAS</text>
+  <text x="205" y="95" fill="#66716d" font-family="Arial" font-size="10" letter-spacing="2">UPCOMING</text>
+  <text x="333" y="95" fill="#66716d" font-family="Arial" font-size="10" letter-spacing="2">GAME RULES</text>
+  <text x="1380" y="95" fill="#89948d" font-family="Arial" font-size="10" text-anchor="end">2 LIVE   /   7 IN DEVELOPMENT</text>
+  <text x="64" y="165" fill="#c9a767" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="3">THE BROADCAST DESK</text>
+  <text x="60" y="220" fill="#f2f1ea" font-family="Georgia" font-size="42" font-weight="bold">Pick a live game.</text>
+  <text x="64" y="250" fill="#919d97" font-family="Arial" font-size="14">Choose your arena. The action begins as soon as you enter.</text>
+  <rect x="64" y="283" width="1312" height="349" rx="5" fill="url(#panel)" stroke="#303a3b"/>
+  <rect x="64" y="283" width="1312" height="349" rx="5" fill="url(#stripes)"/>
+  <rect x="64" y="283" width="8" height="349" fill="#74b987"/>
+  <text x="103" y="323" fill="#a2c7a8" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="2">01  /  LIVE FOOTBALL</text>
+  <text x="100" y="376" fill="#f4f2eb" font-family="Arial" font-size="31" font-weight="900">VIRTUAL FOOTBALL PRO</text>
+  <text x="103" y="410" fill="#9eaaa3" font-family="Arial" font-size="14">Premier League  ·  LaLiga  ·  Serie A</text>
+  <text x="103" y="450" fill="#c6d0c9" font-family="Arial" font-size="13">A new 2D match every minute, with 1X2 and GG/NoGG markets.</text>
+  <rect x="103" y="485" width="190" height="46" rx="3" fill="#cfaa62"/><text x="124" y="513" fill="#171918" font-family="Arial" font-size="11" font-weight="900" letter-spacing="1">OPEN MATCH CENTRE  →</text>
+  <circle cx="111" cy="568" r="4" fill="#70cc91"/><text x="126" y="572" fill="#a9b6ae" font-family="Arial" font-size="10" letter-spacing="1">AVAILABLE NOW</text>
+  <text x="103" y="606" fill="#65726b" font-family="Arial" font-size="9" letter-spacing="2">01 MINUTE ROUNDS    /    INSTANT SETTLEMENT</text>
+  <rect x="745" y="313" width="585" height="288" rx="3" fill="#101616" stroke="#384643"/>
+  <rect x="760" y="328" width="555" height="258" fill="url(#field)" stroke="#b7cbb3" stroke-opacity=".72" stroke-width="2"/>
+  <rect x="760" y="328" width="555" height="258" fill="url(#stripes)"/>
+  <path d="M1037 328V586M760 457H1315M1037 413a44 44 0 1 0 0 88a44 44 0 1 0 0-88M760 398h78v118h-78M1315 398h-78v118h78" fill="none" stroke="#e2e8d7" stroke-opacity=".72" stroke-width="2"/>
+  <circle cx="1037" cy="457" r="4" fill="#e6d8ad"/>
+  <circle cx="983" cy="433" r="6" fill="#f4e8c7"/><circle cx="1102" cy="478" r="6" fill="#d2ad69"/><circle cx="1180" cy="430" r="6" fill="#f4e8c7"/>
+  <text x="774" y="350" fill="#e5e7dc" font-family="Arial" font-size="9" letter-spacing="2">TACTICAL VIEW  /  LIVE SIMULATION</text>
+  <text x="64" y="692" fill="#c9a767" font-family="Arial" font-size="10" font-weight="bold" letter-spacing="3">ALTERNATE BROADCAST</text>
+  <rect x="64" y="713" width="1312" height="105" rx="4" fill="#171a1b" stroke="#373b39"/>
+  <rect x="64" y="713" width="5" height="105" fill="#d29756"/>
+  <rect x="93" y="733" width="65" height="65" rx="3" fill="#30251b" stroke="#765938"/>
+  <path d="M106 781L124 764L135 772L147 750" fill="none" stroke="#e3b06d" stroke-width="3"/>
+  <text x="184" y="748" fill="#c99c64" font-family="Arial" font-size="9" font-weight="bold" letter-spacing="2">02  /  CRASH GAME</text>
+  <text x="184" y="781" fill="#f3f0e8" font-family="Georgia" font-size="24" font-weight="bold">THE DAILY AVIATOR</text>
+  <text x="535" y="764" fill="#939d98" font-family="Arial" font-size="13">Follow the multiplier. Choose when to cash out.</text>
+  <text x="1327" y="772" fill="#ddb275" font-family="Arial" font-size="12" font-weight="bold" text-anchor="end" letter-spacing="1">ENTER GAME  →</text>
+  <text x="64" y="862" fill="#5a625e" font-family="Arial" font-size="10" letter-spacing="2">CONCEPT 02  /  BROADCAST DESK  •  CLEAR GAME COMPARISON, STRONG LIVE/UPCOMING NAVIGATION</text>
+</svg>

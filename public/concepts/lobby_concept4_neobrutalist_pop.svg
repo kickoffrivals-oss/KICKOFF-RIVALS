@@ -1,0 +1,204 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 920" width="100%" height="100%" style="background:#f4f4f0; font-family:system-ui, -apple-system, sans-serif;">
+  <defs>
+    <!-- Halftone Texture -->
+    <pattern id="brutalHalftone" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="2" fill="#000" opacity="0.1" />
+    </pattern>
+    <!-- Hazard Stripes Pattern -->
+    <pattern id="hazardStripes" width="20" height="20" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <rect width="10" height="20" fill="#ffe600" />
+      <rect x="10" width="10" height="20" fill="#000000" />
+    </pattern>
+  </defs>
+
+  <!-- Screen Frame with Thick Black Border -->
+  <rect x="8" y="8" width="434" height="904" rx="34" fill="#f4f4f0" stroke="#000" stroke-width="4" />
+  <!-- Halftone background texture -->
+  <rect x="12" y="12" width="426" height="896" rx="30" fill="url(#brutalHalftone)" />
+
+  <!-- ================= TOP BRUTALIST BANNER ================= -->
+  <g transform="translate(24, 25)">
+    <!-- Main Logo Box with Offset Shadow -->
+    <rect x="4" y="4" width="230" height="52" rx="10" fill="#000" />
+    <rect x="0" y="0" width="230" height="52" rx="10" fill="#ffe600" stroke="#000" stroke-width="3.5" />
+    <text x="115" y="32" font-size="20" font-weight="900" font-style="italic" fill="#000" text-anchor="middle" letter-spacing="-0.5">KICKOFF RIVALS⚡</text>
+
+    <!-- Balance Pill with Offset Shadow -->
+    <g transform="translate(246, 0)">
+      <rect x="4" y="4" width="152" height="52" rx="10" fill="#000" />
+      <rect x="0" y="0" width="152" height="52" rx="10" fill="#ffffff" stroke="#000" stroke-width="3.5" />
+      <circle cx="28" cy="26" r="14" fill="#ff3366" stroke="#000" stroke-width="2" />
+      <text x="28" y="32" font-size="14" font-weight="900" fill="#fff" text-anchor="middle">K</text>
+      <text x="96" y="33" font-size="17" font-weight="900" fill="#000">12,450</text>
+    </g>
+  </g>
+
+  <!-- Ticker Ribbon (Hazard Caution Tape) -->
+  <g transform="translate(24, 90)">
+    <rect x="3" y="3" width="402" height="28" rx="6" fill="#000" />
+    <rect x="0" y="0" width="402" height="28" rx="6" fill="#ffe600" stroke="#000" stroke-width="2.5" />
+    <text x="201" y="19" font-size="11" font-weight="900" fill="#000" text-anchor="middle" letter-spacing="1">
+      ★ ROUND #1042 LIVE NOW ★ AVIATOR HIT 52.8X ★
+    </text>
+  </g>
+
+  <!-- ================= COLLECTIBLE CARD 1: FOOTBALL PRO ================= -->
+  <g transform="translate(24, 132)">
+    <!-- Offset Hard Shadow -->
+    <rect x="5" y="5" width="402" height="195" rx="16" fill="#000" />
+    <!-- Main Card Body in Pure White -->
+    <rect x="0" y="0" width="402" height="195" rx="16" fill="#ffffff" stroke="#000" stroke-width="3.5" />
+
+    <!-- Card Top Header Row -->
+    <g transform="translate(18, 18)">
+      <!-- Series Tag -->
+      <rect x="0" y="0" width="70" height="24" rx="6" fill="#00f0ff" stroke="#000" stroke-width="2" />
+      <text x="35" y="16" font-size="10" font-weight="900" fill="#000" text-anchor="middle">DROP #01</text>
+
+      <!-- Live Badge -->
+      <g transform="translate(78, 0)">
+        <rect x="0" y="0" width="90" height="24" rx="6" fill="#ff3366" stroke="#000" stroke-width="2" />
+        <text x="45" y="16" font-size="10" font-weight="900" fill="#fff" text-anchor="middle">● 24/7 LIVE</text>
+      </g>
+    </g>
+
+    <!-- Content -->
+    <g transform="translate(18, 56)">
+      <text x="0" y="24" font-size="24" font-weight="900" font-style="italic" fill="#000" letter-spacing="-0.5">VIRTUAL FOOTBALL PRO</text>
+      <text x="0" y="46" font-size="12" font-weight="700" fill="#555">
+        Premier League • 35-Second Rounds • Instant Coins
+      </text>
+
+      <!-- Chunky Odds Strip -->
+      <g transform="translate(0, 58)">
+        <rect x="0" y="0" width="65" height="30" rx="8" fill="#ffe600" stroke="#000" stroke-width="2" />
+        <text x="32" y="20" font-size="12" font-weight="900" fill="#000" text-anchor="middle">1 • 2.10</text>
+
+        <rect x="73" y="0" width="65" height="30" rx="8" fill="#f4f4f5" stroke="#000" stroke-width="2" />
+        <text x="105" y="20" font-size="12" font-weight="900" fill="#000" text-anchor="middle">X • 3.20</text>
+
+        <rect x="146" y="0" width="65" height="30" rx="8" fill="#f4f4f5" stroke="#000" stroke-width="2" />
+        <text x="178" y="20" font-size="12" font-weight="900" fill="#000" text-anchor="middle">2 • 2.85</text>
+      </g>
+    </g>
+
+    <!-- Graphic Football Sticker on Right -->
+    <g transform="translate(325, 80)">
+      <circle cx="0" cy="0" r="36" fill="#ffe600" stroke="#000" stroke-width="3" />
+      <text x="0" y="12" font-size="34" text-anchor="middle">⚽</text>
+    </g>
+
+    <!-- Big Action Button -->
+    <g transform="translate(244, 138)">
+      <rect x="3" y="3" width="142" height="42" rx="10" fill="#000" />
+      <rect x="0" y="0" width="142" height="42" rx="10" fill="#00ff66" stroke="#000" stroke-width="2.5" />
+      <text x="71" y="26" font-size="14" font-weight="900" fill="#000" text-anchor="middle">PLAY NOW ➔</text>
+    </g>
+  </g>
+
+  <!-- ================= COLLECTIBLE CARD 2: DAILY AVIATOR ================= -->
+  <g transform="translate(24, 345)">
+    <rect x="5" y="5" width="402" height="195" rx="16" fill="#000" />
+    <rect x="0" y="0" width="402" height="195" rx="16" fill="#ffe600" stroke="#000" stroke-width="3.5" />
+
+    <g transform="translate(18, 18)">
+      <rect x="0" y="0" width="70" height="24" rx="6" fill="#ff3366" stroke="#000" stroke-width="2" />
+      <text x="35" y="16" font-size="10" font-weight="900" fill="#fff" text-anchor="middle">DROP #02</text>
+
+      <g transform="translate(78, 0)">
+        <rect x="0" y="0" width="110" height="24" rx="6" fill="#000" stroke="#000" stroke-width="2" />
+        <text x="55" y="16" font-size="10" font-weight="900" fill="#ffe600" text-anchor="middle">● 100X MULTIPLIER</text>
+      </g>
+    </g>
+
+    <g transform="translate(18, 56)">
+      <text x="0" y="24" font-size="24" font-weight="900" font-style="italic" fill="#000" letter-spacing="-0.5">THE DAILY AVIATOR</text>
+      <text x="0" y="46" font-size="12" font-weight="700" fill="#222">
+        High Altitude Flight • Cash Out Before the Crash
+      </text>
+
+      <!-- Multipliers -->
+      <g transform="translate(0, 58)">
+        <rect x="0" y="0" width="62" height="30" rx="8" fill="#000" stroke="#000" stroke-width="2" />
+        <text x="31" y="20" font-size="12" font-weight="900" fill="#00f0ff" text-anchor="middle">4.50X</text>
+
+        <rect x="70" y="0" width="62" height="30" rx="8" fill="#ffffff" stroke="#000" stroke-width="2" />
+        <text x="101" y="20" font-size="12" font-weight="900" fill="#000" text-anchor="middle">14.8X</text>
+
+        <rect x="140" y="0" width="62" height="30" rx="8" fill="#ff3366" stroke="#000" stroke-width="2" />
+        <text x="171" y="20" font-size="12" font-weight="900" fill="#fff" text-anchor="middle">52.8X</text>
+      </g>
+    </g>
+
+    <g transform="translate(325, 80)">
+      <circle cx="0" cy="0" r="36" fill="#ff3366" stroke="#000" stroke-width="3" />
+      <text x="0" y="12" font-size="34" text-anchor="middle">✈</text>
+    </g>
+
+    <g transform="translate(244, 138)">
+      <rect x="3" y="3" width="142" height="42" rx="10" fill="#000" />
+      <rect x="0" y="0" width="142" height="42" rx="10" fill="#ff3366" stroke="#000" stroke-width="2.5" />
+      <text x="71" y="26" font-size="14" font-weight="900" fill="#fff" text-anchor="middle">FLY NOW ➔</text>
+    </g>
+  </g>
+
+  <!-- ================= IN LABS TILES ================= -->
+  <g transform="translate(24, 558)">
+    <text x="0" y="18" font-size="16" font-weight="900" font-style="italic" fill="#000" letter-spacing="-0.5">LABS &amp; UPCOMING RELEASES</text>
+
+    <g transform="translate(0, 30)">
+      <!-- Tile 1 -->
+      <rect x="3" y="3" width="126" height="135" rx="12" fill="#000" />
+      <rect x="0" y="0" width="126" height="135" rx="12" fill="#ffffff" stroke="#000" stroke-width="3" />
+      <circle cx="63" cy="40" r="20" fill="#ffe600" stroke="#000" stroke-width="2" />
+      <text x="63" y="47" font-size="16" font-weight="900" text-anchor="middle">🪙</text>
+      <text x="63" y="80" font-size="13" font-weight="900" fill="#000" text-anchor="middle">Head &amp; Tail</text>
+      <text x="63" y="96" font-size="10" font-weight="700" fill="#666" text-anchor="middle">Streak Flip</text>
+      <rect x="18" y="106" width="90" height="20" rx="4" fill="#000" />
+      <text x="63" y="120" font-size="9" font-weight="900" fill="#ffe600" text-anchor="middle">IN LABS</text>
+
+      <!-- Tile 2 -->
+      <g transform="translate(138, 0)">
+        <rect x="3" y="3" width="126" height="135" rx="12" fill="#000" />
+        <rect x="0" y="0" width="126" height="135" rx="12" fill="#ffffff" stroke="#000" stroke-width="3" />
+        <circle cx="63" cy="40" r="20" fill="#ff3366" stroke="#000" stroke-width="2" />
+        <text x="63" y="47" font-size="16" text-anchor="middle">🐔</text>
+        <text x="63" y="80" font-size="13" font-weight="900" fill="#000" text-anchor="middle">Chicken Run</text>
+        <text x="63" y="96" font-size="10" font-weight="700" fill="#666" text-anchor="middle">Lane Survival</text>
+        <rect x="18" y="106" width="90" height="20" rx="4" fill="#000" />
+        <text x="63" y="120" font-size="9" font-weight="900" fill="#fff" text-anchor="middle">IN LABS</text>
+      </g>
+
+      <!-- Tile 3 -->
+      <g transform="translate(276, 0)">
+        <rect x="3" y="3" width="126" height="135" rx="12" fill="#000" />
+        <rect x="0" y="0" width="126" height="135" rx="12" fill="#ffffff" stroke="#000" stroke-width="3" />
+        <circle cx="63" cy="40" r="20" fill="#00f0ff" stroke="#000" stroke-width="2" />
+        <text x="63" y="47" font-size="16" text-anchor="middle">🏀</text>
+        <text x="63" y="80" font-size="13" font-weight="900" fill="#000" text-anchor="middle">Hoops Slam</text>
+        <text x="63" y="96" font-size="10" font-weight="700" fill="#666" text-anchor="middle">4Q Hardwood</text>
+        <rect x="18" y="106" width="90" height="20" rx="4" fill="#000" />
+        <text x="63" y="120" font-size="9" font-weight="900" fill="#00f0ff" text-anchor="middle">IN LABS</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ================= CHUNKY BOTTOM NAVIGATION ================= -->
+  <g transform="translate(24, 825)">
+    <rect x="4" y="4" width="402" height="66" rx="18" fill="#000" />
+    <rect x="0" y="0" width="402" height="66" rx="18" fill="#ffffff" stroke="#000" stroke-width="3.5" />
+    <g transform="translate(16, 10)">
+      <rect x="0" y="0" width="88" height="46" rx="12" fill="#ffe600" stroke="#000" stroke-width="2.5" />
+      <text x="44" y="28" font-size="13" font-weight="900" fill="#000" text-anchor="middle">ARENA</text>
+    </g>
+    <g transform="translate(120, 10)">
+      <text x="40" y="28" font-size="13" font-weight="900" fill="#000" text-anchor="middle">SLIP</text>
+    </g>
+    <g transform="translate(210, 10)">
+      <text x="40" y="28" font-size="13" font-weight="900" fill="#000" text-anchor="middle">RANKS</text>
+    </g>
+    <g transform="translate(305, 10)">
+      <text x="40" y="28" font-size="13" font-weight="900" fill="#000" text-anchor="middle">WALLET</text>
+    </g>
+  </g>
+</svg>

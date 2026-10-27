@@ -151,7 +151,7 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
         allianceLeagueId: data.leagueId || null,
         allianceTeamId: data.teamId || null,
         referralCode,
-        coins: 5000,
+        coins: 1000,
         doodlBalance: 1000,
       })
       .returning();
@@ -248,12 +248,13 @@ export const getUserProfile = createServerFn({ method: "GET" })
       nextGiftClaimIn = canClaimWelcomeGift ? 0 : Math.ceil(24 - hoursSince);
     }
 
+    const unifiedBalance = user.doodlBalance ?? user.coins ?? 1000;
     const profileReturn = {
       success: true,
       walletAddress: user.walletAddress,
       username: user.username,
-      coins: user.coins ?? 0,
-      korBalance: user.doodlBalance ?? 0,
+      coins: unifiedBalance,
+      korBalance: unifiedBalance,
       unclaimedBalance: user.unclaimedBalance ?? 0,
       allianceLeagueId: user.allianceLeagueId,
       allianceTeamId: user.allianceTeamId,
@@ -396,11 +397,15 @@ export const registerReferral = createServerFn({ method: "POST" })
     const REWARD_AMOUNT = 5000;
 
     // Update user with referrer and reward
+    const currentBal = user.doodlBalance ?? user.coins ?? 0;
+    const refBal = referrer.doodlBalance ?? referrer.coins ?? 0;
+
     await db
       .update(users)
       .set({
         referredBy: referrer.walletAddress,
-        coins: (user.coins || 0) + REWARD_AMOUNT,
+        coins: currentBal + REWARD_AMOUNT,
+        doodlBalance: currentBal + REWARD_AMOUNT,
       })
       .where(eq(users.walletAddress, user.walletAddress));
 
@@ -410,7 +415,7 @@ export const registerReferral = createServerFn({ method: "POST" })
       walletAddress: user.walletAddress,
       type: "referral",
       amount: REWARD_AMOUNT,
-      currency: "coins",
+      currency: "Coins KOR",
       description: `Welcome Bonus (Referred by ${referrer.username})`,
     });
 
@@ -420,7 +425,8 @@ export const registerReferral = createServerFn({ method: "POST" })
       .set({
         referralCount: (referrer.referralCount || 0) + 1,
         referralEarnings: (referrer.referralEarnings || 0) + REWARD_AMOUNT,
-        coins: (referrer.coins || 0) + REWARD_AMOUNT,
+        coins: refBal + REWARD_AMOUNT,
+        doodlBalance: refBal + REWARD_AMOUNT,
       })
       .where(eq(users.walletAddress, referrer.walletAddress));
 
@@ -506,12 +512,14 @@ export const claimWelcomeGift = createServerFn({ method: "POST" })
       };
     }
 
-    const reward = isFirstTime ? 500 : 100;
+    const currentBal = user.doodlBalance ?? user.coins ?? 0;
+    const newBal = currentBal + reward;
 
     await db
       .update(users)
       .set({
-        coins: (user.coins || 0) + reward,
+        coins: newBal,
+        doodlBalance: newBal,
         lastWelcomeGiftDate: new Date(),
       })
       .where(eq(users.walletAddress, normalized));
@@ -519,7 +527,7 @@ export const claimWelcomeGift = createServerFn({ method: "POST" })
     return {
       success: true,
       reward,
-      message: `Claimed ${reward} coins!`,
+      message: `Claimed ${reward} Coins KOR!`,
     };
   });
 
@@ -602,16 +610,14 @@ export const claimAllianceRewards = createServerFn({ method: "POST" })
       return { success: false, error: "User not found" };
     }
 
-    const unclaimed = user.unclaimedAllianceRewards || 0;
-
-    if (unclaimed <= 0) {
-      return { success: false, error: "No rewards to claim" };
-    }
+    const currentBal = user.doodlBalance ?? user.coins ?? 0;
+    const newBal = currentBal + unclaimed;
 
     await db
       .update(users)
       .set({
-        coins: (user.coins || 0) + unclaimed,
+        coins: newBal,
+        doodlBalance: newBal,
         unclaimedAllianceRewards: 0,
       })
       .where(eq(users.walletAddress, normalized));
