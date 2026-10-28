@@ -30,7 +30,7 @@ export function LandingPageNeoBrutalist({
         <nav className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-8 py-3.5 bg-white border-b-[3.5px] border-black shadow-[0_4px_0_#000]">
           {/* Logo */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="bg-[#ffe600] border-[1.5px] sm:border-[3px] border-black px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-[6px] sm:rounded-[10px] shadow-[1.5px_1.5px_0_#000] sm:shadow-[3px_3px_0_#000] font-black italic tracking-tight text-xs sm:text-xl text-black flex items-center gap-1">
+            <div className="bg-[#ffe600] border-[1.5px] sm:border-[3px] border-black px-1.5 sm:px-3.5 py-0.5 sm:py-1.5 rounded-[4px] sm:rounded-[10px] shadow-[1px_1px_0_#000] sm:shadow-[3px_3px_0_#000] font-black italic tracking-tight text-[9px] sm:text-xl text-black flex items-center gap-1">
               <span>KICKOFF RIVALS</span>
               <span className="text-[#ff3366]">⚡</span>
             </div>
