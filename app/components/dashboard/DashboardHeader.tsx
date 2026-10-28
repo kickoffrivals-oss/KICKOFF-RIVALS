@@ -184,33 +184,24 @@ export function DashboardHeader() {
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="flex justify-between items-center px-2.5 sm:px-6 h-14 sm:h-16 max-w-7xl mx-auto w-full gap-1.5 sm:gap-4">
+      <div className="flex justify-between items-center px-2 sm:px-4 md:px-6 h-14 sm:h-16 max-w-7xl mx-auto w-full gap-1.5 sm:gap-3">
         {/* Brand & Logo */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <Link
             to="/play"
-            className="flex items-center gap-2 sm:gap-3 focus-visible:outline-none rounded-[4px]"
+            className="flex items-center gap-1.5 sm:gap-2 focus-visible:outline-none rounded-[4px]"
             onClick={() => soundFx.playClick()}
             title="Return to Arena Selection"
           >
             {isNeoBrutalist ? (
-              <>
-                {/* Mobile: Compact responsive logo matching Classic height & spacing */}
-                <div className="sm:hidden flex items-center gap-1.5 px-2 py-0.5 bg-[#ffe600] border-[1.5px] border-black rounded-[6px] shadow-[1px_1px_0_#000]">
-                  <span className="font-sport font-black italic tracking-tighter text-black text-xs">
-                    KICKOFF<span className="text-[#ff3366]">RIVALS</span>
-                  </span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-[5px] bg-[#ffe600] border-[1.5px] border-black flex items-center justify-center font-black text-[11px] shadow-[1px_1px_0_#000] shrink-0">
+                  ⚡
                 </div>
-                {/* Desktop: Full PRO badge */}
-                <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-[#ffe600] border-2 border-black rounded-[8px] shadow-[2px_2px_0_#000]">
-                  <span className="font-sport font-black italic tracking-tighter text-black text-base sm:text-lg">
-                    KICKOFF<span className="text-[#ff3366]">RIVALS</span>
-                  </span>
-                  <span className="px-1.5 py-0.5 rounded bg-black text-[#ffe600] text-[10px] font-mono font-black">
-                    PRO
-                  </span>
-                </div>
-              </>
+                <span className="font-sport font-black italic tracking-tighter text-black text-xs sm:text-sm md:text-base leading-none">
+                  KICKOFF<span className="text-[#ff3366]">RIVALS</span>
+                </span>
+              </div>
             ) : (
               <RivalsLogo variant="full" size="sm" disableLink={true} />
             )}
@@ -271,7 +262,7 @@ export function DashboardHeader() {
               }}
               disabled={!canRefresh}
               aria-label="Refresh matchday data"
-              className={`p-1.5 sm:p-2.5 rounded-[6px] sm:rounded-[8px] transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ${
+              className={`p-1 sm:p-2 rounded-[6px] sm:rounded-[8px] transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed shrink-0 ${
                 isNeoBrutalist
                   ? "bg-white hover:bg-[#ffe600] border-[1.5px] sm:border-2 border-black shadow-[1.5px_1.5px_0_#000] sm:shadow-[2px_2px_0_#000] text-black"
                   : "bg-[#1B212D] border border-[#222938] text-[#94A3B8] hover:text-[#FFFFFF] hover:bg-[#242C3C]"
