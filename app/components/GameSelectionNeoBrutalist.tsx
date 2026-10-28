@@ -105,22 +105,22 @@ export function GameSelectionNeoBrutalist({
         {/* =========================================================================
             TOP BRUTALIST HEADER BAR
         ========================================================================= */}
-        <header className="px-3 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b-[3.5px] border-black bg-white shadow-[0_4px_0_#000]">
+        <header className="px-2.5 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 border-b-[3.5px] border-black bg-white shadow-[0_4px_0_#000]">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="bg-[#ffe600] border-[3px] border-black px-3.5 py-1.5 rounded-[10px] shadow-[3px_3px_0_#000] font-black italic tracking-tight text-lg sm:text-xl text-black flex items-center gap-1.5">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="bg-[#ffe600] border-2 sm:border-[3px] border-black px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-[8px] sm:rounded-[10px] shadow-[2px_2px_0_#000] sm:shadow-[3px_3px_0_#000] font-black italic tracking-tight text-xs sm:text-lg text-black flex items-center gap-1.5">
               <span>KICKOFF RIVALS</span>
               <span className="text-[#ff3366]">⚡</span>
             </div>
           </div>
 
           {/* Center/Right Controls: Revert Switcher + Balance */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Revert / Theme Switcher */}
             {onSwitchTheme && (
               <button
                 onClick={onSwitchTheme}
-                className="px-3 py-1.5 rounded-[8px] bg-white hover:bg-slate-100 border-[2.5px] border-black text-xs font-mono font-black text-black shadow-[2.5px_2.5px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
+                className="hidden sm:flex px-3 py-1.5 rounded-[8px] bg-white hover:bg-slate-100 border-[2.5px] border-black text-xs font-mono font-black text-black shadow-[2.5px_2.5px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all items-center gap-1.5 cursor-pointer"
                 title="Switch back to Classic UI"
               >
                 <span>🏛️ Classic UI</span>

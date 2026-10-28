@@ -94,15 +94,15 @@ export function CoinsKorBalance({
 
   // Size tokens
   const sizeClasses = {
-    sm: "px-2 py-0.5 text-[10px] gap-1",
-    md: "px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs gap-1.5",
-    lg: "px-3 sm:px-4 py-1.5 sm:py-2 text-sm gap-2",
+    sm: "px-1.5 sm:px-2 py-0.5 text-[10px] gap-1",
+    md: "px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs gap-1 sm:gap-1.5",
+    lg: "px-2.5 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm gap-1.5 sm:gap-2",
   }[size];
 
   const numberSizeClasses = {
     sm: "text-[10px]",
-    md: "text-xs sm:text-sm",
-    lg: "text-sm sm:text-base",
+    md: "text-[11px] sm:text-xs md:text-sm",
+    lg: "text-xs sm:text-sm md:text-base",
   }[size];
 
   // KOR Pulse Class
@@ -130,9 +130,9 @@ export function CoinsKorBalance({
       role={onCoinsClick ? "button" : undefined}
       tabIndex={onCoinsClick ? 0 : undefined}
       title="Coins: Earned from social tasks & in-game missions (Can be converted to KOR)"
-      className={`flex items-center select-none rounded-[8px] font-mono transition-all duration-150 ${sizeClasses} ${
+      className={`flex items-center select-none rounded-[6px] sm:rounded-[8px] font-mono transition-all duration-150 ${sizeClasses} ${
         isNeoBrutalist
-          ? `bg-[#ffe600] text-black border-2 border-black shadow-[2px_2px_0_#000] ${
+          ? `bg-[#ffe600] text-black border-[1.5px] sm:border-2 border-black shadow-[1.5px_1.5px_0_#000] sm:shadow-[2px_2px_0_#000] ${
               onCoinsClick
                 ? "cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none hover:bg-[#fed600]"
                 : ""
@@ -142,7 +142,7 @@ export function CoinsKorBalance({
             }`
       } ${coinsPulseClass}`}
     >
-      <span className="text-xs">🪙</span>
+      <span className="text-[11px] sm:text-xs">🪙</span>
       <span
         className={`font-black uppercase tracking-wide leading-none ${
           isNeoBrutalist ? "text-black" : "text-amber-300"
@@ -166,9 +166,9 @@ export function CoinsKorBalance({
       role={onKorClick ? "button" : undefined}
       tabIndex={onKorClick ? 0 : undefined}
       title="KOR: Used for placing bets & credited on winning payouts"
-      className={`flex items-center select-none rounded-[8px] font-mono transition-all duration-150 ${sizeClasses} ${
+      className={`flex items-center select-none rounded-[6px] sm:rounded-[8px] font-mono transition-all duration-150 ${sizeClasses} ${
         isNeoBrutalist
-          ? `bg-white text-black border-2 border-black shadow-[2px_2px_0_#000] ${
+          ? `bg-white text-black border-[1.5px] sm:border-2 border-black shadow-[1.5px_1.5px_0_#000] sm:shadow-[2px_2px_0_#000] ${
               onKorClick
                 ? "cursor-pointer active:translate-x-[1px] active:translate-y-[1px] active:shadow-none hover:bg-slate-50"
                 : ""
@@ -179,9 +179,9 @@ export function CoinsKorBalance({
       } ${korPulseClass}`}
     >
       <span
-        className={`px-1.5 py-0.5 rounded-[4px] text-white text-[9px] sm:text-[10px] font-black leading-none shrink-0 ${
+        className={`px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded-[3px] sm:rounded-[4px] text-white text-[8px] sm:text-[9px] md:text-[10px] font-black leading-none shrink-0 ${
           isNeoBrutalist
-            ? "bg-[#ff0055] border border-black shadow-[1px_1px_0_#000]"
+            ? "bg-[#ff0055] border border-black shadow-[0.5px_0.5px_0_#000]"
             : "bg-[#ff3366] shadow"
         }`}
       >
@@ -210,7 +210,7 @@ export function CoinsKorBalance({
   return (
     <div
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 sm:gap-2 shrink-0 ${className}`}
+      className={`inline-flex items-center gap-1 sm:gap-2 shrink-0 ${className}`}
     >
       {(mode === "both" || mode === "coins") && renderCoinsBadge()}
       {(mode === "both" || mode === "kor") && renderKorBadge()}
