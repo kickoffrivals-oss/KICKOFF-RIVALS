@@ -194,14 +194,29 @@ export function DashboardHeader() {
             title="Return to Arena Selection"
           >
             {isNeoBrutalist ? (
-              <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 bg-[#ffe600] border border-black sm:border-[1.5px] rounded-[4px] sm:rounded-[6px] shadow-[1px_1px_0_#000] sm:shadow-[1.5px_1.5px_0_#000] shrink-0">
-                <span className="font-sport font-black italic tracking-tighter text-black text-[9px] sm:text-xs md:text-sm leading-none">
-                  KICKOFF<span className="text-[#ff3366]">RIVALS</span>
-                </span>
-                <span className="px-1 py-0.2 rounded-[2px] bg-black text-[#ffe600] text-[7px] sm:text-[8px] font-mono font-black leading-none">
-                  PRO
-                </span>
-              </div>
+              <>
+                {/* Mobile (< sm): Reduced by 50% again to micro-badge so balance chips and controls have full breathing room */}
+                <div className="sm:hidden flex items-center shrink-0 w-[46px] overflow-visible">
+                  <div className="flex items-center gap-0.5 px-1 py-[1.5px] bg-[#ffe600] border border-black rounded-[3px] shadow-[0.5px_0.5px_0_#000] shrink-0 scale-50 origin-left">
+                    <span className="font-sport font-black italic tracking-tighter text-black text-[9px] leading-none whitespace-nowrap">
+                      KICKOFF<span className="text-[#ff3366]">RIVALS</span>
+                    </span>
+                    <span className="px-0.5 py-[0.5px] rounded-[1.5px] bg-black text-[#ffe600] text-[7px] font-mono font-black leading-none">
+                      PRO
+                    </span>
+                  </div>
+                </div>
+
+                {/* Tablet / Desktop (>= sm): Prominent Neo-Brutalist badge */}
+                <div className="hidden sm:flex items-center gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 bg-[#ffe600] border-[1.5px] md:border-2 border-black rounded-[6px] md:rounded-[8px] shadow-[1.5px_1.5px_0_#000] md:shadow-[2px_2px_0_#000] shrink-0">
+                  <span className="font-sport font-black italic tracking-tighter text-black text-xs md:text-sm lg:text-base leading-none">
+                    KICKOFF<span className="text-[#ff3366]">RIVALS</span>
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-black text-[#ffe600] text-[8px] md:text-[10px] font-mono font-black">
+                    PRO
+                  </span>
+                </div>
+              </>
             ) : (
               <RivalsLogo variant="full" size="sm" disableLink={true} />
             )}
