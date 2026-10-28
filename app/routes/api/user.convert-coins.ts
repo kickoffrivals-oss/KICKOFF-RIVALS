@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertCoins } from "../../server/user";
-import { convertLocalKorToCoins } from "../../lib/localStore";
+import { convertLocalCoinsToKor } from "../../lib/localStore";
 
 export const Route = createFileRoute("/api/user/convert-coins")({
   server: {
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/api/user/convert-coins")({
           return Response.json(result);
         } catch (error: unknown) {
           console.warn("[Convert API] Using local in-memory fallback");
-          const fallback = convertLocalKorToCoins(
+          const fallback = convertLocalCoinsToKor(
             body.walletAddress,
             Number(body.amount),
           );

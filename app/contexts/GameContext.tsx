@@ -575,7 +575,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             txHash: generateHash(),
           };
           setActiveBets((prev) => [bet, ...prev]);
-          addTransaction("bet", stake, "coins", "Match wager");
+          addTransaction("bet", stake, "kor", "Match wager");
           refreshProfileQuery();
           return true;
         } else {
@@ -744,7 +744,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             addTransaction(
               "bet",
               totalStake,
-              "coins",
+              "kor",
               `${successful.length} single bets`,
             );
           }
@@ -833,7 +833,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             addTransaction(
               "bet",
               stake,
-              "coins",
+              "kor",
               `Accumulator (${betSlipSelections.length} selections)`,
             );
           } else {
@@ -998,19 +998,56 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         toast.error("Insufficient Coins balance");
         return false;
       }
-      const korEarned = Math.floor(amount / 10);
-      setCoins((prev) => Math.max(0, prev - amount));
-      setBalance((prev) => prev + korEarned);
-      addTransaction(
-        "convert",
-        amount,
-        "coins",
-        `Converted ${amount.toLocaleString()} Coins to ${korEarned.toLocaleString()} KOR`
-      );
-      toast.success(`🎉 Converted ${amount.toLocaleString()} Coins to +${korEarned.toLocaleString()} KOR!`);
-      return true;
+
+      const userWallet =
+        walletState.address ||
+        profile?.walletAddress ||
+        (profile?.username ? `guest-${profile.username}` : "guest-user");
+
+      try {
+        const res = await fetch(`${API_URL}/api/user/convert-coins`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            walletAddress: userWallet,
+            amount,
+          }),
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          if (data.coins !== undefined) setCoins(data.coins);
+          if (data.korBalance !== undefined) setBalance(data.korBalance);
+          const korEarned = Math.floor(amount / 10);
+          addTransaction(
+            "convert",
+            korEarned,
+            "kor",
+            `Converted ${amount.toLocaleString()} Coins to +${korEarned.toLocaleString()} KOR`
+          );
+          toast.success(`🎉 Converted ${amount.toLocaleString()} Coins to +${korEarned.toLocaleString()} KOR!`);
+          refreshProfileQuery();
+          return true;
+        } else {
+          toast.error(data?.error || "Conversion failed");
+          return false;
+        }
+      } catch (err) {
+        console.error("Coin conversion error:", err);
+        // Fallback optimistic update if offline
+        const korEarned = Math.floor(amount / 10);
+        setCoins((prev) => Math.max(0, prev - amount));
+        setBalance((prev) => prev + korEarned);
+        addTransaction(
+          "convert",
+          korEarned,
+          "kor",
+          `Converted ${amount.toLocaleString()} Coins to +${korEarned.toLocaleString()} KOR`
+        );
+        toast.success(`🎉 Converted ${amount.toLocaleString()} Coins to +${korEarned.toLocaleString()} KOR!`);
+        return true;
+      }
     },
-    [coins, addTransaction]
+    [coins, walletState.address, profile?.walletAddress, profile?.username, addTransaction, refreshProfileQuery]
   );
 
   const handleRedeem = useCallback(

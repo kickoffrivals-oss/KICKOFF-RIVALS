@@ -151,7 +151,7 @@ export async function getOrCreateUserInternal(data: GetOrCreateUserInput) {
         allianceLeagueId: data.leagueId || null,
         allianceTeamId: data.teamId || null,
         referralCode,
-        coins: 1000,
+        coins: 5000,
         doodlBalance: 1000,
       })
       .returning();
@@ -248,13 +248,12 @@ export const getUserProfile = createServerFn({ method: "GET" })
       nextGiftClaimIn = canClaimWelcomeGift ? 0 : Math.ceil(24 - hoursSince);
     }
 
-    const unifiedBalance = user.doodlBalance ?? user.coins ?? 1000;
     const profileReturn = {
       success: true,
       walletAddress: user.walletAddress,
       username: user.username,
-      coins: unifiedBalance,
-      korBalance: unifiedBalance,
+      coins: user.coins ?? 5000,
+      korBalance: user.doodlBalance ?? 1000,
       unclaimedBalance: user.unclaimedBalance ?? 0,
       allianceLeagueId: user.allianceLeagueId,
       allianceTeamId: user.allianceTeamId,
@@ -396,16 +395,12 @@ export const registerReferral = createServerFn({ method: "POST" })
 
     const REWARD_AMOUNT = 5000;
 
-    // Update user with referrer and reward
-    const currentBal = user.doodlBalance ?? user.coins ?? 0;
-    const refBal = referrer.doodlBalance ?? referrer.coins ?? 0;
-
+    // Update user with referrer and reward (5,000 Coins)
     await db
       .update(users)
       .set({
         referredBy: referrer.walletAddress,
-        coins: currentBal + REWARD_AMOUNT,
-        doodlBalance: currentBal + REWARD_AMOUNT,
+        coins: (user.coins ?? 5000) + REWARD_AMOUNT,
       })
       .where(eq(users.walletAddress, user.walletAddress));
 
@@ -415,18 +410,17 @@ export const registerReferral = createServerFn({ method: "POST" })
       walletAddress: user.walletAddress,
       type: "referral",
       amount: REWARD_AMOUNT,
-      currency: "Coins KOR",
+      currency: "coins",
       description: `Welcome Bonus (Referred by ${referrer.username})`,
     });
 
-    // Update referrer's stats
+    // Update referrer's stats (5,000 Coins)
     await db
       .update(users)
       .set({
         referralCount: (referrer.referralCount || 0) + 1,
         referralEarnings: (referrer.referralEarnings || 0) + REWARD_AMOUNT,
-        coins: refBal + REWARD_AMOUNT,
-        doodlBalance: refBal + REWARD_AMOUNT,
+        coins: (referrer.coins ?? 5000) + REWARD_AMOUNT,
       })
       .where(eq(users.walletAddress, referrer.walletAddress));
 
@@ -512,32 +506,40 @@ export const claimWelcomeGift = createServerFn({ method: "POST" })
       };
     }
 
-    const currentBal = user.doodlBalance ?? user.coins ?? 0;
-    const newBal = currentBal + reward;
+    const reward = 1000; // 1,000 Coins daily gift
+    const newCoins = (user.coins ?? 5000) + reward;
 
     await db
       .update(users)
       .set({
-        coins: newBal,
-        doodlBalance: newBal,
+        coins: newCoins,
         lastWelcomeGiftDate: new Date(),
       })
       .where(eq(users.walletAddress, normalized));
 
+    await db.insert(transactions).values({
+      id: `tx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      walletAddress: normalized,
+      type: "bonus",
+      amount: reward,
+      currency: "coins",
+      description: `Daily Welcome Gift (+${reward} Coins)`,
+    });
+
     return {
       success: true,
       reward,
-      message: `Claimed ${reward} Coins KOR!`,
+      message: `Claimed ${reward} Coins!`,
     };
   });
 
 // ==========================================
-// CONVERT KOR TO COINS
+// CONVERT COINS TO KOR (10 Coins = 1 KOR)
 // ==========================================
 
 const convertCoinsSchema = z.object({
   walletAddress: z.string().min(1),
-  amount: z.number().min(10), // minimum 10 KOR
+  amount: z.number().min(10), // minimum 10 Coins
 });
 
 export const convertCoins = createServerFn({ method: "POST" })
@@ -553,16 +555,19 @@ export const convertCoins = createServerFn({ method: "POST" })
       return { success: false, error: "User not found" };
     }
 
-    const korToConvert = Math.floor(data.amount);
+    const coinsToConvert = Math.floor(data.amount);
 
-    if (korToConvert > (user.doodlBalance || 0)) {
-      return { success: false, error: "Insufficient KOR balance" };
+    if (coinsToConvert < 10) {
+      return { success: false, error: "Minimum conversion is 10 Coins" };
     }
 
-    const coinsToAdd = korToConvert * 10;
+    if (coinsToConvert > (user.coins || 0)) {
+      return { success: false, error: "Insufficient Coins balance" };
+    }
 
-    const newKor = (user.doodlBalance || 0) - korToConvert;
-    const newCoins = (user.coins || 0) + coinsToAdd;
+    const korToAdd = Math.floor(coinsToConvert / 10);
+    const newCoins = (user.coins || 0) - coinsToConvert;
+    const newKor = (user.doodlBalance || 0) + korToAdd;
 
     await db
       .update(users)
@@ -577,9 +582,9 @@ export const convertCoins = createServerFn({ method: "POST" })
       id: `tx-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       walletAddress: normalized,
       type: "convert",
-      amount: coinsToAdd,
-      currency: "coins",
-      description: `Converted ${korToConvert} KOR to ${coinsToAdd} Coins`,
+      amount: korToAdd,
+      currency: "kor",
+      description: `Converted ${coinsToConvert.toLocaleString()} Coins to +${korToAdd.toLocaleString()} KOR`,
     });
 
     return {
@@ -610,14 +615,17 @@ export const claimAllianceRewards = createServerFn({ method: "POST" })
       return { success: false, error: "User not found" };
     }
 
-    const currentBal = user.doodlBalance ?? user.coins ?? 0;
-    const newBal = currentBal + unclaimed;
+    const unclaimed = user.unclaimedAllianceRewards || 0;
+    if (unclaimed <= 0) {
+      return { success: false, error: "No alliance rewards to claim" };
+    }
+
+    const newCoins = (user.coins || 0) + unclaimed;
 
     await db
       .update(users)
       .set({
-        coins: newBal,
-        doodlBalance: newBal,
+        coins: newCoins,
         unclaimedAllianceRewards: 0,
       })
       .where(eq(users.walletAddress, normalized));

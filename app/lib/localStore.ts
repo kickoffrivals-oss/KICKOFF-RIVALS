@@ -445,10 +445,11 @@ export function placeLocalBet(params: {
 
   const user = store.users[params.walletAddress.toLowerCase()];
   if (!user) return { success: false, error: "User not found" };
-  if ((user.coins ?? 5000) < params.stake) return { success: false, error: "Insufficient Coins balance" };
+  const currentKor = user.doodlBalance ?? 1000;
+  if (currentKor < params.stake) return { success: false, error: "Insufficient KOR balance" };
 
-  // Deduct coins immediately when bet is placed
-  user.coins = (user.coins ?? 5000) - params.stake;
+  // Deduct KOR (doodlBalance) immediately when bet is placed
+  user.doodlBalance = currentKor - params.stake;
 
   const match = store.matches.find((m) => m.id === params.matchId);
   if (match && (match.status === "RESULT" || match.status === "FINISHED")) {
@@ -479,7 +480,7 @@ export function placeLocalBet(params: {
   return {
     success: true,
     bet,
-    newBalance: user.coins,
+    newBalance: user.doodlBalance,
   };
 }
 
@@ -503,10 +504,11 @@ export function placeLocalAccumulatorBet(params: {
 
   const user = store.users[params.walletAddress?.toLowerCase()];
   if (!user) return { success: false, error: "User not found" };
-  if ((user.coins ?? 5000) < params.stake) return { success: false, error: "Insufficient Coins balance" };
+  const currentKor = user.doodlBalance ?? 1000;
+  if (currentKor < params.stake) return { success: false, error: "Insufficient KOR balance" };
 
-  // Deduct coins immediately when accumulator bet is placed
-  user.coins = (user.coins ?? 5000) - params.stake;
+  // Deduct KOR immediately when accumulator bet is placed
+  user.doodlBalance = currentKor - params.stake;
 
   const matchMap = new Map(store.matches.map((m) => [m.id, m]));
   const potentialReturn = Math.round(params.stake * params.totalOdds);
@@ -537,27 +539,35 @@ export function placeLocalAccumulatorBet(params: {
   return {
     success: true,
     bets,
-    newBalance: user.coins,
+    newBalance: user.doodlBalance,
   };
 }
 
-export function convertLocalKorToCoins(walletAddress: string, korAmount: number) {
+export function convertLocalCoinsToKor(walletAddress: string, coinsAmount: number) {
   const user = store.users[walletAddress.toLowerCase()];
   if (!user) return { success: false, error: "User not found" };
-  const currentKor = user.doodlBalance ?? 1000;
-  if (currentKor < korAmount) {
-    return { success: false, error: "Insufficient KOR balance" };
+  const currentCoins = user.coins ?? 5000;
+  if (currentCoins < coinsAmount) {
+    return { success: false, error: "Insufficient Coins balance" };
   }
-  const coinsGained = korAmount * 10;
-  user.doodlBalance = currentKor - korAmount;
-  user.coins = (user.coins ?? 5000) + coinsGained;
+  const korGained = Math.floor(coinsAmount / 10);
+  if (korGained <= 0) {
+    return { success: false, error: "Minimum conversion is 10 Coins" };
+  }
+  user.coins = currentCoins - coinsAmount;
+  user.doodlBalance = (user.doodlBalance ?? 1000) + korGained;
   saveStore();
   return {
     success: true,
     coins: user.coins,
     korBalance: user.doodlBalance,
-    message: `Converted ${korAmount} KOR to ${coinsGained.toLocaleString()} Coins!`,
+    message: `Converted ${coinsAmount.toLocaleString()} Coins to +${korGained.toLocaleString()} KOR!`,
   };
+}
+
+// Backwards-compatibility alias
+export function convertLocalKorToCoins(walletAddress: string, amount: number) {
+  return convertLocalCoinsToKor(walletAddress, amount);
 }
 
 export function getLocalMatches(leagueId?: string) {
