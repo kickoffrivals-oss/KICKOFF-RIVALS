@@ -194,14 +194,26 @@ export function DashboardHeader() {
             title="Return to Arena Selection"
           >
             {isNeoBrutalist ? (
-              <div className="flex items-center gap-1 sm:gap-2">
-                <div className="w-4 h-4 sm:w-6 sm:h-6 rounded-[3px] sm:rounded-[5px] bg-[#ffe600] border border-black flex items-center justify-center font-black text-[9px] sm:text-[11px] shadow-[0.5px_0.5px_0_#000] sm:shadow-[1px_1px_0_#000] shrink-0">
-                  ⚡
+              <>
+                {/* Mobile: Logo reduced by half for mobile responsiveness */}
+                <div className="md:hidden flex items-center gap-1 px-1.5 py-0.5 bg-[#ffe600] border-[1.5px] border-black rounded-[5px] shadow-[1px_1px_0_#000] shrink-0">
+                  <span className="font-sport font-black italic tracking-tighter text-black text-[10px] leading-none">
+                    KICKOFF<span className="text-[#ff3366]">RIVALS</span>
+                  </span>
+                  <span className="px-1 py-0.2 rounded-[2px] bg-black text-[#ffe600] text-[7.5px] font-mono font-black leading-none">
+                    PRO
+                  </span>
                 </div>
-                <span className="font-sport font-black italic tracking-tighter text-black text-[10.5px] sm:text-sm md:text-base leading-none">
-                  KICKOFF<span className="text-[#ff3366]">RIVALS</span>
-                </span>
-              </div>
+                {/* Desktop: Full size logo badge */}
+                <div className="hidden md:flex items-center gap-2 px-2.5 py-1 bg-[#ffe600] border-2 border-black rounded-[8px] shadow-[2px_2px_0_#000] shrink-0">
+                  <span className="font-sport font-black italic tracking-tighter text-black text-base lg:text-lg">
+                    KICKOFF<span className="text-[#ff3366]">RIVALS</span>
+                  </span>
+                  <span className="px-1.5 py-0.5 rounded bg-black text-[#ffe600] text-[10px] font-mono font-black">
+                    PRO
+                  </span>
+                </div>
+              </>
             ) : (
               <RivalsLogo variant="full" size="sm" disableLink={true} />
             )}
