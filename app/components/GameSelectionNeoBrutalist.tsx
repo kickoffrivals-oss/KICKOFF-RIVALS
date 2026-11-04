@@ -133,13 +133,13 @@ export function GameSelectionNeoBrutalist({
         </header>
 
         {/* =========================================================================
-            HAZARD CAUTION TAPE / TICKER RIBBON
+            HAZARD CAUTION TAPE / TICKER RIBBON (Continuous Marquee)
         ========================================================================= */}
         <div
-          className="bg-[#ffe600] border-b-[3.5px] border-black px-4 py-2 overflow-x-auto no-scrollbar scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+          className="bg-[#ffe600] border-b-[3.5px] border-black py-2 overflow-hidden select-none"
         >
-          <div className="flex items-center gap-6 whitespace-nowrap min-w-max text-xs sm:text-sm font-black font-mono tracking-wider text-black uppercase">
+          <div className="animate-marquee flex items-center gap-6 whitespace-nowrap text-xs sm:text-sm font-black font-mono tracking-wider text-black uppercase">
+            {/* Set 1 */}
             <span className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#ff3366] animate-pulse" />
               ★ ROUND #1042 LIVE NOW
@@ -150,6 +150,20 @@ export function GameSelectionNeoBrutalist({
             <span>★ VIRTUAL FOOTBALL 35S PAYOUTS ★</span>
             <span>•</span>
             <span>★ PROVABLY FAIR SHA-256 ★</span>
+            <span>•</span>
+
+            {/* Set 2 (Seamless Infinite Loop) */}
+            <span className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff3366] animate-pulse" />
+              ★ ROUND #1042 LIVE NOW
+            </span>
+            <span>•</span>
+            <span>★ AVIATOR HIT 52.81X WIN ★</span>
+            <span>•</span>
+            <span>★ VIRTUAL FOOTBALL 35S PAYOUTS ★</span>
+            <span>•</span>
+            <span>★ PROVABLY FAIR SHA-256 ★</span>
+            <span>•</span>
           </div>
         </div>
 

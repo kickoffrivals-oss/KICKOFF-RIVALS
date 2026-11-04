@@ -60,13 +60,13 @@ export function LandingPageNeoBrutalist({
         </nav>
 
         {/* =========================================================================
-            HAZARD CAUTION STRIPE
+            HAZARD CAUTION STRIPE (Continuous Marquee)
         ========================================================================= */}
         <div
-          className="bg-[#ffe600] border-b-[3.5px] border-black px-4 py-2 overflow-x-auto no-scrollbar scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+          className="bg-[#ffe600] border-b-[3.5px] border-black py-2 overflow-hidden select-none"
         >
-          <div className="flex items-center gap-6 whitespace-nowrap min-w-max text-xs sm:text-sm font-black font-mono tracking-wider text-black uppercase">
+          <div className="animate-marquee flex items-center gap-6 whitespace-nowrap text-xs sm:text-sm font-black font-mono tracking-wider text-black uppercase">
+            {/* Set 1 */}
             <span className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#ff3366] animate-pulse" />
               ★ 35S ROUND CYCLE LIVE
@@ -77,6 +77,20 @@ export function LandingPageNeoBrutalist({
             <span>★ THE DAILY AVIATOR 100X ★</span>
             <span>•</span>
             <span>★ INSTANT COINS KOR SETTLEMENTS ★</span>
+            <span>•</span>
+
+            {/* Set 2 (Seamless Infinite Loop) */}
+            <span className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ff3366] animate-pulse" />
+              ★ 35S ROUND CYCLE LIVE
+            </span>
+            <span>•</span>
+            <span>★ VIRTUAL FOOTBALL PRO ★</span>
+            <span>•</span>
+            <span>★ THE DAILY AVIATOR 100X ★</span>
+            <span>•</span>
+            <span>★ INSTANT COINS KOR SETTLEMENTS ★</span>
+            <span>•</span>
           </div>
         </div>
 
