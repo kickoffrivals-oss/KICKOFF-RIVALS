@@ -312,11 +312,12 @@ export function GameSelectionClassic({
   return (
     <div className="min-h-screen bg-[#0A0D12] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
       {/* Header */}
-      <header className="px-4 sm:px-8 py-3.5 flex items-center justify-between border-b border-[#222938] bg-[#13171F]">
-        <div className="flex items-center gap-3">
-          <RivalsLogo size="md" variant="full" className="text-white" />
+      <header className="px-2 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between border-b border-[#222938] bg-[#13171F]">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <RivalsLogo size="sm" variant="full" className="text-white sm:hidden" />
+          <RivalsLogo size="md" variant="full" className="text-white hidden sm:flex" />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {onSwitchTheme && (
             <button
               onClick={onSwitchTheme}

@@ -105,17 +105,17 @@ export function GameSelectionNeoBrutalist({
         {/* =========================================================================
             TOP BRUTALIST HEADER BAR
         ========================================================================= */}
-        <header className="px-2.5 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 border-b-[3.5px] border-black bg-white shadow-[0_4px_0_#000]">
+        <header className="px-2 sm:px-8 py-2 sm:py-3.5 flex items-center justify-between gap-1.5 sm:gap-3 border-b-[3.5px] border-black bg-white shadow-[0_4px_0_#000] overflow-hidden">
           {/* Logo */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <div className="bg-[#ffe600] border-[1.5px] sm:border-[3px] border-black px-1.5 sm:px-3.5 py-0.5 sm:py-1.5 rounded-[4px] sm:rounded-[10px] shadow-[1px_1px_0_#000] sm:shadow-[3px_3px_0_#000] font-black italic tracking-tight text-[8px] sm:text-lg text-black flex items-center gap-1">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            <div className="bg-[#ffe600] border border-black sm:border-[3px] px-1.5 sm:px-3.5 py-0.5 sm:py-1.5 rounded-[4px] sm:rounded-[10px] shadow-[1px_1px_0_#000] sm:shadow-[3px_3px_0_#000] font-black italic tracking-tight text-[8px] sm:text-lg text-black flex items-center gap-0.5 sm:gap-1 whitespace-nowrap">
               <span>KICKOFF RIVALS</span>
               <span className="text-[#ff3366]">⚡</span>
             </div>
           </div>
 
           {/* Center/Right Controls: Revert Switcher + Balance */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             {/* Revert / Theme Switcher */}
             {onSwitchTheme && (
               <button

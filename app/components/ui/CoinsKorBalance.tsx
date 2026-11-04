@@ -94,14 +94,14 @@ export function CoinsKorBalance({
 
   // Size tokens
   const sizeClasses = {
-    sm: "px-1.5 sm:px-2 py-0.5 text-[10px] gap-1",
-    md: "px-2 sm:px-2.5 md:px-3 py-0.5 sm:py-1 text-[11px] sm:text-xs gap-1 sm:gap-1.5",
+    sm: "px-1 sm:px-2 py-0.5 text-[9px] sm:text-[10px] gap-0.5 sm:gap-1",
+    md: "px-1.5 sm:px-2.5 md:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs gap-1 sm:gap-1.5",
     lg: "px-2.5 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm gap-1.5 sm:gap-2",
   }[size];
 
   const numberSizeClasses = {
-    sm: "text-[10px]",
-    md: "text-[11px] sm:text-xs md:text-sm",
+    sm: "text-[9px] sm:text-[10px]",
+    md: "text-[10px] sm:text-xs md:text-sm",
     lg: "text-xs sm:text-sm md:text-base",
   }[size];
 
@@ -142,7 +142,7 @@ export function CoinsKorBalance({
             }`
       } ${coinsPulseClass}`}
     >
-      <span className="text-[11px] sm:text-xs">🪙</span>
+      <span className="text-[10px] sm:text-xs">🪙</span>
       <span
         className={`font-black uppercase tracking-wide leading-none ${
           isNeoBrutalist ? "text-black" : "text-amber-300"
@@ -179,7 +179,7 @@ export function CoinsKorBalance({
       } ${korPulseClass}`}
     >
       <span
-        className={`px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded-[3px] sm:rounded-[4px] text-white text-[8px] sm:text-[9px] md:text-[10px] font-black leading-none shrink-0 ${
+        className={`px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded-[3px] sm:rounded-[4px] text-white text-[7.5px] sm:text-[9px] md:text-[10px] font-black leading-none shrink-0 ${
           isNeoBrutalist
             ? "bg-[#ff0055] border border-black shadow-[0.5px_0.5px_0_#000]"
             : "bg-[#ff3366] shadow"
