@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { soundFx } from "../lib/soundFx";
 import { LegalFooter } from "./legal/LegalFooter";
-import { CoinsKorBalance } from "./ui/CoinsKorBalance";
+import { WalletBalancePopover } from "./ui/WalletBalancePopover";
 
 interface GameSelectionNeoBrutalistProps {
   onSelectFootball: () => void;
@@ -105,7 +105,7 @@ export function GameSelectionNeoBrutalist({
         {/* =========================================================================
             TOP BRUTALIST HEADER BAR
         ========================================================================= */}
-        <header className="px-2 sm:px-8 py-2 sm:py-3.5 flex items-center justify-between gap-1.5 sm:gap-3 border-b-[3.5px] border-black bg-white shadow-[0_4px_0_#000] overflow-hidden">
+        <header className="relative z-40 px-2 sm:px-8 py-2 sm:py-3.5 flex items-center justify-between gap-1.5 sm:gap-3 border-b-[3.5px] border-black bg-white shadow-[0_4px_0_#000]">
           {/* Logo */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             <div className="bg-[#ffe600] border border-black sm:border-[3px] px-1.5 sm:px-3.5 py-0.5 sm:py-1.5 rounded-[4px] sm:rounded-[10px] shadow-[1px_1px_0_#000] sm:shadow-[3px_3px_0_#000] font-black italic tracking-tight text-[8px] sm:text-lg text-black flex items-center gap-0.5 sm:gap-1 whitespace-nowrap">
@@ -127,8 +127,8 @@ export function GameSelectionNeoBrutalist({
               </button>
             )}
 
-            {/* Balance Chip Component */}
-            <CoinsKorBalance balance={balance} />
+            {/* Wallet & Balance Popover */}
+            <WalletBalancePopover balance={balance} />
           </div>
         </header>
 

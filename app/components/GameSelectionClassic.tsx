@@ -3,7 +3,7 @@ import { RivalsLogo } from "./RivalsLogo";
 import { IconFootball, IconChevronRight, IconLock } from "./Icons";
 import { soundFx } from "../lib/soundFx";
 import { LegalFooter } from "./legal/LegalFooter";
-import { CoinsKorBalance } from "./ui/CoinsKorBalance";
+import { WalletBalancePopover } from "./ui/WalletBalancePopover";
 
 interface GameSelectionClassicProps {
   onSelectFootball: () => void;
@@ -312,7 +312,7 @@ export function GameSelectionClassic({
   return (
     <div className="min-h-screen bg-[#0A0D12] text-white flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
       {/* Header */}
-      <header className="px-2 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between border-b border-[#222938] bg-[#13171F]">
+      <header className="relative z-40 px-2 sm:px-8 py-2.5 sm:py-3.5 flex items-center justify-between border-b border-[#222938] bg-[#13171F]">
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <RivalsLogo size="sm" variant="full" className="text-white sm:hidden" />
           <RivalsLogo size="md" variant="full" className="text-white hidden sm:flex" />
@@ -327,8 +327,8 @@ export function GameSelectionClassic({
             </button>
           )}
 
-          {/* Synchronized Coins KOR Balance Chip Component */}
-          <CoinsKorBalance balance={balance} />
+          {/* Wallet & Balance Popover */}
+          <WalletBalancePopover balance={balance} />
 
           <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-[4px] bg-[#1B212D] border border-[#222938] text-xs font-mono text-slate-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
