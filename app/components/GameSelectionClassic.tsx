@@ -320,7 +320,7 @@ export function GameSelectionClassic({
           {onSwitchTheme && (
             <button
               onClick={onSwitchTheme}
-              className="flex items-center gap-1.5 h-8 px-3 rounded-[4px] bg-[#1B212D] hover:bg-[#252c3c] border border-[#ffe600]/40 text-[#ffe600] text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 h-8 px-3 rounded-[4px] bg-[#1B212D] hover:bg-[#252c3c] border border-[#ffe600]/40 text-[#ffe600] text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
               <span>⚡ Switch to Neo-Brutalist</span>
             </button>

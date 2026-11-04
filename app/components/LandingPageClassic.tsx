@@ -69,10 +69,11 @@ export function LandingPageClassic({ onEnter, onSwitchTheme }: LandingPageClassi
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Switch Theme - Hidden on mobile (< sm) because floating toggle is pinned bottom-left */}
           {onSwitchTheme && (
             <button
               onClick={onSwitchTheme}
-              className="flex items-center gap-1.5 h-9 px-3 rounded-[4px] bg-[#1B212D] hover:bg-[#252c3c] border border-[#ffe600]/40 text-[#ffe600] text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-[4px] bg-[#1B212D] hover:bg-[#252c3c] border border-[#ffe600]/40 text-[#ffe600] text-xs font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer"
             >
               <span>⚡ Switch to Neo-Brutalist</span>
             </button>
@@ -80,10 +81,10 @@ export function LandingPageClassic({ onEnter, onSwitchTheme }: LandingPageClassi
 
           <button
             onClick={handleLaunch}
-            className="flex items-center gap-1.5 h-9 px-4 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold uppercase tracking-wider transition-colors focus-visible:outline-2 focus-visible:outline-emerald-500 cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 h-7 sm:h-9 px-2.5 sm:px-4 rounded-[4px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors focus-visible:outline-2 focus-visible:outline-emerald-500 cursor-pointer whitespace-nowrap"
           >
             <span>Enter Arena</span>
-            <IconChevronRight className="w-4 h-4" />
+            <IconChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
       </nav>

@@ -38,11 +38,11 @@ export function LandingPageNeoBrutalist({
 
           {/* Right Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Revert Theme Toggle */}
+            {/* Revert Theme Toggle - Hidden on mobile (< sm) because floating toggle is pinned bottom-left */}
             {onSwitchTheme && (
               <button
                 onClick={onSwitchTheme}
-                className="px-3 py-1.5 rounded-[8px] bg-white hover:bg-slate-100 border-[2.5px] border-black text-xs font-mono font-black text-black shadow-[2.5px_2.5px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
+                className="hidden sm:flex px-3 py-1.5 rounded-[8px] bg-white hover:bg-slate-100 border-[2.5px] border-black text-xs font-mono font-black text-black shadow-[2.5px_2.5px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all items-center gap-1.5 cursor-pointer"
                 title="Switch back to Classic UI"
               >
                 <span>🏛️ Classic UI</span>
@@ -52,7 +52,7 @@ export function LandingPageNeoBrutalist({
             {/* Launch CTA */}
             <button
               onClick={handleLaunch}
-              className="flex items-center gap-1.5 h-10 px-4 rounded-[10px] bg-[#00ff66] hover:bg-[#05f062] border-[3px] border-black text-black text-xs sm:text-sm font-black uppercase tracking-wider shadow-[3px_3px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 h-7 sm:h-10 px-2.5 sm:px-4 rounded-[6px] sm:rounded-[10px] bg-[#00ff66] hover:bg-[#05f062] border-[1.5px] sm:border-[3px] border-black text-black text-[10px] sm:text-sm font-black uppercase tracking-wider shadow-[1.5px_1.5px_0_#000] sm:shadow-[3px_3px_0_#000] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer whitespace-nowrap"
             >
               <span>ENTER ARENA ➔</span>
             </button>
