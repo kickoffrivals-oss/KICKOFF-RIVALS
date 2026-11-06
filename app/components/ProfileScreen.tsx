@@ -434,15 +434,6 @@ export function ProfileScreen({
           </span>
         </div>
 
-        <p
-          className={cn(
-            "text-xs leading-relaxed",
-            isNeoBrutalist ? "text-black/70 font-bold" : "text-text-muted"
-          )}
-        >
-          Your balance is unified and automatically synchronized across Virtual Football, Daily Aviator, and all KickOff Rivals mini-games.
-        </p>
-
         <div
           className={cn(
             "pt-2 flex items-center justify-between",
