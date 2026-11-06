@@ -22,7 +22,7 @@ export interface Team {
 export interface MatchEvent {
   minute: number;
   description: string;
-  type: 'goal' | 'card' | 'yellow_card' | 'red_card' | 'foul' | 'substitution' | 'chance' | 'whistle' | 'injury' | 'penalty_shout' | 'near_miss';
+  type: 'goal' | 'save' | 'card' | 'yellow_card' | 'red_card' | 'foul' | 'substitution' | 'chance' | 'whistle' | 'injury' | 'penalty_shout' | 'near_miss';
   teamId?: string;
 }
 

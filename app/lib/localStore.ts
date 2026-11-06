@@ -129,26 +129,158 @@ function simulateMatchEvents(
   homeScore: number,
   awayScore: number,
   rng: seedrandom.PRNG,
-  homeTeamName?: string,
-  awayTeamName?: string
+  homeTeamName: string = "Home",
+  awayTeamName: string = "Away"
 ) {
-  const events = [];
+  const events: Array<{
+    minute: number;
+    type: "goal" | "save" | "near_miss" | "chance" | "card";
+    teamId: string;
+    description: string;
+  }> = [];
+
+  const usedMinutes = new Set<number>();
+  const getUniqueMinute = (minM = 2, maxM = 88): number => {
+    let m = Math.floor(rng() * (maxM - minM + 1)) + minM;
+    let attempts = 0;
+    while (usedMinutes.has(m) && attempts < 25) {
+      m = Math.floor(rng() * (maxM - minM + 1)) + minM;
+      attempts++;
+    }
+    usedMinutes.add(m);
+    return m;
+  };
+
+  // 1. Home Goals (Exact count = homeScore)
   for (let i = 0; i < homeScore; i++) {
+    const minute = getUniqueMinute();
+    const roll = rng();
+    let desc: string;
+
+    if (roll < 0.16) {
+      desc = `⚡ PENALTY GOAL! ${homeTeamName} calmly sends the keeper the wrong way and buries it!`;
+    } else if (roll < 0.30) {
+      desc = `🎯 FREE KICK GOAL! Magnificent curling set-piece from ${homeTeamName} bends into the top corner!`;
+    } else if (roll < 0.54) {
+      desc = `⚽ GOAL! Stunning strike by ${homeTeamName} blasts into the back of the net!`;
+    } else if (roll < 0.78) {
+      desc = `⚽ GOAL! Slick passing move finished off with clinical precision by ${homeTeamName}!`;
+    } else {
+      desc = `⚽ GOAL! Poacher's instinct from ${homeTeamName} tapping in the loose ball!`;
+    }
+
     events.push({
-      minute: Math.floor(rng() * 88) + 2,
-      type: "goal" as const,
+      minute,
+      type: "goal",
       teamId: homeTeamId,
-      description: homeTeamName ? `Goal scored by ${homeTeamName}!` : "Goal scored!",
+      description: desc,
     });
   }
+
+  // 2. Away Goals (Exact count = awayScore)
   for (let i = 0; i < awayScore; i++) {
+    const minute = getUniqueMinute();
+    const roll = rng();
+    let desc: string;
+
+    if (roll < 0.16) {
+      desc = `⚡ PENALTY GOAL! ${awayTeamName} steps up with ice in their veins and converts the penalty!`;
+    } else if (roll < 0.30) {
+      desc = `🎯 FREE KICK GOAL! Sensational dipping free kick from ${awayTeamName} leaves the keeper rooted!`;
+    } else if (roll < 0.54) {
+      desc = `⚽ GOAL! Fierce drive by ${awayTeamName} finds the bottom corner with pinpoint accuracy!`;
+    } else if (roll < 0.78) {
+      desc = `⚽ GOAL! Brilliant counter-attack executed to perfection by ${awayTeamName}!`;
+    } else {
+      desc = `⚽ GOAL! ${awayTeamName} scrambles the ball over the goal line after a chaotic goalmouth scramble!`;
+    }
+
     events.push({
-      minute: Math.floor(rng() * 88) + 2,
-      type: "goal" as const,
+      minute,
+      type: "goal",
       teamId: awayTeamId,
-      description: awayTeamName ? `Goal scored by ${awayTeamName}!` : "Goal scored!",
+      description: desc,
     });
   }
+
+  // 3. Dynamic Entertainment Match Events (Saves, Near Misses, Free Kick Misses, Penalty Misses)
+  // 2 to 4 dramatic events per match
+  const extraEvents = Math.floor(rng() * 3) + 2;
+
+  for (let i = 0; i < extraEvents; i++) {
+    const minute = getUniqueMinute();
+    const isHomeAttack = rng() > 0.5;
+    const attackingTeam = isHomeAttack ? homeTeamName : awayTeamName;
+    const attackingId = isHomeAttack ? homeTeamId : awayTeamId;
+    const defendingTeam = isHomeAttack ? awayTeamName : homeTeamName;
+    const defendingId = isHomeAttack ? awayTeamId : homeTeamId;
+
+    const roll = rng();
+
+    if (roll < 0.40) {
+      // 40% Goalkeeper Save
+      const saveQuotes = [
+        `🧤 OUTSTANDING SAVE! ${defendingTeam} goalkeeper dives full-stretch to tip a rocket shot over the crossbar!`,
+        `🧤 HEROIC SAVE! ${defendingTeam} keeper reacts in a flash to deny ${attackingTeam} from point-blank range!`,
+        `🧤 FINGERTIP SAVE! ${defendingTeam} goalkeeper parries a venomous drive around the post!`,
+        `🧤 REFLEX STOP! Brilliant one-on-one save by ${defendingTeam} keeper smothering the ball!`,
+      ];
+      events.push({
+        minute,
+        type: "save",
+        teamId: defendingId,
+        description: saveQuotes[Math.floor(rng() * saveQuotes.length)],
+      });
+    } else if (roll < 0.65) {
+      // 25% Free Kick Miss
+      const fkMissQuotes = [
+        `🎯 Free kick by ${attackingTeam} curls viciously over the wall but clips the top of the crossbar!`,
+        `🎯 Free kick awarded to ${attackingTeam} — curling attempt whistles inches wide of the left post!`,
+        `🎯 Fierce free kick from ${attackingTeam} dips just late and lands on the roof of the net!`,
+      ];
+      events.push({
+        minute,
+        type: "near_miss",
+        teamId: attackingId,
+        description: fkMissQuotes[Math.floor(rng() * fkMissQuotes.length)],
+      });
+    } else if (roll < 0.78) {
+      // 13% Penalty Miss Drama (Dramatic moment!)
+      const penMissQuotes = [
+        `❌ PENALTY SAVED! ${defendingTeam} goalkeeper guesses the right way and pulls off a heroic penalty stop against ${attackingTeam}!`,
+        `💥 PENALTY OFF THE BAR! ${attackingTeam} strikes the spot-kick with power but rattles the crossbar!`,
+        `❌ PENALTY MISSED! Heartbreak for ${attackingTeam} as the penalty kick skims wide of the post!`,
+      ];
+      events.push({
+        minute,
+        type: "near_miss",
+        teamId: attackingId,
+        description: penMissQuotes[Math.floor(rng() * penMissQuotes.length)],
+      });
+    } else if (roll < 0.90) {
+      // 12% Woodwork / Big Chance
+      const chanceQuotes = [
+        `💥 OFF THE WOODWORK! Cracking effort from ${attackingTeam} smashes off the inside of the post and bounces clear!`,
+        `⚡ BIG CHANCE! ${attackingTeam} carves through the backline, but the volley flashes agonizingly wide!`,
+        `💥 SO CLOSE! Long-range thunderbolt from ${attackingTeam} shakes the frame of the goal!`,
+      ];
+      events.push({
+        minute,
+        type: "chance",
+        teamId: attackingId,
+        description: chanceQuotes[Math.floor(rng() * chanceQuotes.length)],
+      });
+    } else {
+      // 10% Yellow Card
+      events.push({
+        minute,
+        type: "card",
+        teamId: defendingId,
+        description: `🟨 YELLOW CARD shown to ${defendingTeam} for a cynical tactical foul breaking up the ${attackingTeam} attack.`,
+      });
+    }
+  }
+
   return events.sort((a, b) => a.minute - b.minute);
 }
 

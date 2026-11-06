@@ -62,35 +62,62 @@ export function SimulationScreen({
     return false;
   };
 
-  // Derive possession stats deterministically from match ratings or scores
-  const homeStrength = match.homeTeam.strength || 80;
-  const awayStrength = match.awayTeam.strength || 80;
-  const totalStrength = homeStrength + awayStrength;
-  const homePossession = Math.round((homeStrength / totalStrength) * 100);
-  const awayPossession = 100 - homePossession;
-
   const matchEvents = useMemo(() => {
     const rawEvents = result?.events || match.events || [];
     if (rawEvents.length > 0) return rawEvents;
 
     // Fallback generation if no precomputed events exist
-    const genEvents = [];
+    const genEvents: any[] = [];
+    const usedMin = new Set<number>();
+    const getMin = (preferred: number) => {
+      let m = Math.max(2, Math.min(88, preferred));
+      while (usedMin.has(m) && m < 88) m++;
+      usedMin.add(m);
+      return m;
+    };
+
     for (let i = 0; i < finalHomeScore; i++) {
+      const min = getMin(16 + i * 26);
+      const desc = i === 0 && finalHomeScore > 1
+        ? `⚡ PENALTY GOAL! ${match.homeTeam.name} calmly converts from the penalty spot!`
+        : i === 1
+        ? `🎯 FREE KICK GOAL! Magnificent curling set-piece from ${match.homeTeam.name} bends into the top corner!`
+        : `⚽ GOAL! Clinical strike into the corner by ${match.homeTeam.name}!`;
       genEvents.push({
-        minute: Math.min(85, 18 + i * 28),
+        minute: min,
         type: "goal" as const,
         teamId: homeTeamId,
-        description: `Goal scored by ${match.homeTeam.name}`,
+        description: desc,
       });
     }
+
     for (let i = 0; i < finalAwayScore; i++) {
+      const min = getMin(24 + i * 26);
+      const desc = i === 0 && finalAwayScore > 1
+        ? `🎯 FREE KICK GOAL! Sensational dipping free kick from ${match.awayTeam.name} leaves keeper rooted!`
+        : `⚽ GOAL! Swift counter-attack executed with perfection by ${match.awayTeam.name}!`;
       genEvents.push({
-        minute: Math.min(88, 26 + i * 28),
+        minute: min,
         type: "goal" as const,
         teamId: awayTeamId,
-        description: `Goal scored by ${match.awayTeam.name}`,
+        description: desc,
       });
     }
+
+    // Add 2 dramatic entertainment events
+    genEvents.push({
+      minute: getMin(34),
+      type: "save" as const,
+      teamId: awayTeamId,
+      description: `🧤 OUTSTANDING SAVE! ${match.awayTeam.name} goalkeeper dives full-stretch to tip a bullet shot over the crossbar!`,
+    });
+    genEvents.push({
+      minute: getMin(62),
+      type: "near_miss" as const,
+      teamId: homeTeamId,
+      description: `🎯 Free kick by ${match.homeTeam.name} curls viciously over the wall but clips the top of the crossbar!`,
+    });
+
     return genEvents.sort((a, b) => a.minute - b.minute);
   }, [result?.events, match.events, finalHomeScore, finalAwayScore, homeTeamId, awayTeamId, match.homeTeam.name, match.awayTeam.name]);
 
@@ -117,12 +144,6 @@ export function SimulationScreen({
     return displayedEvents.filter((e) => e.type === "goal" && !isHomeEvent(e.teamId)).length;
   }, [displayedEvents, matchEvents, homeTeamId, match.awayScore, result?.awayScore, currentMinute]);
 
-  // Initialize lastGoalCountRef with existing goal count so opening pitch view mid-game doesn't re-trigger past celebrations
-  const initialGoalCount = useMemo(() => {
-    return matchEvents.filter((e) => e.type === "goal" && e.minute <= currentMinute).length;
-  }, []);
-  const lastGoalCountRef = useRef<number>(initialGoalCount);
-
   // Ball trajectory coordinates (0..105, 0..68)
   const { ballX, ballY, currentEventType } = useMemo(() => {
     const recentEvent = matchEvents.find(
@@ -131,6 +152,8 @@ export function SimulationScreen({
 
     if (recentEvent) {
       const isHome = isHomeEvent(recentEvent.teamId);
+      const desc = recentEvent.description || "";
+
       if (recentEvent.type === "goal") {
         return {
           ballX: isHome ? 104 : 1, // Into opponent's goal
@@ -138,10 +161,31 @@ export function SimulationScreen({
           currentEventType: "goal" as const,
         };
       }
-      const evType = recentEvent.type as string;
-      if (evType === "shot" || evType === "save") {
+      if (recentEvent.type === "save") {
         return {
-          ballX: isHome ? 94 : 11, // Penalty box
+          ballX: isHome ? 7 : 98, // Parried right in front of net
+          ballY: 34 + Math.sin(currentMinute * 2) * 5,
+          currentEventType: "save" as const,
+        };
+      }
+      if (desc.includes("PENALTY")) {
+        return {
+          ballX: isHome ? 94 : 11, // Penalty spot
+          ballY: 34,
+          currentEventType: "shot" as const,
+        };
+      }
+      if (desc.includes("FREE KICK")) {
+        return {
+          ballX: isHome ? 80 : 25, // Free kick outside box
+          ballY: 22 + Math.sin(currentMinute) * 12,
+          currentEventType: "shot" as const,
+        };
+      }
+      const evType = recentEvent.type as string;
+      if (evType === "shot" || evType === "chance" || evType === "near_miss") {
+        return {
+          ballX: isHome ? 96 : 9, // Danger zone
           ballY: 34 + Math.sin(currentMinute * 2) * 8,
           currentEventType: evType,
         };
@@ -165,6 +209,44 @@ export function SimulationScreen({
     };
   }, [currentMinute, matchEvents, homeTeamId]);
 
+  // Dynamic in-game possession that realistically shifts and undulates throughout the 90 minutes
+  const { homePossession, awayPossession } = useMemo(() => {
+    const homeStrength = match.homeTeam.strength || 80;
+    const awayStrength = match.awayTeam.strength || 80;
+    const totalStrength = homeStrength + awayStrength;
+    const baseHome = (homeStrength / totalStrength) * 100;
+
+    // Match-specific deterministic seed offset
+    const seedOffset = (match.id.charCodeAt(match.id.length - 1) || 5) * 0.7;
+
+    // Macro momentum wave (longer swings of pressure, period ~16-20 mins)
+    const macroWave = Math.sin((currentMinute + seedOffset) * 0.32) * 6.5;
+
+    // Micro momentum spell (shorter tactical spells, period ~6 mins)
+    const microWave = Math.cos((currentMinute + seedOffset * 1.5) * 0.85) * 3;
+
+    // Ball territory pressure bias (when ball is in attacking half, pressing team gains share)
+    const territoryShift = ((ballX - 52.5) / 52.5) * 4;
+
+    // Scoreline dynamic: trailing team pushes more for possession
+    const scoreDiff = liveHomeScore - liveAwayScore;
+    const urgencyShift = scoreDiff * -1.5;
+
+    const rawHome = baseHome + macroWave + microWave + territoryShift + urgencyShift;
+    const clampedHome = Math.max(36, Math.min(64, Math.round(rawHome)));
+
+    return {
+      homePossession: clampedHome,
+      awayPossession: 100 - clampedHome,
+    };
+  }, [match.homeTeam.strength, match.awayTeam.strength, match.id, currentMinute, ballX, liveHomeScore, liveAwayScore]);
+
+  // Initialize lastGoalCountRef with existing goal count so opening pitch view mid-game doesn't re-trigger past celebrations
+  const initialGoalCount = useMemo(() => {
+    return matchEvents.filter((e) => e.type === "goal" && e.minute <= currentMinute).length;
+  }, []);
+  const lastGoalCountRef = useRef<number>(initialGoalCount);
+
   // Keep ball trail of 4 previous positions
   useEffect(() => {
     ballHistoryRef.current = [
@@ -187,8 +269,12 @@ export function SimulationScreen({
         setGoalHighlight(isHome ? "away" : "home"); // Highlight the defending net that conceded
         setAriaGoalAnnouncement(`Goal! ${teamName} scores at minute ${recentGoal.minute}.`);
 
+        const isPenalty = recentGoal.description.includes("PENALTY");
+        const isFreeKick = recentGoal.description.includes("FREE KICK");
+        const goalLabel = isPenalty ? "⚡ PENALTY GOAL" : isFreeKick ? "🎯 FREE KICK GOAL" : "GOAL";
+
         setActiveEventBadge({
-          text: `GOAL • ${teamCode} ${recentGoal.minute}'`,
+          text: `${goalLabel} • ${teamCode} ${recentGoal.minute}'`,
           type: "goal",
           x: isHome ? 87.5 : 17.5, // Top-Right for right net goal; Top-Left for left net goal
           y: 5.5,
@@ -199,7 +285,7 @@ export function SimulationScreen({
         const timer = setTimeout(() => {
           setGoalHighlight(null);
           setActiveEventBadge(null);
-        }, 2000);
+        }, 2200);
         lastGoalCountRef.current = goalEvents.length;
         return () => clearTimeout(timer);
       } else {
@@ -207,25 +293,34 @@ export function SimulationScreen({
       }
     }
 
-    // Check for other in-game events
+    // Check for other in-game events (Saves, Penalty Misses, Free Kick Misses, Big Chances, Cards)
     if (displayedEvents.length > 0 && currentMinute !== lastEventMinuteRef.current) {
       const topEvent = displayedEvents[0];
       if (topEvent.minute === currentMinute && topEvent.type !== "goal") {
         const isHome = isHomeEvent(topEvent.teamId);
         const teamCode = isHome ? homeCode : awayCode;
-        const badgeText = topEvent.type.toUpperCase();
+        const desc = topEvent.description || "";
+
+        let badgeText = topEvent.type.toUpperCase();
+        if (desc.includes("SAVE")) badgeText = "🧤 SAVE";
+        else if (desc.includes("PENALTY")) badgeText = "❌ PENALTY MISS";
+        else if (desc.includes("FREE KICK")) badgeText = "🎯 FREE KICK";
+        else if (desc.includes("WOODWORK") || desc.includes("POST")) badgeText = "💥 OFF THE POST";
+        else if (desc.includes("CHANCE")) badgeText = "⚡ BIG CHANCE";
+        else if (topEvent.type === "card") badgeText = "🟨 YELLOW CARD";
 
         setActiveEventBadge({
           text: `${badgeText} • ${teamCode}`,
           type: topEvent.type,
           x: ballX,
-          y: ballY,
+          y: Math.max(12, Math.min(56, ballY - 6)),
           teamCode,
+          isHome,
         });
 
         const timer = setTimeout(() => {
           setActiveEventBadge(null);
-        }, 1500);
+        }, 1800);
         lastEventMinuteRef.current = currentMinute;
         return () => clearTimeout(timer);
       }
@@ -1127,32 +1222,97 @@ export function SimulationScreen({
             ) : (
               displayedEvents.map((event, idx) => {
                 const isGoal = event.type === "goal";
+                const desc = event.description || "";
+
+                let tagLabel = "EVENT";
+                let tagBg = "bg-white text-black";
+                let cardStyle = isNeoBrutalist
+                  ? "bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                  : "bg-[#0A0D12] border-[#222938] text-slate-300";
+
+                if (isGoal) {
+                  if (desc.includes("PENALTY")) {
+                    tagLabel = "⚡ PENALTY GOAL";
+                    tagBg = isNeoBrutalist ? "bg-[#ffe600] text-black" : "bg-emerald-500 text-black";
+                  } else if (desc.includes("FREE KICK")) {
+                    tagLabel = "🎯 FREE KICK GOAL";
+                    tagBg = isNeoBrutalist ? "bg-[#00ffff] text-black" : "bg-emerald-500 text-black";
+                  } else {
+                    tagLabel = "⚽ GOAL";
+                    tagBg = isNeoBrutalist ? "bg-black text-[#00ff66]" : "bg-emerald-500 text-black";
+                  }
+                  cardStyle = isNeoBrutalist
+                    ? "bg-[#00ff66] border-[2.5px] border-black text-black font-black shadow-[3px_3px_0_#000]"
+                    : "bg-[#1B212D] border-emerald-500/40 text-emerald-300 font-bold";
+                } else if (event.type === "save" || desc.includes("SAVE")) {
+                  tagLabel = "🧤 SAVE";
+                  tagBg = isNeoBrutalist ? "bg-[#00ffff] text-black" : "bg-cyan-500/30 text-cyan-300";
+                  cardStyle = isNeoBrutalist
+                    ? "bg-[#e6ffff] border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                    : "bg-[#0c1c24] border-cyan-500/30 text-cyan-200";
+                } else if (desc.includes("PENALTY")) {
+                  tagLabel = "❌ PENALTY MISS";
+                  tagBg = isNeoBrutalist ? "bg-[#ff0055] text-white" : "bg-rose-500/30 text-rose-300";
+                  cardStyle = isNeoBrutalist
+                    ? "bg-[#fff0f5] border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                    : "bg-[#1f0e14] border-rose-500/30 text-rose-200";
+                } else if (desc.includes("FREE KICK")) {
+                  tagLabel = "🎯 FREE KICK MISS";
+                  tagBg = isNeoBrutalist ? "bg-[#ffe600] text-black" : "bg-amber-500/30 text-amber-300";
+                  cardStyle = isNeoBrutalist
+                    ? "bg-[#fffef0] border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                    : "bg-[#1f1a0e] border-amber-500/30 text-amber-200";
+                } else if (desc.includes("WOODWORK") || desc.includes("POST")) {
+                  tagLabel = "💥 OFF THE POST";
+                  tagBg = isNeoBrutalist ? "bg-[#ff9900] text-black" : "bg-orange-500/30 text-orange-300";
+                  cardStyle = isNeoBrutalist
+                    ? "bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                    : "bg-[#0A0D12] border-[#222938] text-slate-300";
+                } else if (event.type === "card") {
+                  tagLabel = "🟨 CARD";
+                  tagBg = isNeoBrutalist ? "bg-[#ffe600] text-black" : "bg-yellow-500/30 text-yellow-300";
+                  cardStyle = isNeoBrutalist
+                    ? "bg-[#fffef0] border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                    : "bg-[#1f1a0e] border-yellow-500/30 text-yellow-200";
+                } else if (event.type === "chance") {
+                  tagLabel = "⚡ CHANCE";
+                  tagBg = isNeoBrutalist ? "bg-white text-black" : "bg-slate-700 text-white";
+                  cardStyle = isNeoBrutalist
+                    ? "bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
+                    : "bg-[#0A0D12] border-[#222938] text-slate-300";
+                }
+
                 return (
                   <div
                     key={idx}
                     className={cn(
-                      "p-2.5 rounded-[4px] border text-xs flex items-start gap-2 transition-colors",
-                      isNeoBrutalist
-                        ? isGoal
-                          ? "bg-[#00ff66] border-2 border-black text-black font-black shadow-[2px_2px_0_#000]"
-                          : "bg-white border-2 border-black text-black font-bold shadow-[2px_2px_0_#000]"
-                        : isGoal
-                        ? "bg-[#1B212D] border-emerald-500/40 text-emerald-300 font-bold"
-                        : "bg-[#0A0D12] border-[#222938] text-slate-300"
+                      "p-2.5 rounded-[4px] border text-xs flex flex-col gap-1 transition-all",
+                      cardStyle
                     )}
                   >
-                    <span
-                      className={cn(
-                        "font-mono font-black px-1.5 py-0.5 rounded-[2px] text-xs shrink-0 tabular-nums border",
-                        isNeoBrutalist
-                          ? "bg-[#ffe600] text-black border-black"
-                          : "text-amber-400 bg-[#13171F] border-[#222938]"
-                      )}
-                    >
-                      {event.minute}'
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={cn(
+                          "font-mono font-black px-1.5 py-0.5 rounded-[2px] text-[10px] shrink-0 tabular-nums border",
+                          isNeoBrutalist
+                            ? "bg-[#ffe600] text-black border-black shadow-[1px_1px_0_#000]"
+                            : "text-amber-400 bg-[#13171F] border-[#222938]"
+                        )}
+                      >
+                        {event.minute}'
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[9px] uppercase font-mono font-black px-1.5 py-0.5 rounded-[2px] border",
+                          isNeoBrutalist ? "border-black shadow-[1px_1px_0_#000]" : "border-white/20",
+                          tagBg
+                        )}
+                      >
+                        {tagLabel}
+                      </span>
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="leading-tight">{event.description}</p>
+                      <p className="leading-tight text-xs font-bold pl-0.5">{event.description}</p>
                     </div>
                   </div>
                 );

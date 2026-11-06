@@ -402,6 +402,7 @@ export type MatchEvent = {
   description: string;
   type:
   | "goal"
+  | "save"
   | "card"
   | "yellow_card"
   | "red_card"
