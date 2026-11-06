@@ -1007,12 +1007,6 @@ export function ProfileScreen({
             onClick={onOpenWallet}
           />
           <SettingsButton
-            icon={<IconRefresh className={cn("w-4 h-4", isNeoBrutalist ? "text-black" : "text-slate-300")} />}
-            label="Synchronize Account"
-            description="Force update matchday balances from local state"
-            onClick={onSystemSync}
-          />
-          <SettingsButton
             icon={<IconLogOut className={cn("w-4 h-4", isNeoBrutalist ? "text-[#ff0055]" : "text-red-400")} />}
             label="Disconnect Session"
             description="Sign out and disconnect wallet session"
