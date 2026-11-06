@@ -45,7 +45,11 @@ export function DashboardLayout() {
         isNeoBrutalist
           ? "bg-[#faf8ee] text-black bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:24px_24px]"
           : "bg-surface-page text-text-primary"
-      } ${betSlipSelections.length > 0 ? "lg:pr-[380px]" : ""}`}
+      } ${
+        betSlipSelections.length > 0
+          ? "pb-[72px] lg:pb-8 lg:pr-[380px]"
+          : "pb-4 lg:pb-8"
+      }`}
     >
       <DashboardHeader />
       {/* Tab content rendered here via nested routes */}
