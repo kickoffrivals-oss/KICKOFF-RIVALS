@@ -19,33 +19,39 @@ interface AviatorRedesignProps {
   initialViewport?: ViewportMode;
 }
 
-// Initial recent multiplier history for Live Dispatch strip
-const INITIAL_MULTIPLIERS = [
-  { id: 1, val: 5.21 },
-  { id: 2, val: 1.03 },
-  { id: 3, val: 52.81 },
-  { id: 4, val: 14.85 },
-  { id: 5, val: 2.14 },
-  { id: 6, val: 1.15 },
-  { id: 7, val: 8.42 },
-  { id: 8, val: 104.2 },
-  { id: 9, val: 1.98 },
-  { id: 10, val: 3.75 },
-  { id: 11, val: 24.5 },
-];
+export interface UserBetRecord {
+  id: string;
+  user: string;
+  bet: number;
+  mult: number;
+  win: number;
+  isWin: boolean;
+  timestamp: number;
+}
 
-// Sample live bets for desktop left column
-const SAMPLE_LIVE_BETS = [
-  { user: "Pilot_77", bet: 150, mult: 4.63, win: 694.5, isWin: true },
-  { user: "AeroKing", bet: 50, mult: 4.0, win: 200.0, isWin: true },
-  { user: "Nova_X", bet: 200, mult: 1.85, win: 370.0, isWin: true },
-  { user: "SkyRider", bet: 500, mult: 0, win: 0, isWin: false },
-  { user: "CyberAce", bet: 100, mult: 3.2, win: 320.0, isWin: true },
-  { user: "Vortex99", bet: 250, mult: 0, win: 0, isWin: false },
-  { user: "Falcon01", bet: 75, mult: 12.4, win: 930.0, isWin: true },
-  { user: "Blaze_7", bet: 300, mult: 0, win: 0, isWin: false },
-  { user: "HyperJet", bet: 120, mult: 2.1, win: 252.0, isWin: true },
-];
+// Initial recent multiplier history for Live Dispatch strip (loads real history from localStorage)
+const getInitialMultipliers = (): { id: number; val: number }[] => {
+  try {
+    const saved = localStorage.getItem("aviator_multiplier_history");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {}
+  return [];
+};
+
+// Real user bet history loaded from localStorage
+const getInitialBetHistory = (): UserBetRecord[] => {
+  try {
+    const saved = localStorage.getItem("aviator_user_bets");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {}
+  return [];
+};
 
 // Helper to color-code multiplier chips
 function getMultiplierChipStyle(val: number, isNeoBrutalist: boolean = false) {
@@ -100,7 +106,25 @@ export function AviatorRedesign({
   const [activeTab, setActiveTab] = useState<MobileTab>("all");
 
   // Multiplier history chips
-  const [multipliersHistory, setMultipliersHistory] = useState(INITIAL_MULTIPLIERS);
+  const [multipliersHistory, setMultipliersHistory] = useState<{ id: number; val: number }[]>(getInitialMultipliers);
+
+  // Real user bet history
+  const [betHistory, setBetHistory] = useState<UserBetRecord[]>(getInitialBetHistory);
+
+  const recordBetHistory = useCallback((record: UserBetRecord) => {
+    setBetHistory((prev) => {
+      const updated = [record, ...prev.slice(0, 29)];
+      try {
+        localStorage.setItem("aviator_user_bets", JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  }, []);
+  const recordBetHistoryRef = useRef(recordBetHistory);
+  recordBetHistoryRef.current = recordBetHistory;
+
+  const balanceRef = useRef(balance);
+  balanceRef.current = balance;
 
   // Panel 1 Bet states
   const [bet1Amount, setBet1Amount] = useState<number>(100);
@@ -172,17 +196,18 @@ export function AviatorRedesign({
   const handlePlaceBet = useCallback(
     (panelIndex: 1 | 2) => {
       const isP1 = panelIndex === 1;
-      const amount = isP1 ? bet1Amount : bet2Amount;
+      const amount = isP1 ? panel1Ref.current.amount : panel2Ref.current.amount;
       if (amount < 100) {
         toast.error("Minimum bet is 100 KOR!");
         if (isP1) setBet1Amount(100);
         else setBet2Amount(100);
         return;
       }
-      if (balance < amount) {
+      if (balanceRef.current < amount) {
         toast.error("Insufficient KOR balance!");
         return;
       }
+      balanceRef.current = Math.max(0, balanceRef.current - amount);
       if (onBalanceChange) {
         onBalanceChange((prev) => Math.max(0, prev - amount));
       }
@@ -191,31 +216,36 @@ export function AviatorRedesign({
       const nextStatus: BetPanelStatus = currentStatus === GameStatus.IDLE ? "active" : "queued";
       if (isP1) {
         setBet1Status(nextStatus);
+        panel1Ref.current.status = nextStatus;
         setBet1WinAmount(null);
       } else {
         setBet2Status(nextStatus);
+        panel2Ref.current.status = nextStatus;
         setBet2WinAmount(null);
       }
     },
-    [balance, bet1Amount, bet2Amount, onBalanceChange]
+    [onBalanceChange]
   );
 
   // Bet Cancelled Handler
   const handleCancelBet = useCallback(
     (panelIndex: 1 | 2) => {
       const isP1 = panelIndex === 1;
-      const amount = isP1 ? bet1Amount : bet2Amount;
+      const amount = isP1 ? panel1Ref.current.amount : panel2Ref.current.amount;
+      balanceRef.current += amount;
       if (onBalanceChange) {
         onBalanceChange((prev) => prev + amount);
       }
       soundFx.playClick();
       if (isP1) {
         setBet1Status("idle");
+        panel1Ref.current.status = "idle";
       } else {
         setBet2Status("idle");
+        panel2Ref.current.status = "idle";
       }
     },
-    [bet1Amount, bet2Amount, onBalanceChange]
+    [onBalanceChange]
   );
 
   // Cashout Handler
@@ -228,6 +258,7 @@ export function AviatorRedesign({
       const amount = isP1 ? panel1Ref.current.amount : panel2Ref.current.amount;
       const payout = Math.round(amount * currentMult * 100) / 100;
 
+      balanceRef.current += payout;
       if (onBalanceChange) {
         onBalanceChange((prev) => prev + payout);
       }
@@ -247,13 +278,59 @@ export function AviatorRedesign({
 
       if (isP1) {
         setBet1Status("cashed_out");
+        panel1Ref.current.status = "cashed_out";
         setBet1WinAmount(payout);
       } else {
         setBet2Status("cashed_out");
+        panel2Ref.current.status = "cashed_out";
         setBet2WinAmount(payout);
       }
+
+      recordBetHistoryRef.current({
+        id: `${Date.now()}-${panelIndex}`,
+        user: isP1 ? "You (Bet 1)" : "You (Bet 2)",
+        bet: amount,
+        mult: Math.round(currentMult * 100) / 100,
+        win: payout,
+        isWin: true,
+        timestamp: Date.now(),
+      });
     },
     [onBalanceChange, isNeoBrutalist]
+  );
+
+  const handlePlaceBetRef = useRef(handlePlaceBet);
+  handlePlaceBetRef.current = handlePlaceBet;
+
+  const handleCashoutRef = useRef(handleCashout);
+  handleCashoutRef.current = handleCashout;
+
+  // Continuous Auto Bet toggle handler
+  const handleToggleAutoBet = useCallback(
+    (panelIndex: 1 | 2, enabled: boolean) => {
+      if (panelIndex === 1) {
+        setBet1AutoBet(enabled);
+        panel1Ref.current.autoBet = enabled;
+        if (
+          enabled &&
+          engine.getState().status === GameStatus.IDLE &&
+          panel1Ref.current.status === "idle"
+        ) {
+          handlePlaceBet(1);
+        }
+      } else {
+        setBet2AutoBet(enabled);
+        panel2Ref.current.autoBet = enabled;
+        if (
+          enabled &&
+          engine.getState().status === GameStatus.IDLE &&
+          panel2Ref.current.status === "idle"
+        ) {
+          handlePlaceBet(2);
+        }
+      }
+    },
+    [handlePlaceBet]
   );
 
   // Animation Loop & Engine Synchronization (10s waiting cycle)
@@ -267,28 +344,85 @@ export function AviatorRedesign({
       if (prevStatus !== currentStatus) {
         if (currentStatus === GameStatus.FLYING) {
           soundFx.playTakeoff();
-          if (panel1Ref.current.status === "queued") setBet1Status("active");
-          if (panel2Ref.current.status === "queued") setBet2Status("active");
+          if (panel1Ref.current.status === "queued") {
+            setBet1Status("active");
+            panel1Ref.current.status = "active";
+          }
+          if (panel2Ref.current.status === "queued") {
+            setBet2Status("active");
+            panel2Ref.current.status = "active";
+          }
         } else if (currentStatus === GameStatus.CRASHED) {
           soundFx.playCrash();
           // Add round crash multiplier to history strip
-          setMultipliersHistory((prev) => [
-            { id: Date.now(), val: state.multiplier },
-            ...prev.slice(0, 19),
-          ]);
-          // Reset active bets that did not cash out
-          if (panel1Ref.current.status === "active") setBet1Status("idle");
-          if (panel2Ref.current.status === "active") setBet2Status("idle");
-        } else if (currentStatus === GameStatus.IDLE) {
-          // Reset cashed-out status for new round
-          setBet1Status((prev) => (prev === "cashed_out" ? "idle" : prev));
-          setBet2Status((prev) => (prev === "cashed_out" ? "idle" : prev));
-          // Trigger auto-bet if enabled
-          if (panel1Ref.current.autoBet && panel1Ref.current.status === "idle") {
-            handlePlaceBet(1);
+          const crashVal = state.multiplier;
+          setMultipliersHistory((prev) => {
+            const nextList = [
+              { id: Date.now(), val: crashVal },
+              ...prev.slice(0, 19),
+            ];
+            try {
+              localStorage.setItem("aviator_multiplier_history", JSON.stringify(nextList));
+            } catch (e) {}
+            return nextList;
+          });
+
+          // Check for lost bets (active bets that did not cash out before crash)
+          if (panel1Ref.current.status === "active") {
+            recordBetHistoryRef.current({
+              id: `${Date.now()}-1`,
+              user: "You (Bet 1)",
+              bet: panel1Ref.current.amount,
+              mult: 0,
+              win: 0,
+              isWin: false,
+              timestamp: Date.now(),
+            });
+            setBet1Status("idle");
+            panel1Ref.current.status = "idle";
           }
-          if (panel2Ref.current.autoBet && panel2Ref.current.status === "idle") {
-            handlePlaceBet(2);
+          if (panel2Ref.current.status === "active") {
+            recordBetHistoryRef.current({
+              id: `${Date.now()}-2`,
+              user: "You (Bet 2)",
+              bet: panel2Ref.current.amount,
+              mult: 0,
+              win: 0,
+              isWin: false,
+              timestamp: Date.now(),
+            });
+            setBet2Status("idle");
+            panel2Ref.current.status = "idle";
+          }
+        } else if (currentStatus === GameStatus.IDLE) {
+          // Entering new waiting/betting round
+          // 1. If a bet was queued during flight, promote it to active
+          if (panel1Ref.current.status === "queued") {
+            setBet1Status("active");
+            panel1Ref.current.status = "active";
+          } else {
+            // Reset for the new round
+            setBet1Status("idle");
+            panel1Ref.current.status = "idle";
+            setBet1WinAmount(null);
+            // If Auto Bet is enabled, continuously place the bet immediately!
+            if (panel1Ref.current.autoBet) {
+              handlePlaceBetRef.current(1);
+            }
+          }
+
+          if (panel2Ref.current.status === "queued") {
+            setBet2Status("active");
+            panel2Ref.current.status = "active";
+          } else {
+            // Reset for the new round
+            setBet2Status("idle");
+            panel2Ref.current.status = "idle";
+            setBet2WinAmount(null);
+            // If Auto Bet is enabled, continuously place the bet immediately!
+            if (panel2Ref.current.autoBet) {
+              handlePlaceBetRef.current(2);
+            }
           }
         }
         prevStatusRef.current = currentStatus;
@@ -312,14 +446,14 @@ export function AviatorRedesign({
           panel1Ref.current.autoCashout &&
           m >= panel1Ref.current.cashoutMult
         ) {
-          handleCashout(1, m);
+          handleCashoutRef.current(1, m);
         }
         if (
           panel2Ref.current.status === "active" &&
           panel2Ref.current.autoCashout &&
           m >= panel2Ref.current.cashoutMult
         ) {
-          handleCashout(2, m);
+          handleCashoutRef.current(2, m);
         }
       } else if (currentStatus === GameStatus.CRASHED) {
         setMultiplier(state.multiplier);
@@ -331,7 +465,7 @@ export function AviatorRedesign({
 
     requestRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(requestRef.current);
-  }, [handlePlaceBet, handleCashout]);
+  }, []);
 
   // Render Single Bet Panel
   const renderBetPanel = (
@@ -440,7 +574,12 @@ export function AviatorRedesign({
             }
           >
             <button
-              onClick={() => setAmount(Math.max(100, (amount || 100) - 100))}
+              onClick={() => {
+                const next = Math.max(100, (amount || 100) - 100);
+                setAmount(next);
+                if (isP1) panel1Ref.current.amount = next;
+                else panel2Ref.current.amount = next;
+              }}
               className={
                 isNeoBrutalist
                   ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#ffe600] hover:bg-[#fed600] text-black border border-black flex items-center justify-center font-black text-lg transition-all active:scale-95 cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
@@ -460,14 +599,21 @@ export function AviatorRedesign({
                 onChange={(e) => {
                   const val = parseInt(e.target.value, 10);
                   if (!isNaN(val)) {
-                    setAmount(Math.max(0, val));
+                    const valid = Math.max(0, val);
+                    setAmount(valid);
+                    if (isP1) panel1Ref.current.amount = valid;
+                    else panel2Ref.current.amount = valid;
                   } else {
                     setAmount(0);
+                    if (isP1) panel1Ref.current.amount = 0;
+                    else panel2Ref.current.amount = 0;
                   }
                 }}
                 onBlur={() => {
                   if (!amount || amount < 100) {
                     setAmount(100);
+                    if (isP1) panel1Ref.current.amount = 100;
+                    else panel2Ref.current.amount = 100;
                   }
                 }}
                 className={
@@ -480,7 +626,12 @@ export function AviatorRedesign({
               />
             </div>
             <button
-              onClick={() => setAmount((amount || 0) + 100)}
+              onClick={() => {
+                const next = (amount || 0) + 100;
+                setAmount(next);
+                if (isP1) panel1Ref.current.amount = next;
+                else panel2Ref.current.amount = next;
+              }}
               className={
                 isNeoBrutalist
                   ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#ffe600] hover:bg-[#fed600] text-black border border-black flex items-center justify-center font-black text-lg transition-all active:scale-95 cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
@@ -520,9 +671,13 @@ export function AviatorRedesign({
               <button
                 key={idx}
                 onClick={() => {
-                  if (q.label === "Min") setAmount(100);
-                  else if (q.label === "Max") setAmount(5000);
-                  else setAmount((amount || 0) + q.amt);
+                  let next = 100;
+                  if (q.label === "Min") next = 100;
+                  else if (q.label === "Max") next = 5000;
+                  else next = (amount || 0) + q.amt;
+                  setAmount(next);
+                  if (isP1) panel1Ref.current.amount = next;
+                  else panel2Ref.current.amount = next;
                 }}
                 className={
                   isNeoBrutalist
@@ -946,11 +1101,7 @@ export function AviatorRedesign({
               type="button"
               onClick={() => setViewport("mobile")}
               className={`px-2 sm:px-2.5 py-1 rounded-[6px] transition-all cursor-pointer font-black text-[10px] sm:text-xs flex items-center gap-1.5 ${
-                viewport === "mobile"
-                  ? isNeoBrutalist
-                    ? "bg-black text-white shadow-[1px_1px_0_#000]"
-                    : "bg-[#8b5cf6] text-white shadow"
-                  : isNeoBrutalist
+                isNeoBrutalist
                   ? "text-black/70 hover:text-black font-bold"
                   : "text-slate-400 hover:text-white"
               }`}
@@ -963,13 +1114,9 @@ export function AviatorRedesign({
               type="button"
               onClick={() => setViewport("desktop")}
               className={`px-2 sm:px-2.5 py-1 rounded-[6px] transition-all cursor-pointer font-black text-[10px] sm:text-xs flex items-center gap-1.5 ${
-                viewport === "desktop"
-                  ? isNeoBrutalist
-                    ? "bg-black text-white shadow-[1px_1px_0_#000]"
-                    : "bg-[#8b5cf6] text-white shadow"
-                  : isNeoBrutalist
-                  ? "text-black/70 hover:text-black font-bold"
-                  : "text-slate-400 hover:text-white"
+                isNeoBrutalist
+                  ? "bg-black text-white shadow-[1px_1px_0_#000]"
+                  : "bg-[#8b5cf6] text-white shadow"
               }`}
               title="Desktop View"
             >
@@ -1020,17 +1167,27 @@ export function AviatorRedesign({
         }}
       >
         <div className="flex items-center gap-1.5 flex-nowrap min-w-max">
-          {multipliersHistory.map((item) => (
+          {multipliersHistory.length === 0 ? (
             <span
-              key={item.id}
-              className={`px-2 py-0.5 rounded-[5px] border text-[11px] font-mono font-black transition-all cursor-default ${getMultiplierChipStyle(
-                item.val,
-                isNeoBrutalist
-              )}`}
+              className={`text-[11px] font-mono px-2 py-0.5 ${
+                isNeoBrutalist ? "text-black/60 font-bold" : "text-slate-500"
+              }`}
             >
-              {item.val.toFixed(2)}x
+              History will appear after first flight
             </span>
-          ))}
+          ) : (
+            multipliersHistory.map((item) => (
+              <span
+                key={item.id}
+                className={`px-2 py-0.5 rounded-[5px] border text-[11px] font-mono font-black transition-all cursor-default ${getMultiplierChipStyle(
+                  item.val,
+                  isNeoBrutalist
+                )}`}
+              >
+                {item.val.toFixed(2)}x
+              </span>
+            ))
+          )}
         </div>
         <button
           onClick={() => setIsProvablyFairOpen(true)}
@@ -1060,8 +1217,16 @@ export function AviatorRedesign({
 
   // Mobile Bottom Tabs
   const renderMobileBottomTabs = () => {
+    // Current round active bets placed by user
+    const currentRoundBetsCount =
+      (bet1Status !== "idle" ? 1 : 0) + (bet2Status !== "idle" ? 1 : 0);
+
     const tabs: { id: MobileTab; label: string; count?: number }[] = [
-      { id: "all", label: "Bets", count: 18 },
+      {
+        id: "all",
+        label: "Bets",
+        count: currentRoundBetsCount > 0 ? currentRoundBetsCount : undefined,
+      },
       { id: "mine", label: "My Bets" },
     ];
 
@@ -1103,6 +1268,36 @@ export function AviatorRedesign({
 
   // Desktop Left Column
   const renderDesktopLeftColumn = () => {
+    // Current round active bets placed by user
+    const currentRoundBets: {
+      panel: 1 | 2;
+      user: string;
+      amount: number;
+      status: BetPanelStatus;
+      winAmount: number | null;
+    }[] = [];
+
+    if (bet1Status !== "idle") {
+      currentRoundBets.push({
+        panel: 1,
+        user: "You (Bet 1)",
+        amount: bet1Amount,
+        status: bet1Status,
+        winAmount: bet1WinAmount,
+      });
+    }
+    if (bet2Status !== "idle") {
+      currentRoundBets.push({
+        panel: 2,
+        user: "You (Bet 2)",
+        amount: bet2Amount,
+        status: bet2Status,
+        winAmount: bet2WinAmount,
+      });
+    }
+
+    const hasAnyBets = currentRoundBets.length > 0 || betHistory.length > 0;
+
     return (
       <aside
         className={`w-[310px] xl:w-[340px] shrink-0 flex flex-col gap-3 rounded-[14px] p-3 h-full overflow-hidden ${
@@ -1139,17 +1334,27 @@ export function AviatorRedesign({
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto no-scrollbar">
-            {multipliersHistory.map((item) => (
+            {multipliersHistory.length === 0 ? (
               <span
-                key={item.id}
-                className={`px-2 py-0.5 rounded-[5px] border text-[11px] font-mono font-black ${getMultiplierChipStyle(
-                  item.val,
-                  isNeoBrutalist
-                )}`}
+                className={`text-[11px] font-mono py-1 ${
+                  isNeoBrutalist ? "text-black/60 font-bold" : "text-slate-500"
+                }`}
               >
-                {item.val.toFixed(2)}x
+                Waiting for completed flights...
               </span>
-            ))}
+            ) : (
+              multipliersHistory.map((item) => (
+                <span
+                  key={item.id}
+                  className={`px-2 py-0.5 rounded-[5px] border text-[11px] font-mono font-black ${getMultiplierChipStyle(
+                    item.val,
+                    isNeoBrutalist
+                  )}`}
+                >
+                  {item.val.toFixed(2)}x
+                </span>
+              ))
+            )}
           </div>
         </div>
 
@@ -1161,7 +1366,7 @@ export function AviatorRedesign({
                 isNeoBrutalist ? "text-black font-black" : "text-slate-300"
               }`}
             >
-              Live Bets ({SAMPLE_LIVE_BETS.length})
+              Live Bets ({currentRoundBets.length})
             </span>
             <span
               className={`text-[10px] font-mono font-bold ${
@@ -1172,82 +1377,242 @@ export function AviatorRedesign({
             </span>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
-            {SAMPLE_LIVE_BETS.map((b, i) => (
+          {!hasAnyBets ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-4 my-auto">
               <div
-                key={i}
-                className={`flex items-center justify-between p-1.5 rounded-[8px] text-xs font-mono transition-all ${
+                className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 text-2xl ${
                   isNeoBrutalist
-                    ? "bg-white border-2 border-black shadow-[1.5px_1.5px_0_#000]"
-                    : "bg-[#0c0a1d] border border-[#1f1b3d]"
+                    ? "bg-[#ffe600] border-2 border-black shadow-[2px_2px_0_#000]"
+                    : "bg-[#1f1b3d] text-slate-300 border border-[#2d2757]"
                 }`}
               >
-                <div className="flex items-center gap-1.5 min-w-0">
+                ✈️
+              </div>
+              <div
+                className={`text-xs font-mono font-bold mb-1 uppercase tracking-wide ${
+                  isNeoBrutalist ? "text-black font-black" : "text-slate-200"
+                }`}
+              >
+                No Live Bets Placed
+              </div>
+              <div
+                className={`text-[11px] font-mono leading-relaxed max-w-[210px] ${
+                  isNeoBrutalist ? "text-black/70 font-bold" : "text-slate-400"
+                }`}
+              >
+                Place a bet or enable Auto Bet to join the flight!
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 scrollbar-thin">
+              {/* Active Current Round Bets */}
+              {currentRoundBets.map((b) => {
+                const isFlying = engineState.status === GameStatus.FLYING;
+                return (
                   <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                    key={`current-${b.panel}`}
+                    className={`flex items-center justify-between p-2 rounded-[8px] text-xs font-mono transition-all ${
                       isNeoBrutalist
-                        ? "bg-[#00f0ff] text-black border border-black font-black"
-                        : "bg-[#1f1b3d] text-slate-300"
+                        ? "bg-white border-2 border-black shadow-[2px_2px_0_#000]"
+                        : "bg-[#161233] border border-[#2c265e]"
                     }`}
                   >
-                    {b.user.charAt(0)}
-                  </div>
-                  <span
-                    className={`truncate text-[11px] ${
-                      isNeoBrutalist ? "font-black text-black" : "font-medium text-slate-300"
-                    }`}
-                  >
-                    {b.user}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3 shrink-0">
-                  <span
-                    className={`font-mono text-[11px] ${
-                      isNeoBrutalist ? "text-black font-bold" : "text-slate-400"
-                    }`}
-                  >
-                    {b.bet}
-                  </span>
-                  {b.isWin ? (
-                    <div className="flex flex-col items-end">
-                      <span
-                        className={`font-bold text-[11px] ${
-                          isNeoBrutalist ? "text-[#00aa44] font-black" : "text-emerald-400"
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                          isNeoBrutalist
+                            ? "bg-[#00f0ff] text-black border border-black font-black"
+                            : "bg-[#8b5cf6] text-white"
                         }`}
                       >
-                        {b.mult}x
-                      </span>
-                      <span
-                        className={`text-[10px] font-bold ${
-                          isNeoBrutalist ? "text-[#00aa44]" : "text-emerald-400"
-                        }`}
-                      >
-                        +{b.win.toFixed(1)}
-                      </span>
+                        Y
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span
+                          className={`truncate text-[11px] ${
+                            isNeoBrutalist ? "font-black text-black" : "font-bold text-white"
+                          }`}
+                        >
+                          {b.user}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold ${
+                            b.status === "cashed_out"
+                              ? isNeoBrutalist
+                                ? "text-[#00aa44]"
+                                : "text-emerald-400"
+                              : b.status === "queued"
+                              ? isNeoBrutalist
+                                ? "text-black/60"
+                                : "text-amber-400"
+                              : isFlying
+                              ? isNeoBrutalist
+                                ? "text-[#00aa44] animate-pulse"
+                                : "text-[#00f0ff] animate-pulse"
+                              : isNeoBrutalist
+                              ? "text-black/60"
+                              : "text-slate-400"
+                          }`}
+                        >
+                          {b.status === "cashed_out"
+                            ? "CASHED OUT"
+                            : b.status === "queued"
+                            ? "QUEUED NEXT"
+                            : isFlying
+                            ? "IN FLIGHT"
+                            : "PLACED"}
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex flex-col items-end">
+
+                    <div className="flex items-center gap-3 shrink-0">
                       <span
-                        className={`font-bold text-[11px] ${
-                          isNeoBrutalist ? "text-[#ff0055] font-black" : "text-red-400"
+                        className={`font-mono text-[11px] ${
+                          isNeoBrutalist ? "text-black font-bold" : "text-slate-300"
                         }`}
                       >
-                        LOST
+                        {b.amount}
                       </span>
-                      <span
-                        className={`text-[10px] ${
-                          isNeoBrutalist ? "text-black/50" : "text-slate-600"
-                        }`}
-                      >
-                        -{b.bet}
-                      </span>
+                      {b.status === "cashed_out" ? (
+                        <div className="flex flex-col items-end">
+                          <span
+                            className={`font-bold text-[11px] ${
+                              isNeoBrutalist ? "text-[#00aa44] font-black" : "text-emerald-400"
+                            }`}
+                          >
+                            {b.winAmount ? (b.winAmount / b.amount).toFixed(2) : multiplier.toFixed(2)}x
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold ${
+                              isNeoBrutalist ? "text-[#00aa44]" : "text-emerald-400"
+                            }`}
+                          >
+                            +{b.winAmount ? b.winAmount.toFixed(1) : (b.amount * multiplier).toFixed(1)}
+                          </span>
+                        </div>
+                      ) : isFlying ? (
+                        <div className="flex flex-col items-end">
+                          <span
+                            className={`font-bold text-[11px] ${
+                              isNeoBrutalist ? "text-[#ff9900] font-black" : "text-amber-400"
+                            }`}
+                          >
+                            {multiplier.toFixed(2)}x
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold ${
+                              isNeoBrutalist ? "text-[#ff9900]" : "text-amber-300"
+                            }`}
+                          >
+                            +{(b.amount * multiplier).toFixed(1)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-end">
+                          <span
+                            className={`text-[10px] font-bold ${
+                              isNeoBrutalist ? "text-black/60 font-black" : "text-slate-400"
+                            }`}
+                          >
+                            WAITING
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Real Bet History */}
+              {betHistory.length > 0 && (
+                <>
+                  {currentRoundBets.length > 0 && (
+                    <div
+                      className={`text-[10px] font-mono uppercase tracking-wider font-bold pt-2 pb-0.5 ${
+                        isNeoBrutalist ? "text-black/60 font-black" : "text-slate-400"
+                      }`}
+                    >
+                      Recent Bet History
                     </div>
                   )}
-                </div>
-              </div>
-            ))}
-          </div>
+                  {betHistory.map((b) => (
+                    <div
+                      key={b.id}
+                      className={`flex items-center justify-between p-1.5 rounded-[8px] text-xs font-mono transition-all ${
+                        isNeoBrutalist
+                          ? "bg-white border-2 border-black shadow-[1.5px_1.5px_0_#000]"
+                          : "bg-[#0c0a1d] border border-[#1f1b3d]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <div
+                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                            isNeoBrutalist
+                              ? "bg-[#00f0ff] text-black border border-black font-black"
+                              : "bg-[#1f1b3d] text-slate-300"
+                          }`}
+                        >
+                          Y
+                        </div>
+                        <span
+                          className={`truncate text-[11px] ${
+                            isNeoBrutalist ? "font-black text-black" : "font-medium text-slate-300"
+                          }`}
+                        >
+                          {b.user}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span
+                          className={`font-mono text-[11px] ${
+                            isNeoBrutalist ? "text-black font-bold" : "text-slate-400"
+                          }`}
+                        >
+                          {b.bet}
+                        </span>
+                        {b.isWin ? (
+                          <div className="flex flex-col items-end">
+                            <span
+                              className={`font-bold text-[11px] ${
+                                isNeoBrutalist ? "text-[#00aa44] font-black" : "text-emerald-400"
+                              }`}
+                            >
+                              {b.mult.toFixed(2)}x
+                            </span>
+                            <span
+                              className={`text-[10px] font-bold ${
+                                isNeoBrutalist ? "text-[#00aa44]" : "text-emerald-400"
+                              }`}
+                            >
+                              +{b.win.toFixed(1)}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-end">
+                            <span
+                              className={`font-bold text-[11px] ${
+                                isNeoBrutalist ? "text-[#ff0055] font-black" : "text-red-400"
+                              }`}
+                            >
+                              LOST
+                            </span>
+                            <span
+                              className={`text-[10px] ${
+                                isNeoBrutalist ? "text-black/50" : "text-slate-600"
+                              }`}
+                            >
+                              -{b.bet}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )}
         </div>
       </aside>
     );
@@ -1278,13 +1643,9 @@ export function AviatorRedesign({
               type="button"
               onClick={() => setViewport("mobile")}
               className={`p-2 sm:px-2.5 sm:py-1.5 rounded-[8px] transition-all cursor-pointer font-black text-xs flex items-center gap-1.5 ${
-                viewport === "mobile"
-                  ? isNeoBrutalist
-                    ? "bg-black text-white shadow-[1.5px_1.5px_0_#000]"
-                    : "bg-[#8b5cf6] text-white shadow"
-                  : isNeoBrutalist
-                  ? "text-black/70 hover:text-black font-bold"
-                  : "text-slate-400 hover:text-white"
+                isNeoBrutalist
+                  ? "bg-black text-white shadow-[1.5px_1.5px_0_#000]"
+                  : "bg-[#8b5cf6] text-white shadow"
               }`}
               title="Mobile View (Active)"
               aria-label="Mobile View (Active)"
@@ -1297,11 +1658,7 @@ export function AviatorRedesign({
               type="button"
               onClick={() => setViewport("desktop")}
               className={`p-2 sm:px-2.5 sm:py-1.5 rounded-[8px] transition-all cursor-pointer font-black text-xs flex items-center gap-1.5 ${
-                viewport === "desktop"
-                  ? isNeoBrutalist
-                    ? "bg-black text-white shadow-[1.5px_1.5px_0_#000]"
-                    : "bg-[#8b5cf6] text-white shadow"
-                  : isNeoBrutalist
+                isNeoBrutalist
                   ? "bg-[#ffe600] hover:bg-[#00f0ff] text-black border-2 border-black shadow-[2px_2px_0_#000] active:translate-x-[1px] active:translate-y-[1px]"
                   : "bg-[#1a1638] hover:bg-[#26204d] text-slate-200 hover:text-white border border-[#26204d]"
               }`}
@@ -1343,7 +1700,7 @@ export function AviatorRedesign({
                     bet1Amount,
                     setBet1Amount,
                     bet1AutoBet,
-                    setBet1AutoBet,
+                    (v) => handleToggleAutoBet(1, v),
                     bet1AutoCashout,
                     setBet1AutoCashout,
                     bet1CashoutMult,
@@ -1354,7 +1711,7 @@ export function AviatorRedesign({
                     bet2Amount,
                     setBet2Amount,
                     bet2AutoBet,
-                    setBet2AutoBet,
+                    (v) => handleToggleAutoBet(2, v),
                     bet2AutoCashout,
                     setBet2AutoCashout,
                     bet2CashoutMult,
@@ -1402,7 +1759,7 @@ export function AviatorRedesign({
                     bet1Amount,
                     setBet1Amount,
                     bet1AutoBet,
-                    setBet1AutoBet,
+                    (v) => handleToggleAutoBet(1, v),
                     bet1AutoCashout,
                     setBet1AutoCashout,
                     bet1CashoutMult,
@@ -1413,7 +1770,7 @@ export function AviatorRedesign({
                     bet2Amount,
                     setBet2Amount,
                     bet2AutoBet,
-                    setBet2AutoBet,
+                    (v) => handleToggleAutoBet(2, v),
                     bet2AutoCashout,
                     setBet2AutoCashout,
                     bet2CashoutMult,
