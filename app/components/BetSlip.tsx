@@ -623,12 +623,15 @@ export function BetSlip({
               <button
                 key={amount}
                 type="button"
+                disabled={!isBettingOpen || isLoading}
                 onClick={() => {
+                  if (!isBettingOpen || isLoading) return;
                   soundFx.playClick();
                   setStake((prev) => Math.min(balance, (prev || 0) + amount));
                 }}
                 className={cn(
                   "flex-1 py-1 rounded text-xs font-mono font-bold border transition-all cursor-pointer",
+                  (!isBettingOpen || isLoading) && "opacity-50 cursor-not-allowed pointer-events-none",
                   isNeoBrutalist
                     ? "bg-white text-black border-2 border-black hover:bg-[#ffe600] active:bg-[#ffe600] active:translate-x-[1px] active:translate-y-[1px] font-black shadow-[1.5px_1.5px_0_#000]"
                     : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong active:bg-surface-raised font-bold"
@@ -639,12 +642,15 @@ export function BetSlip({
             ))}
             <button
               type="button"
+              disabled={!isBettingOpen || isLoading}
               onClick={() => {
+                if (!isBettingOpen || isLoading) return;
                 soundFx.playClick();
                 setStake(balance);
               }}
               className={cn(
                 "flex-1 py-1 rounded text-xs font-mono font-black border transition-all cursor-pointer",
+                (!isBettingOpen || isLoading) && "opacity-50 cursor-not-allowed pointer-events-none",
                 isNeoBrutalist
                   ? "bg-[#00ff66] text-black border-2 border-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#12e069] active:translate-x-[1px] active:translate-y-[1px]"
                   : "bg-surface-page text-semantic-reward border-border-subtle hover:border-semantic-reward font-black"
@@ -658,6 +664,7 @@ export function BetSlip({
           <div
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 rounded border transition-all",
+              (!isBettingOpen || isLoading) && "opacity-60",
               isNeoBrutalist
                 ? "bg-white border-2 border-black shadow-[2px_2px_0_#000]"
                 : "bg-surface-page border-border-subtle focus-within:border-accent"
@@ -679,14 +686,18 @@ export function BetSlip({
             <input
               id="betslip-stake-input"
               type="number"
+              disabled={!isBettingOpen || isLoading}
+              readOnly={!isBettingOpen || isLoading}
               value={stake === 0 ? "" : stake}
               placeholder="0"
               onChange={(e) => {
+                if (!isBettingOpen || isLoading) return;
                 const val = e.target.value === "" ? 0 : Number(e.target.value);
                 setStake(Math.min(balance, Math.max(0, val)));
               }}
               className={cn(
                 "flex-1 bg-transparent text-right font-mono font-bold text-sm focus:outline-none tabular-nums",
+                (!isBettingOpen || isLoading) && "cursor-not-allowed text-text-muted",
                 isNeoBrutalist ? "text-black font-black" : "text-text-primary"
               )}
               min={1}
@@ -700,7 +711,7 @@ export function BetSlip({
             >
               KOR
             </span>
-            {stake > 0 && (
+            {stake > 0 && isBettingOpen && !isLoading && (
               <button
                 type="button"
                 onClick={() => {

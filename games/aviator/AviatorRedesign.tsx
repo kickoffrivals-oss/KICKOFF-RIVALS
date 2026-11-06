@@ -485,6 +485,9 @@ export function AviatorRedesign({
     const isFlying = engineState.status === GameStatus.FLYING;
     const isWaiting = engineState.status === GameStatus.IDLE;
 
+    // Bet amount cannot be changed once the bet has started (is active/queued/cashed out or while flight is running)
+    const isAmountDisabled = betStatus !== "idle" || isFlying;
+
     let buttonLabel = "BET";
     let buttonSubtext = `${amount} KOR`;
     let buttonBg = isNeoBrutalist
@@ -575,14 +578,20 @@ export function AviatorRedesign({
           >
             <button
               onClick={() => {
+                if (isAmountDisabled) return;
                 const next = Math.max(100, (amount || 100) - 100);
                 setAmount(next);
                 if (isP1) panel1Ref.current.amount = next;
                 else panel2Ref.current.amount = next;
               }}
+              disabled={isAmountDisabled}
               className={
                 isNeoBrutalist
-                  ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#ffe600] hover:bg-[#fed600] text-black border border-black flex items-center justify-center font-black text-lg transition-all active:scale-95 cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
+                  ? isAmountDisabled
+                    ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-slate-200 text-slate-400 border border-slate-300 flex items-center justify-center font-black text-lg cursor-not-allowed opacity-50"
+                    : "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#ffe600] hover:bg-[#fed600] text-black border border-black flex items-center justify-center font-black text-lg transition-all active:scale-95 cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
+                  : isAmountDisabled
+                  ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#120f26] text-slate-600 border border-[#1d193d] flex items-center justify-center font-bold text-base cursor-not-allowed opacity-50"
                   : "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#1a1638] hover:bg-[#25204d] text-slate-300 hover:text-white flex items-center justify-center font-bold text-base transition-colors active:scale-95 cursor-pointer touch-manipulation"
               }
               aria-label="Decrease bet amount by 100"
@@ -595,8 +604,11 @@ export function AviatorRedesign({
                 min={100}
                 max={50000}
                 step={100}
+                disabled={isAmountDisabled}
+                readOnly={isAmountDisabled}
                 value={amount === 0 ? "" : amount}
                 onChange={(e) => {
+                  if (isAmountDisabled) return;
                   const val = parseInt(e.target.value, 10);
                   if (!isNaN(val)) {
                     const valid = Math.max(0, val);
@@ -610,6 +622,7 @@ export function AviatorRedesign({
                   }
                 }}
                 onBlur={() => {
+                  if (isAmountDisabled) return;
                   if (!amount || amount < 100) {
                     setAmount(100);
                     if (isP1) panel1Ref.current.amount = 100;
@@ -618,8 +631,12 @@ export function AviatorRedesign({
                 }}
                 className={
                   isNeoBrutalist
-                    ? "w-full max-w-[100px] bg-transparent text-center font-mono font-black text-base sm:text-lg text-black focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none cursor-text"
-                    : "w-full max-w-[100px] bg-transparent text-center font-mono font-bold text-sm sm:text-base text-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none cursor-text"
+                    ? `w-full max-w-[100px] bg-transparent text-center font-mono font-black text-base sm:text-lg focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                        isAmountDisabled ? "text-black/40 cursor-not-allowed" : "text-black cursor-text"
+                      }`
+                    : `w-full max-w-[100px] bg-transparent text-center font-mono font-bold text-sm sm:text-base focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                        isAmountDisabled ? "text-slate-500 cursor-not-allowed" : "text-white cursor-text"
+                      }`
                 }
                 aria-label="Bet amount"
                 placeholder="100"
@@ -627,14 +644,20 @@ export function AviatorRedesign({
             </div>
             <button
               onClick={() => {
+                if (isAmountDisabled) return;
                 const next = (amount || 0) + 100;
                 setAmount(next);
                 if (isP1) panel1Ref.current.amount = next;
                 else panel2Ref.current.amount = next;
               }}
+              disabled={isAmountDisabled}
               className={
                 isNeoBrutalist
-                  ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#ffe600] hover:bg-[#fed600] text-black border border-black flex items-center justify-center font-black text-lg transition-all active:scale-95 cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
+                  ? isAmountDisabled
+                    ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-slate-200 text-slate-400 border border-slate-300 flex items-center justify-center font-black text-lg cursor-not-allowed opacity-50"
+                    : "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#ffe600] hover:bg-[#fed600] text-black border border-black flex items-center justify-center font-black text-lg transition-all active:scale-95 cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
+                  : isAmountDisabled
+                  ? "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#120f26] text-slate-600 border border-[#1d193d] flex items-center justify-center font-bold text-base cursor-not-allowed opacity-50"
                   : "w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] bg-[#1a1638] hover:bg-[#25204d] text-slate-300 hover:text-white flex items-center justify-center font-bold text-base transition-colors active:scale-95 cursor-pointer touch-manipulation"
               }
               aria-label="Increase bet amount by 100"
@@ -670,7 +693,9 @@ export function AviatorRedesign({
             {quickAmounts.map((q, idx) => (
               <button
                 key={idx}
+                disabled={isAmountDisabled}
                 onClick={() => {
+                  if (isAmountDisabled) return;
                   let next = 100;
                   if (q.label === "Min") next = 100;
                   else if (q.label === "Max") next = 5000;
@@ -681,7 +706,11 @@ export function AviatorRedesign({
                 }}
                 className={
                   isNeoBrutalist
-                    ? "h-6 sm:h-7 rounded-[5px] bg-white hover:bg-[#ffe600] text-black border-2 border-black text-[10px] font-mono font-black transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
+                    ? isAmountDisabled
+                      ? "h-6 sm:h-7 rounded-[5px] bg-slate-100 text-slate-400 border border-slate-300 text-[10px] font-mono font-bold flex items-center justify-center cursor-not-allowed opacity-50"
+                      : "h-6 sm:h-7 rounded-[5px] bg-white hover:bg-[#ffe600] text-black border-2 border-black text-[10px] font-mono font-black transition-all active:scale-95 flex items-center justify-center cursor-pointer shadow-[1px_1px_0_#000] touch-manipulation"
+                    : isAmountDisabled
+                    ? "h-6 sm:h-7 rounded-[5px] bg-[#100d24] text-slate-600 border border-[#191536] text-[10px] font-mono font-bold flex items-center justify-center cursor-not-allowed opacity-50"
                     : "h-6 sm:h-7 rounded-[5px] bg-[#181533] hover:bg-[#231f47] text-slate-400 hover:text-white border border-[#231f47] text-[10px] font-mono font-bold transition-colors active:scale-95 flex items-center justify-center cursor-pointer touch-manipulation"
                 }
               >
