@@ -69,7 +69,7 @@ export function LandingPageNeoBrutalist({
             {/* Set 1 */}
             <span className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#ff3366] animate-pulse" />
-              ★ 1-MIN BETTING ROUNDS LIVE
+              ★ 1M 30S BETTING ROUNDS LIVE
             </span>
             <span>•</span>
             <span>★ VIRTUAL FOOTBALL PRO ★</span>
@@ -82,7 +82,7 @@ export function LandingPageNeoBrutalist({
             {/* Set 2 (Seamless Infinite Loop) */}
             <span className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#ff3366] animate-pulse" />
-              ★ 1-MIN BETTING ROUNDS LIVE
+              ★ 1M 30S BETTING ROUNDS LIVE
             </span>
             <span>•</span>
             <span>★ VIRTUAL FOOTBALL PRO ★</span>
