@@ -309,11 +309,16 @@ export function SimulationScreen({
         else if (desc.includes("CHANCE")) badgeText = "⚡ BIG CHANCE";
         else if (topEvent.type === "card") badgeText = "🟨 YELLOW CARD";
 
+        // Position all on-pitch notifications in the top corner (top-right or top-left)
+        // exactly where the goal notification shows
+        const isRightHalf = ballX >= 52.5 || (isHome && !desc.includes("SAVE")) || (!isHome && desc.includes("SAVE"));
+        const posX = isRightHalf ? 87.5 : 17.5;
+
         setActiveEventBadge({
           text: `${badgeText} • ${teamCode}`,
           type: topEvent.type,
-          x: ballX,
-          y: Math.max(12, Math.min(56, ballY - 6)),
+          x: posX,
+          y: 5.5,
           teamCode,
           isHome,
         });
@@ -987,15 +992,11 @@ export function SimulationScreen({
                 className="transition-transform duration-200 ease-out motion-reduce:transition-none"
               />
 
-              {/* On-Pitch Event Badge (Goal banner renders in top-right or top-left corner) */}
+              {/* On-Pitch Event Badge (All notifications render cleanly in top-right or top-left corner) */}
               {activeEventBadge && (() => {
                 const isGoalBadge = activeEventBadge.type === "goal";
-                const posX = isGoalBadge
-                  ? activeEventBadge.x
-                  : Math.max(14, Math.min(91, activeEventBadge.x));
-                const posY = isGoalBadge
-                  ? activeEventBadge.y
-                  : Math.max(10, Math.min(58, activeEventBadge.y - 6));
+                const posX = activeEventBadge.x;
+                const posY = activeEventBadge.y;
 
                 return (
                   <g
@@ -1004,21 +1005,21 @@ export function SimulationScreen({
                       transform: `translate(${posX}px, ${posY}px)`,
                     }}
                   >
-                    {/* Neo-Brutalist shadow offset for goal alert banner */}
+                    {/* Neo-Brutalist shadow offset for alert banner */}
                     {isNeoBrutalist && (
                       <rect
-                        x="-13.2"
+                        x="-14.2"
                         y="-2.7"
-                        width="28"
+                        width="30"
                         height="7"
                         rx="1"
                         fill="#000000"
                       />
                     )}
                     <rect
-                      x="-14"
+                      x="-15"
                       y="-3.5"
-                      width="28"
+                      width="30"
                       height="7"
                       rx="1"
                       fill={
@@ -1027,7 +1028,13 @@ export function SimulationScreen({
                             ? activeEventBadge.isHome
                               ? "#00ff66"
                               : "#ff0055"
-                            : "#ffe600"
+                            : activeEventBadge.type === "save"
+                            ? "#00ffff"
+                            : activeEventBadge.type === "near_miss"
+                            ? "#ffcc00"
+                            : activeEventBadge.type === "card"
+                            ? "#ffe600"
+                            : "#ffffff"
                           : "#0A0D12"
                       }
                       stroke="#000000"
@@ -1046,7 +1053,7 @@ export function SimulationScreen({
                           ? "#10B981"
                           : "#FFFFFF"
                       }
-                      fontSize="2.4"
+                      fontSize="2.2"
                       fontFamily="monospace"
                       fontWeight="900"
                     >
