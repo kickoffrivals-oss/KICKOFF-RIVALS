@@ -4,6 +4,8 @@ import { Match, MatchResult } from "../types";
 import { IconX, IconClock } from "./Icons";
 import { soundFx } from "../lib/soundFx";
 import { useTheme } from "../contexts/ThemeContext";
+import { TeamLogo } from "./TeamLogo";
+import { TEAMS } from "../constants";
 
 interface SimulationScreenProps {
   match: Match;
@@ -54,6 +56,32 @@ export function SimulationScreen({
 
   const homeTeamId = match.homeTeam?.id || (match as any).homeTeamId || (match as any).home_team_id;
   const awayTeamId = match.awayTeam?.id || (match as any).awayTeamId || (match as any).away_team_id;
+
+  const homeLogo = useMemo(() => {
+    if (match.homeTeam?.logo) return match.homeTeam.logo;
+    const leagueTeams = TEAMS[match.leagueId] || [];
+    const hName = match.homeTeam?.name?.toLowerCase().trim();
+    const found = leagueTeams.find(
+      (t) => t.id === homeTeamId || (hName && t.name.toLowerCase().trim() === hName)
+    );
+    if (found?.logo) return found.logo;
+    return Object.values(TEAMS)
+      .flat()
+      .find((t) => t.id === homeTeamId || (hName && t.name.toLowerCase().trim() === hName))?.logo;
+  }, [match.homeTeam, match.leagueId, homeTeamId]);
+
+  const awayLogo = useMemo(() => {
+    if (match.awayTeam?.logo) return match.awayTeam.logo;
+    const leagueTeams = TEAMS[match.leagueId] || [];
+    const aName = match.awayTeam?.name?.toLowerCase().trim();
+    const found = leagueTeams.find(
+      (t) => t.id === awayTeamId || (aName && t.name.toLowerCase().trim() === aName)
+    );
+    if (found?.logo) return found.logo;
+    return Object.values(TEAMS)
+      .flat()
+      .find((t) => t.id === awayTeamId || (aName && t.name.toLowerCase().trim() === aName))?.logo;
+  }, [match.awayTeam, match.leagueId, awayTeamId]);
 
   const isHomeEvent = (teamId: any) => {
     if (!teamId) return true;
@@ -472,20 +500,21 @@ export function SimulationScreen({
           >
             {/* Home Team */}
             <div className="flex items-center gap-2 min-w-0">
-              <span
+              <TeamLogo
+                name={match.homeTeam.name}
+                color={match.homeTeam.color}
+                logo={homeLogo}
+                size="sm"
                 className={cn(
-                  "w-3.5 h-3.5 rounded-[2px] shrink-0",
+                  "w-6 h-6 sm:w-7 sm:h-7 rounded-full shrink-0 overflow-hidden",
                   isNeoBrutalist
-                    ? "border-2 border-black shadow-[1px_1px_0_#000]"
-                    : "border border-black/40"
+                    ? "border-[1.5px] border-black shadow-[1.5px_1.5px_0_#000] bg-white p-0.5"
+                    : "border border-border-subtle bg-surface-raised p-0.5"
                 )}
-                style={{
-                  backgroundColor: isNeoBrutalist ? "#00ff66" : match.homeTeam.color,
-                }}
               />
               <span
                 className={cn(
-                  "font-bold text-xs uppercase tracking-wider",
+                  "font-bold text-xs uppercase tracking-wider truncate",
                   isNeoBrutalist ? "text-black font-black" : "text-white"
                 )}
               >
@@ -599,22 +628,23 @@ export function SimulationScreen({
               </span>
               <span
                 className={cn(
-                  "font-bold text-xs uppercase tracking-wider",
+                  "font-bold text-xs uppercase tracking-wider truncate",
                   isNeoBrutalist ? "text-black font-black" : "text-white"
                 )}
               >
                 {match.awayTeam.name}
               </span>
-              <span
+              <TeamLogo
+                name={match.awayTeam.name}
+                color={match.awayTeam.color}
+                logo={awayLogo}
+                size="sm"
                 className={cn(
-                  "w-3.5 h-3.5 rounded-[2px] shrink-0",
+                  "w-6 h-6 sm:w-7 sm:h-7 rounded-full shrink-0 overflow-hidden",
                   isNeoBrutalist
-                    ? "border-2 border-black shadow-[1px_1px_0_#000]"
-                    : "border border-black/40"
+                    ? "border-[1.5px] border-black shadow-[1.5px_1.5px_0_#000] bg-white p-0.5"
+                    : "border border-border-subtle bg-surface-raised p-0.5"
                 )}
-                style={{
-                  backgroundColor: isNeoBrutalist ? "#ff0055" : match.awayTeam.color,
-                }}
               />
             </div>
           </div>
@@ -1081,16 +1111,17 @@ export function SimulationScreen({
                   isNeoBrutalist ? "text-black font-black" : "text-white"
                 )}
               >
-                <span
+                <TeamLogo
+                  name={match.homeTeam.name}
+                  color={match.homeTeam.color}
+                  logo={homeLogo}
+                  size="sm"
                   className={cn(
-                    "w-3 h-3 rounded-[2px]",
-                    isNeoBrutalist && "border border-black"
+                    "w-4 h-4 rounded-full shrink-0 overflow-hidden",
+                    isNeoBrutalist
+                      ? "border border-black bg-white shadow-[1px_1px_0_#000]"
+                      : "border border-border-subtle bg-surface-raised"
                   )}
-                  style={{
-                    backgroundColor: isNeoBrutalist
-                      ? "#00ff66"
-                      : match.homeTeam.color,
-                  }}
                 />
                 <span>{homeCode}</span>
                 <span
@@ -1129,16 +1160,17 @@ export function SimulationScreen({
                   {awayPossession}%
                 </span>
                 <span>{awayCode}</span>
-                <span
+                <TeamLogo
+                  name={match.awayTeam.name}
+                  color={match.awayTeam.color}
+                  logo={awayLogo}
+                  size="sm"
                   className={cn(
-                    "w-3 h-3 rounded-[2px]",
-                    isNeoBrutalist && "border border-black"
+                    "w-4 h-4 rounded-full shrink-0 overflow-hidden",
+                    isNeoBrutalist
+                      ? "border border-black bg-white shadow-[1px_1px_0_#000]"
+                      : "border border-border-subtle bg-surface-raised"
                   )}
-                  style={{
-                    backgroundColor: isNeoBrutalist
-                      ? "#ff0055"
-                      : match.awayTeam.color,
-                  }}
                 />
               </span>
             </div>
