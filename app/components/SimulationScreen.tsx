@@ -37,6 +37,7 @@ export function SimulationScreen({
     x: number;
     y: number;
     teamCode: string;
+    isHome?: boolean;
   } | null>(null);
   const [goalHighlight, setGoalHighlight] = useState<"home" | "away" | null>(null);
   const [ariaGoalAnnouncement, setAriaGoalAnnouncement] = useState<string>("");
@@ -189,9 +190,10 @@ export function SimulationScreen({
         setActiveEventBadge({
           text: `GOAL • ${teamCode} ${recentGoal.minute}'`,
           type: "goal",
-          x: isHome ? 102 : 3,
-          y: 34,
+          x: isHome ? 87.5 : 17.5, // Top-Right for right net goal; Top-Left for left net goal
+          y: 5.5,
           teamCode,
+          isHome,
         });
 
         const timer = setTimeout(() => {
@@ -890,52 +892,74 @@ export function SimulationScreen({
                 className="transition-transform duration-200 ease-out motion-reduce:transition-none"
               />
 
-              {/* On-Pitch Event Badge */}
-              {activeEventBadge && (
-                <g
-                  className="animate-fade-in transition-opacity duration-300 pointer-events-none"
-                  style={{
-                    transform: `translate(${Math.max(
-                      14,
-                      Math.min(91, activeEventBadge.x)
-                    )}px, ${Math.max(10, Math.min(58, activeEventBadge.y - 6))}px)`,
-                  }}
-                >
-                  <rect
-                    x="-14"
-                    y="-3.5"
-                    width="28"
-                    height="7"
-                    rx="1"
-                    fill={
-                      isNeoBrutalist
-                        ? activeEventBadge.type === "goal"
-                          ? "#00ff66"
-                          : "#ffe600"
-                        : "#0A0D12"
-                    }
-                    stroke="#000000"
-                    strokeWidth={isNeoBrutalist ? "0.9" : "0.5"}
-                  />
-                  <text
-                    x="0"
-                    y="1.2"
-                    textAnchor="middle"
-                    fill={
-                      isNeoBrutalist
-                        ? "#000000"
-                        : activeEventBadge.type === "goal"
-                        ? "#10B981"
-                        : "#FFFFFF"
-                    }
-                    fontSize="2.5"
-                    fontFamily="monospace"
-                    fontWeight="900"
+              {/* On-Pitch Event Badge (Goal banner renders in top-right or top-left corner) */}
+              {activeEventBadge && (() => {
+                const isGoalBadge = activeEventBadge.type === "goal";
+                const posX = isGoalBadge
+                  ? activeEventBadge.x
+                  : Math.max(14, Math.min(91, activeEventBadge.x));
+                const posY = isGoalBadge
+                  ? activeEventBadge.y
+                  : Math.max(10, Math.min(58, activeEventBadge.y - 6));
+
+                return (
+                  <g
+                    className="animate-fade-in transition-opacity duration-300 pointer-events-none"
+                    style={{
+                      transform: `translate(${posX}px, ${posY}px)`,
+                    }}
                   >
-                    {activeEventBadge.text}
-                  </text>
-                </g>
-              )}
+                    {/* Neo-Brutalist shadow offset for goal alert banner */}
+                    {isNeoBrutalist && (
+                      <rect
+                        x="-13.2"
+                        y="-2.7"
+                        width="28"
+                        height="7"
+                        rx="1"
+                        fill="#000000"
+                      />
+                    )}
+                    <rect
+                      x="-14"
+                      y="-3.5"
+                      width="28"
+                      height="7"
+                      rx="1"
+                      fill={
+                        isNeoBrutalist
+                          ? isGoalBadge
+                            ? activeEventBadge.isHome
+                              ? "#00ff66"
+                              : "#ff0055"
+                            : "#ffe600"
+                          : "#0A0D12"
+                      }
+                      stroke="#000000"
+                      strokeWidth={isNeoBrutalist ? "0.9" : "0.5"}
+                    />
+                    <text
+                      x="0"
+                      y="1.1"
+                      textAnchor="middle"
+                      fill={
+                        isNeoBrutalist
+                          ? isGoalBadge && !activeEventBadge.isHome
+                            ? "#FFFFFF"
+                            : "#000000"
+                          : isGoalBadge
+                          ? "#10B981"
+                          : "#FFFFFF"
+                      }
+                      fontSize="2.4"
+                      fontFamily="monospace"
+                      fontWeight="900"
+                    >
+                      {activeEventBadge.text}
+                    </text>
+                  </g>
+                );
+              })()}
             </svg>
           </div>
 
