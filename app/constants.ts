@@ -319,8 +319,8 @@ export const TEAMS: Record<string, Team[]> = {
 };
 
 export const INITIAL_BALANCE = 1000;
-export const ROUND_DURATION_SEC = 20; // 20 seconds betting
-export const MATCH_DURATION_SEC = 60; // 60 seconds (1 minute) live
+export const ROUND_DURATION_SEC = 60; // 60 seconds (1 minute) betting
+export const MATCH_DURATION_SEC = 10; // 10 seconds live simulation
 export const RESULT_DURATION_SEC = 10; // 10 seconds intermission
 export const MAX_ROUNDS = 38; // Standard league season length
 

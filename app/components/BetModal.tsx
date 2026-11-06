@@ -42,10 +42,11 @@ export function BetModal({
   };
 
   const isBettingClosed = () => {
+    if (match.status === "RESULT" || match.status === "FINISHED") return true;
     if (match.status !== "LIVE") return false;
     if (!match.liveStartTime) return false;
     const elapsed = Date.now() - new Date(match.liveStartTime).getTime();
-    return elapsed > 10000;
+    return elapsed > 3000;
   };
 
   const bettingClosed = isBettingClosed();
