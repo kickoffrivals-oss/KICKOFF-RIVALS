@@ -13,6 +13,8 @@ function ProfileTab() {
   const { logout: storeLogout } = useUserStore();
   const { profile, isLoading } = useProfile();
   const {
+    korBalance,
+    balance,
     setShowWallet,
     handleLogout: contextLogout,
     handleRedeem,
@@ -48,10 +50,17 @@ function ProfileTab() {
     );
   }
 
+  const currentKor = korBalance ?? balance ?? profile.korBalance;
+  const mergedStats = {
+    ...profile,
+    korBalance: currentKor,
+    coins: currentKor,
+  };
+
   return (
     <main className="p-3 max-w-md mx-auto w-full">
       <ProfileScreen
-        stats={profile}
+        stats={mergedStats}
         onLogout={() => {
           storeLogout();
           contextLogout();

@@ -422,7 +422,7 @@ export function ProfileScreen({
               isNeoBrutalist ? "text-black" : "text-text-primary"
             )}
           >
-            {formatNumber(stats?.korBalance ?? stats?.coins ?? 0)}
+            {Number(stats?.korBalance ?? stats?.coins ?? 0).toLocaleString()}
           </p>
           <span
             className={cn(
