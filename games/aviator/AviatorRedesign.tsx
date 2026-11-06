@@ -744,17 +744,6 @@ export function AviatorRedesign({
               />
             </>
           )}
-
-          {isWaiting && (
-            <path
-              d="M 50 380 Q 200 380 400 375"
-              fill="none"
-              stroke={isNeoBrutalist ? "#504780" : "#2e2957"}
-              strokeWidth="3"
-              strokeDasharray="6 6"
-              strokeLinecap="round"
-            />
-          )}
         </svg>
 
         {/* Standby Aeroplane on runway during Waiting state */}
@@ -829,20 +818,6 @@ export function AviatorRedesign({
               )}
               <div className="text-4xl sm:text-6xl font-black font-sans text-white tracking-tight drop-shadow-md">
                 {countdown.toFixed(1)}s
-              </div>
-              <div
-                className={`w-36 sm:w-48 h-1.5 rounded-full overflow-hidden ${
-                  isNeoBrutalist ? "bg-black/60 border border-black" : "bg-[#1f1b3d]"
-                }`}
-              >
-                <div
-                  className={`h-full rounded-full transition-all duration-100 ${
-                    isNeoBrutalist
-                      ? "bg-[#00ff66]"
-                      : "bg-gradient-to-r from-[#00f0ff] to-[#3b82f6]"
-                  }`}
-                  style={{ width: `${Math.min(100, Math.max(0, (countdown / 10.0) * 100))}%` }}
-                />
               </div>
             </div>
           )}
