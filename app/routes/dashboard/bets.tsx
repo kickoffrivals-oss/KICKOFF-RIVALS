@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useGame } from "../../contexts/GameContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import {
   SingleBetCard,
   AccumulatorBetCard,
@@ -9,7 +10,7 @@ import {
 import type { Bet } from "../../types";
 import { soundFx } from "../../lib/soundFx";
 import { Ticket, Trophy } from "lucide-react";
-import { formatNumber } from "../../lib/utils";
+import { formatNumber, cn } from "../../lib/utils";
 
 export const Route = createFileRoute("/dashboard/bets")({
   component: BetsTab,
@@ -100,30 +101,73 @@ function BetsTab() {
     }
   }
 
+  const { isNeoBrutalist } = useTheme();
+
   return (
     <main className="p-4 sm:p-6 max-w-2xl mx-auto w-full space-y-4">
       {/* Bets Header */}
-      <div className="bg-surface-panel border border-border-subtle rounded-md p-4 flex items-center justify-between">
+      <div
+        className={cn(
+          "p-4 flex items-center justify-between transition-colors",
+          isNeoBrutalist
+            ? "bg-white border-[2.5px] sm:border-[3px] border-black shadow-[4px_4px_0_#000] text-black rounded-[10px]"
+            : "bg-surface-panel border border-border-subtle rounded-md text-text-primary"
+        )}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-sm bg-surface-raised border border-border-subtle flex items-center justify-center text-accent">
-            <Ticket size={20} strokeWidth={2} />
+          <div
+            className={cn(
+              "w-10 h-10 flex items-center justify-center shrink-0",
+              isNeoBrutalist
+                ? "bg-[#ffe600] border-2 border-black rounded-[6px] text-black shadow-[2px_2px_0_#000]"
+                : "rounded-sm bg-surface-raised border border-border-subtle text-accent"
+            )}
+          >
+            <Ticket size={20} strokeWidth={isNeoBrutalist ? 2.5 : 2} />
           </div>
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-text-muted block">
+            <span
+              className={cn(
+                "text-xs uppercase tracking-wider block",
+                isNeoBrutalist ? "text-black/70 font-black" : "text-text-muted font-bold"
+              )}
+            >
               MATCHDAY PORTFOLIO
             </span>
-            <h1 className="text-base sm:text-lg font-black text-text-primary font-display tracking-tight uppercase">
+            <h1
+              className={cn(
+                "text-base sm:text-lg font-black font-display tracking-tight uppercase",
+                isNeoBrutalist ? "text-black font-black" : "text-text-primary"
+              )}
+            >
               MY BET SLIPS
             </h1>
           </div>
         </div>
 
-        <div className="text-right bg-surface-raised border border-border-subtle px-3 py-1.5 rounded-sm">
-          <span className="text-xs font-semibold text-text-muted uppercase tracking-wider block">
+        <div
+          className={cn(
+            "text-right px-3 py-1.5",
+            isNeoBrutalist
+              ? "bg-[#ffe600] text-black border-2 border-black rounded-[6px] shadow-[2px_2px_0_#000]"
+              : "bg-surface-raised border border-border-subtle rounded-sm"
+          )}
+        >
+          <span
+            className={cn(
+              "text-xs uppercase tracking-wider block",
+              isNeoBrutalist ? "text-black/80 font-black" : "text-text-muted font-semibold"
+            )}
+          >
             Total Won
           </span>
-          <span className="text-sm font-black text-semantic-reward font-mono tabular-nums flex items-center justify-end gap-1">
-            <Trophy size={13} className="text-semantic-reward" />
+          <span
+            className={cn(
+              "text-sm font-black font-mono tabular-nums flex items-center justify-end gap-1",
+              isNeoBrutalist ? "text-black font-black" : "text-semantic-reward"
+            )}
+          >
+            <Trophy size={13} className={isNeoBrutalist ? "text-black" : "text-semantic-reward"} />
             {formatNumber(totalWon)} KOR
           </span>
         </div>
@@ -164,21 +208,38 @@ interface BetTabToggleProps {
 }
 
 function BetTabToggle({ active, onChange }: BetTabToggleProps) {
+  const { isNeoBrutalist } = useTheme();
+
   return (
-    <div className="flex bg-surface-page p-1 rounded-sm border border-border-subtle">
-      {(["ongoing", "ended"] as const).map((tab) => (
-        <button
-          key={tab}
-          onClick={() => onChange(tab)}
-          className={`flex-1 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
-            active === tab
-              ? "bg-surface-raised text-text-primary border border-border-strong font-bold"
-              : "text-text-muted hover:text-text-primary"
-          }`}
-        >
-          {tab === "ongoing" ? "Active Slips" : "Settled History"}
-        </button>
-      ))}
+    <div
+      className={cn(
+        "flex p-1 transition-all",
+        isNeoBrutalist
+          ? "bg-white border-2 border-black rounded-[8px] shadow-[2px_2px_0_#000] gap-1"
+          : "bg-surface-page rounded-sm border border-border-subtle"
+      )}
+    >
+      {(["ongoing", "ended"] as const).map((tab) => {
+        const isActive = active === tab;
+        return (
+          <button
+            key={tab}
+            onClick={() => onChange(tab)}
+            className={cn(
+              "flex-1 py-2 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer",
+              isNeoBrutalist
+                ? isActive
+                  ? "bg-[#ffe600] text-black border-2 border-black rounded-[6px] font-black shadow-[1.5px_1.5px_0_#000]"
+                  : "text-black/70 hover:text-black font-black border border-transparent rounded-[6px]"
+                : isActive
+                ? "bg-surface-raised text-text-primary border border-border-strong font-bold rounded-sm focus-visible:outline-2 focus-visible:outline-accent"
+                : "text-text-muted hover:text-text-primary rounded-sm focus-visible:outline-2 focus-visible:outline-accent"
+            )}
+          >
+            {tab === "ongoing" ? "Active Slips" : "Settled History"}
+          </button>
+        );
+      })}
     </div>
   );
 }
