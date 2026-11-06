@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowDownToLine, Send } from "lucide-react";
 import { cn } from "../lib/utils";
 import { UserStats, Transaction } from "../types";
 import { CONVERSION_RATE, CONVERSION_YIELD } from "../constants";
@@ -270,6 +271,59 @@ export function WalletModal({
               >
                 <span>⇄ Convert Coins to KOR</span>
               </button>
+
+              {/* Inactive Secondary Actions: Withdraw & Send KOR */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  disabled
+                  title="Withdrawals are currently inactive"
+                  className={cn(
+                    "w-full py-2 px-2.5 text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-not-allowed select-none",
+                    isNeoBrutalist
+                      ? "bg-[#f2efe4] text-black/45 border-2 border-dashed border-black/30 rounded-[8px] font-black shadow-[1.5px_1.5px_0_#00000015]"
+                      : "rounded-[6px] bg-[#141820] border border-dashed border-[#222938] text-slate-500 font-bold"
+                  )}
+                >
+                  <ArrowDownToLine className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                  <span>Withdraw</span>
+                  <span
+                    className={cn(
+                      "text-[9px] px-1.5 py-0.2 rounded font-mono font-bold uppercase",
+                      isNeoBrutalist
+                        ? "bg-black/10 text-black/60"
+                        : "bg-white/10 text-slate-400"
+                    )}
+                  >
+                    Soon
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled
+                  title="Send KOR is currently inactive"
+                  className={cn(
+                    "w-full py-2 px-2.5 text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-not-allowed select-none",
+                    isNeoBrutalist
+                      ? "bg-[#f2efe4] text-black/45 border-2 border-dashed border-black/30 rounded-[8px] font-black shadow-[1.5px_1.5px_0_#00000015]"
+                      : "rounded-[6px] bg-[#141820] border border-dashed border-[#222938] text-slate-500 font-bold"
+                  )}
+                >
+                  <Send className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                  <span>Send KOR</span>
+                  <span
+                    className={cn(
+                      "text-[9px] px-1.5 py-0.2 rounded font-mono font-bold uppercase",
+                      isNeoBrutalist
+                        ? "bg-black/10 text-black/60"
+                        : "bg-white/10 text-slate-400"
+                    )}
+                  >
+                    Soon
+                  </span>
+                </button>
+              </div>
 
               {/* Game Stats Snapshot */}
               <div className="grid grid-cols-3 gap-2">
