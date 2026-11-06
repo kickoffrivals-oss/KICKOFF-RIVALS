@@ -123,22 +123,30 @@ function generateRoundMatches(seasonId: number, roundNumber: number, startTime: 
   return generated;
 }
 
-function simulateMatchEvents(homeTeamId: string, awayTeamId: string, homeScore: number, awayScore: number, rng: seedrandom.PRNG) {
+function simulateMatchEvents(
+  homeTeamId: string,
+  awayTeamId: string,
+  homeScore: number,
+  awayScore: number,
+  rng: seedrandom.PRNG,
+  homeTeamName?: string,
+  awayTeamName?: string
+) {
   const events = [];
   for (let i = 0; i < homeScore; i++) {
     events.push({
-      minute: Math.floor(rng() * 90) + 1,
+      minute: Math.floor(rng() * 88) + 2,
       type: "goal" as const,
       teamId: homeTeamId,
-      description: "Goal scored!",
+      description: homeTeamName ? `Goal scored by ${homeTeamName}!` : "Goal scored!",
     });
   }
   for (let i = 0; i < awayScore; i++) {
     events.push({
-      minute: Math.floor(rng() * 90) + 1,
+      minute: Math.floor(rng() * 88) + 2,
       type: "goal" as const,
       teamId: awayTeamId,
-      description: "Goal scored!",
+      description: awayTeamName ? `Goal scored by ${awayTeamName}!` : "Goal scored!",
     });
   }
   return events.sort((a, b) => a.minute - b.minute);
@@ -169,9 +177,14 @@ export function updateLocalGameState() {
     // BETTING PHASE
     for (const m of store.matches) {
       m.status = "SCHEDULED";
+      m.currentScore = undefined;
     }
   } else if (elapsed < bettingMs + liveMs) {
     // LIVE SIMULATION PHASE
+    const liveElapsed = elapsed - bettingMs;
+    const liveProgress = Math.min(1, Math.max(0, liveElapsed / liveMs));
+    const liveMinute = Math.floor(liveProgress * 90);
+
     for (const m of store.matches) {
       if (m.status === "SCHEDULED") {
         m.status = "LIVE";
@@ -180,9 +193,27 @@ export function updateLocalGameState() {
         const rng = seedrandom(seed);
         m.homeScore = Math.floor(rng() * 4);
         m.awayScore = Math.floor(rng() * 4);
-        m.events = simulateMatchEvents(m.homeTeam.id, m.awayTeam.id, m.homeScore, m.awayScore, rng);
+        m.events = simulateMatchEvents(
+          m.homeTeam.id,
+          m.awayTeam.id,
+          m.homeScore,
+          m.awayScore,
+          rng,
+          m.homeTeam.name,
+          m.awayTeam.name
+        );
         m.vrfSeed = seed;
         m.isVerifiable = true;
+      }
+
+      if (m.status === "LIVE" && m.events) {
+        const homeGoals = m.events.filter(
+          (e: any) => e.type === "goal" && e.teamId === m.homeTeam.id && e.minute <= liveMinute
+        ).length;
+        const awayGoals = m.events.filter(
+          (e: any) => e.type === "goal" && e.teamId === m.awayTeam.id && e.minute <= liveMinute
+        ).length;
+        m.currentScore = { home: homeGoals, away: awayGoals };
       }
     }
   } else {
@@ -190,6 +221,7 @@ export function updateLocalGameState() {
     for (const m of store.matches) {
       if (m.status === "LIVE") {
         m.status = "RESULT";
+        m.currentScore = { home: m.homeScore ?? 0, away: m.awayScore ?? 0 };
       }
     }
     settleLocalBets();

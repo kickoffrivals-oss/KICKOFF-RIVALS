@@ -31,7 +31,6 @@ export function SimulationScreen({
   onFinish,
 }: SimulationScreenProps) {
   const { isNeoBrutalist } = useTheme();
-  const [displayedEvents, setDisplayedEvents] = useState<any[]>([]);
   const [activeEventBadge, setActiveEventBadge] = useState<{
     text: string;
     type: string;
@@ -43,15 +42,24 @@ export function SimulationScreen({
   const [ariaGoalAnnouncement, setAriaGoalAnnouncement] = useState<string>("");
 
   const eventsContainerRef = useRef<HTMLDivElement>(null);
-  const lastGoalCountRef = useRef<number>(0);
   const lastEventMinuteRef = useRef<number>(-1);
   const ballHistoryRef = useRef<Point[]>([]);
 
-  const homeScore = match.currentScore?.home ?? match.homeScore ?? result?.homeScore ?? 0;
-  const awayScore = match.currentScore?.away ?? match.awayScore ?? result?.awayScore ?? 0;
+  const finalHomeScore = match.homeScore ?? result?.homeScore ?? match.currentScore?.home ?? 0;
+  const finalAwayScore = match.awayScore ?? result?.awayScore ?? match.currentScore?.away ?? 0;
 
   const homeCode = getTeamCode(match.homeTeam.name);
   const awayCode = getTeamCode(match.awayTeam.name);
+
+  const homeTeamId = match.homeTeam?.id || (match as any).homeTeamId || (match as any).home_team_id;
+  const awayTeamId = match.awayTeam?.id || (match as any).awayTeamId || (match as any).away_team_id;
+
+  const isHomeEvent = (teamId: any) => {
+    if (!teamId) return true;
+    if (teamId === homeTeamId || String(teamId).toLowerCase() === String(homeTeamId).toLowerCase()) return true;
+    if (teamId === match.homeTeam?.name || String(teamId).toLowerCase() === String(match.homeTeam?.name).toLowerCase()) return true;
+    return false;
+  };
 
   // Derive possession stats deterministically from match ratings or scores
   const homeStrength = match.homeTeam.strength || 80;
@@ -66,24 +74,53 @@ export function SimulationScreen({
 
     // Fallback generation if no precomputed events exist
     const genEvents = [];
-    for (let i = 0; i < homeScore; i++) {
+    for (let i = 0; i < finalHomeScore; i++) {
       genEvents.push({
         minute: Math.min(85, 18 + i * 28),
         type: "goal" as const,
-        teamId: match.homeTeam.id,
+        teamId: homeTeamId,
         description: `Goal scored by ${match.homeTeam.name}`,
       });
     }
-    for (let i = 0; i < awayScore; i++) {
+    for (let i = 0; i < finalAwayScore; i++) {
       genEvents.push({
         minute: Math.min(88, 26 + i * 28),
         type: "goal" as const,
-        teamId: match.awayTeam.id,
+        teamId: awayTeamId,
         description: `Goal scored by ${match.awayTeam.name}`,
       });
     }
     return genEvents.sort((a, b) => a.minute - b.minute);
-  }, [result?.events, match.events, homeScore, awayScore, match.homeTeam.id, match.homeTeam.name, match.awayTeam.id, match.awayTeam.name]);
+  }, [result?.events, match.events, finalHomeScore, finalAwayScore, homeTeamId, awayTeamId, match.homeTeam.name, match.awayTeam.name]);
+
+  // Derived in-sync commentary events up to current minute
+  const displayedEvents = useMemo(() => {
+    return matchEvents
+      .filter((event) => event.minute <= currentMinute)
+      .sort((a, b) => b.minute - a.minute);
+  }, [matchEvents, currentMinute]);
+
+  // Live score derived strictly from active commentary goal events so the scoreboard
+  // and commentary feed are always 100% in sync on both desktop and mobile
+  const liveHomeScore = useMemo(() => {
+    if (currentMinute >= 90) {
+      return match.homeScore ?? result?.homeScore ?? matchEvents.filter((e) => e.type === "goal" && isHomeEvent(e.teamId)).length;
+    }
+    return displayedEvents.filter((e) => e.type === "goal" && isHomeEvent(e.teamId)).length;
+  }, [displayedEvents, matchEvents, homeTeamId, match.homeScore, result?.homeScore, currentMinute]);
+
+  const liveAwayScore = useMemo(() => {
+    if (currentMinute >= 90) {
+      return match.awayScore ?? result?.awayScore ?? matchEvents.filter((e) => e.type === "goal" && !isHomeEvent(e.teamId)).length;
+    }
+    return displayedEvents.filter((e) => e.type === "goal" && !isHomeEvent(e.teamId)).length;
+  }, [displayedEvents, matchEvents, homeTeamId, match.awayScore, result?.awayScore, currentMinute]);
+
+  // Initialize lastGoalCountRef with existing goal count so opening pitch view mid-game doesn't re-trigger past celebrations
+  const initialGoalCount = useMemo(() => {
+    return matchEvents.filter((e) => e.type === "goal" && e.minute <= currentMinute).length;
+  }, []);
+  const lastGoalCountRef = useRef<number>(initialGoalCount);
 
   // Ball trajectory coordinates (0..105, 0..68)
   const { ballX, ballY, currentEventType } = useMemo(() => {
@@ -92,10 +129,10 @@ export function SimulationScreen({
     );
 
     if (recentEvent) {
-      const isHomeEvent = recentEvent.teamId === match.homeTeam.id;
+      const isHome = isHomeEvent(recentEvent.teamId);
       if (recentEvent.type === "goal") {
         return {
-          ballX: isHomeEvent ? 104 : 1, // Into opponent's goal
+          ballX: isHome ? 104 : 1, // Into opponent's goal
           ballY: 34 + Math.sin(currentMinute) * 2,
           currentEventType: "goal" as const,
         };
@@ -103,14 +140,14 @@ export function SimulationScreen({
       const evType = recentEvent.type as string;
       if (evType === "shot" || evType === "save") {
         return {
-          ballX: isHomeEvent ? 94 : 11, // Penalty box
+          ballX: isHome ? 94 : 11, // Penalty box
           ballY: 34 + Math.sin(currentMinute * 2) * 8,
           currentEventType: evType,
         };
       }
       if (evType === "corner") {
         return {
-          ballX: isHomeEvent ? 104 : 1,
+          ballX: isHome ? 104 : 1,
           ballY: currentMinute % 2 === 0 ? 2 : 66,
           currentEventType: "corner" as const,
         };
@@ -125,7 +162,7 @@ export function SimulationScreen({
       ballY: Math.max(4, Math.min(64, yBase)),
       currentEventType: null,
     };
-  }, [currentMinute, matchEvents, match.homeTeam.id]);
+  }, [currentMinute, matchEvents, homeTeamId]);
 
   // Keep ball trail of 4 previous positions
   useEffect(() => {
@@ -135,46 +172,44 @@ export function SimulationScreen({
     ];
   }, [ballX, ballY]);
 
-  // Filter events up to current minute and trigger event notifications
+  // Goal announcement and pitch banner events
   useEffect(() => {
-    const eventsToShow = matchEvents
-      .filter((event) => event.minute <= currentMinute)
-      .sort((a, b) => b.minute - a.minute);
-    setDisplayedEvents(eventsToShow);
-
-    // Check for goal
-    const goalEvents = eventsToShow.filter((e) => e.type === "goal");
+    const goalEvents = displayedEvents.filter((e) => e.type === "goal");
     if (goalEvents.length > lastGoalCountRef.current) {
       const recentGoal = goalEvents[0];
-      const isHome = recentGoal.teamId === match.homeTeam.id;
+      const isHome = isHomeEvent(recentGoal.teamId);
       const teamCode = isHome ? homeCode : awayCode;
       const teamName = isHome ? match.homeTeam.name : match.awayTeam.name;
 
-      soundFx.playGoal();
-      setGoalHighlight(isHome ? "away" : "home"); // Highlight the defending net that conceded
-      setAriaGoalAnnouncement(`Goal! ${teamName} scores at minute ${recentGoal.minute}.`);
+      if (recentGoal.minute === currentMinute || recentGoal.minute === currentMinute - 1) {
+        soundFx.playGoal();
+        setGoalHighlight(isHome ? "away" : "home"); // Highlight the defending net that conceded
+        setAriaGoalAnnouncement(`Goal! ${teamName} scores at minute ${recentGoal.minute}.`);
 
-      setActiveEventBadge({
-        text: `GOAL • ${teamCode} ${recentGoal.minute}'`,
-        type: "goal",
-        x: isHome ? 102 : 3,
-        y: 34,
-        teamCode,
-      });
+        setActiveEventBadge({
+          text: `GOAL • ${teamCode} ${recentGoal.minute}'`,
+          type: "goal",
+          x: isHome ? 102 : 3,
+          y: 34,
+          teamCode,
+        });
 
-      const timer = setTimeout(() => {
-        setGoalHighlight(null);
-        setActiveEventBadge(null);
-      }, 2000);
-      lastGoalCountRef.current = goalEvents.length;
-      return () => clearTimeout(timer);
+        const timer = setTimeout(() => {
+          setGoalHighlight(null);
+          setActiveEventBadge(null);
+        }, 2000);
+        lastGoalCountRef.current = goalEvents.length;
+        return () => clearTimeout(timer);
+      } else {
+        lastGoalCountRef.current = goalEvents.length;
+      }
     }
 
     // Check for other in-game events
-    if (eventsToShow.length > 0 && currentMinute !== lastEventMinuteRef.current) {
-      const topEvent = eventsToShow[0];
+    if (displayedEvents.length > 0 && currentMinute !== lastEventMinuteRef.current) {
+      const topEvent = displayedEvents[0];
       if (topEvent.minute === currentMinute && topEvent.type !== "goal") {
-        const isHome = topEvent.teamId === match.homeTeam.id;
+        const isHome = isHomeEvent(topEvent.teamId);
         const teamCode = isHome ? homeCode : awayCode;
         const badgeText = topEvent.type.toUpperCase();
 
@@ -193,7 +228,7 @@ export function SimulationScreen({
         return () => clearTimeout(timer);
       }
     }
-  }, [currentMinute, matchEvents, match.homeTeam, match.awayTeam, homeCode, awayCode, ballX, ballY]);
+  }, [displayedEvents, currentMinute, homeTeamId, homeCode, awayCode, match.homeTeam.name, match.awayTeam.name, ballX, ballY]);
 
   // Formations: 5 players per team shifting towards the ball
   const homePlayers: Point[] = useMemo(() => [
@@ -314,7 +349,7 @@ export function SimulationScreen({
       </header>
 
       {/* Main Broadcast Split-Screen Viewport */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 sm:p-6 overflow-hidden max-w-7xl mx-auto w-full">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 sm:p-6 overflow-y-auto lg:overflow-hidden max-w-7xl mx-auto w-full">
         {/* Left: Pitch & Scoreboard Container (8 Columns) */}
         <div
           className={cn(
@@ -391,14 +426,14 @@ export function SimulationScreen({
               >
                 <span
                   className={
-                    homeScore > awayScore
+                    liveHomeScore > liveAwayScore
                       ? isNeoBrutalist
                         ? "text-black underline decoration-2"
                         : "text-emerald-400"
                       : ""
                   }
                 >
-                  {homeScore}
+                  {liveHomeScore}
                 </span>
                 <span
                   className={
@@ -409,14 +444,14 @@ export function SimulationScreen({
                 </span>
                 <span
                   className={
-                    awayScore > homeScore
+                    liveAwayScore > liveHomeScore
                       ? isNeoBrutalist
                         ? "text-black underline decoration-2"
                         : "text-emerald-400"
                       : ""
                   }
                 >
-                  {awayScore}
+                  {liveAwayScore}
                 </span>
               </div>
               <span

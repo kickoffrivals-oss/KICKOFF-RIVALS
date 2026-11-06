@@ -19,20 +19,39 @@ interface MatchGridProps {
 function resolveDisplayScore(m: Match, gameState: GameState, currentMinute: number) {
   if (gameState !== "LIVE" && gameState !== "FINISHED" && gameState !== "RESULT") return undefined;
 
-  if (m.homeScore !== undefined && m.homeScore !== null) {
-    return { home: m.homeScore, away: m.awayScore! };
+  const homeTeamId = m.homeTeam?.id || (m as any).homeTeamId || (m as any).home_team_id;
+  const awayTeamId = m.awayTeam?.id || (m as any).awayTeamId || (m as any).away_team_id;
+
+  const isHomeEvent = (teamId: any) => {
+    if (!teamId) return true;
+    if (teamId === homeTeamId || String(teamId).toLowerCase() === String(homeTeamId).toLowerCase()) return true;
+    if (teamId === m.homeTeam?.name || String(teamId).toLowerCase() === String(m.homeTeam?.name).toLowerCase()) return true;
+    return false;
+  };
+
+  // During LIVE phase, compute score strictly from goals scored up to currentMinute
+  if (gameState === "LIVE") {
+    const rawEvents = m.events || m.result?.events;
+    if (rawEvents && rawEvents.length > 0) {
+      const activeGoals = rawEvents.filter(
+        (e: any) => e.type === "goal" && e.minute <= currentMinute
+      );
+      const homeGoals = activeGoals.filter((e: any) => isHomeEvent(e.teamId)).length;
+      const awayGoals = activeGoals.length - homeGoals;
+      return { home: homeGoals, away: awayGoals };
+    }
+
+    if (m.currentScore) {
+      return { home: m.currentScore.home, away: m.currentScore.away };
+    }
+
+    // If no events pre-generated, default to 0-0 until events trigger
+    return { home: 0, away: 0 };
   }
 
-  if (m.events) {
-    const homeGoals = m.events.filter(
-      (e: any) =>
-        e.type === "goal" && e.teamId === m.homeTeam.id && e.minute <= currentMinute,
-    ).length;
-    const awayGoals = m.events.filter(
-      (e: any) =>
-        e.type === "goal" && e.teamId === m.awayTeam.id && e.minute <= currentMinute,
-    ).length;
-    return { home: homeGoals, away: awayGoals };
+  // Finished or Result phase: show full-time final scores
+  if (m.homeScore !== undefined && m.homeScore !== null) {
+    return { home: m.homeScore, away: m.awayScore ?? 0 };
   }
 
   if (m.result) {
