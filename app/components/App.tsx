@@ -1905,7 +1905,7 @@ const App: React.FC = () => {
 
       {/* Mystery box removed - no spinner UI */}
 
-      {watchingMatchId && matches.find((m) => m.id === watchingMatchId) && (
+      {watchingMatchId && gameState === "LIVE" && matches.find((m) => m.id === watchingMatchId) && (
         <SimulationScreen
           match={matches.find((m) => m.id === watchingMatchId)!}
           result={matches.find((m) => m.id === watchingMatchId)!.result!}

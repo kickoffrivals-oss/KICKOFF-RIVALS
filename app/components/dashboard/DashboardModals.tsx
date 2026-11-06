@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useSignMessage } from "wagmi";
 import { useGame } from "../../contexts/GameContext";
 import { useProfile } from "../../hooks/useProfile";
@@ -56,6 +56,13 @@ export function DashboardModals() {
     fetchMatches,
     adminSessionToken,
   } = useGame();
+
+  // Automatically close pitch view if the match round is no longer LIVE
+  useEffect(() => {
+    if (gameState !== "LIVE" && watchingMatchId) {
+      setWatchingMatchId(null);
+    }
+  }, [gameState, watchingMatchId, setWatchingMatchId]);
 
   if (!profile) return null;
 
@@ -128,7 +135,7 @@ This action does not cost gas.`;
         />
       )}
 
-      {watchingMatchId && matches.find((m) => m.id === watchingMatchId) && (
+      {watchingMatchId && gameState === "LIVE" && matches.find((m) => m.id === watchingMatchId) && (
         <SimulationScreen
           match={matches.find((m) => m.id === watchingMatchId)!}
           result={matches.find((m) => m.id === watchingMatchId)?.result}

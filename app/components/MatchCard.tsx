@@ -103,22 +103,24 @@ export function MatchCard({
           )}
         </div>
 
-        {/* Watch Live Pitch Button */}
-        <button
-          onClick={() => {
-            soundFx.playClick();
-            onWatch(match);
-          }}
-          aria-label={`Watch pitch view for ${match.homeTeam.name} vs ${match.awayTeam.name}`}
-          className={`flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-[5px] sm:rounded-[6px] transition-all cursor-pointer ${
-            isNeoBrutalist
-              ? "bg-[#ffe600] text-black border-[1.5px] sm:border-2 border-black shadow-[1.5px_1.5px_0_#000] sm:shadow-[2px_2px_0_#000] hover:bg-[#ffe600]/80 active:translate-x-[1px] active:translate-y-[1px]"
-              : "text-text-muted hover:text-text-primary hover:bg-surface-raised border border-border-subtle"
-          }`}
-        >
-          <Eye size={12} className="sm:w-3.5 sm:h-3.5" strokeWidth={isNeoBrutalist ? 2.5 : 2} />
-          <span>Pitch View</span>
-        </button>
+        {/* Watch Live Pitch Button - only displayed when match is LIVE */}
+        {isLive && (
+          <button
+            onClick={() => {
+              soundFx.playClick();
+              onWatch(match);
+            }}
+            aria-label={`Watch pitch view for ${match.homeTeam.name} vs ${match.awayTeam.name}`}
+            className={`flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-black px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-[5px] sm:rounded-[6px] transition-all cursor-pointer ${
+              isNeoBrutalist
+                ? "bg-[#ffe600] text-black border-[1.5px] sm:border-2 border-black shadow-[1.5px_1.5px_0_#000] sm:shadow-[2px_2px_0_#000] hover:bg-[#ffe600]/80 active:translate-x-[1px] active:translate-y-[1px]"
+                : "text-text-muted hover:text-text-primary hover:bg-surface-raised border border-border-subtle"
+            }`}
+          >
+            <Eye size={12} className="sm:w-3.5 sm:h-3.5" strokeWidth={isNeoBrutalist ? 2.5 : 2} />
+            <span>Pitch View</span>
+          </button>
+        )}
       </div>
 
       {/* Teams & Scoreboard Arena */}
