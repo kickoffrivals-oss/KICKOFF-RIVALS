@@ -39,7 +39,7 @@ export function BetSlip({
   const { isNeoBrutalist } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [stake, setStake] = useState(100);
+  const [stake, setStake] = useState(0);
   const [betType, setBetType] = useState<"single" | "accumulator">("single");
   const [prevCount, setPrevCount] = useState(selections.length);
 
@@ -625,17 +625,13 @@ export function BetSlip({
                 type="button"
                 onClick={() => {
                   soundFx.playClick();
-                  setStake(amount);
+                  setStake((prev) => Math.min(balance, (prev || 0) + amount));
                 }}
                 className={cn(
                   "flex-1 py-1 rounded text-xs font-mono font-bold border transition-all cursor-pointer",
                   isNeoBrutalist
-                    ? stake === amount
-                      ? "bg-[#ffe600] text-black border-2 border-black font-black shadow-[1.5px_1.5px_0_#000]"
-                      : "bg-white text-black border-2 border-black hover:bg-[#fff7b3] font-black shadow-[1px_1px_0_#000]"
-                    : stake === amount
-                    ? "bg-surface-raised text-text-primary border-border-strong"
-                    : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong"
+                    ? "bg-white text-black border-2 border-black hover:bg-[#ffe600] active:bg-[#ffe600] active:translate-x-[1px] active:translate-y-[1px] font-black shadow-[1.5px_1.5px_0_#000]"
+                    : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong active:bg-surface-raised font-bold"
                 )}
               >
                 +{amount}
@@ -650,8 +646,8 @@ export function BetSlip({
               className={cn(
                 "flex-1 py-1 rounded text-xs font-mono font-black border transition-all cursor-pointer",
                 isNeoBrutalist
-                  ? "bg-[#00ff66] text-black border-2 border-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#12e069]"
-                  : "bg-surface-page text-semantic-reward border-border-subtle hover:border-semantic-reward"
+                  ? "bg-[#00ff66] text-black border-2 border-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#12e069] active:translate-x-[1px] active:translate-y-[1px]"
+                  : "bg-surface-page text-semantic-reward border-border-subtle hover:border-semantic-reward font-black"
               )}
             >
               MAX
@@ -674,7 +670,7 @@ export function BetSlip({
             <label
               htmlFor="betslip-stake-input"
               className={cn(
-                "text-xs font-semibold",
+                "text-xs font-semibold shrink-0",
                 isNeoBrutalist ? "text-black/70 font-black" : "text-text-muted"
               )}
             >
@@ -683,8 +679,12 @@ export function BetSlip({
             <input
               id="betslip-stake-input"
               type="number"
-              value={stake}
-              onChange={(e) => setStake(Math.max(0, Number(e.target.value)))}
+              value={stake === 0 ? "" : stake}
+              placeholder="0"
+              onChange={(e) => {
+                const val = e.target.value === "" ? 0 : Number(e.target.value);
+                setStake(Math.min(balance, Math.max(0, val)));
+              }}
               className={cn(
                 "flex-1 bg-transparent text-right font-mono font-bold text-sm focus:outline-none tabular-nums",
                 isNeoBrutalist ? "text-black font-black" : "text-text-primary"
@@ -694,12 +694,30 @@ export function BetSlip({
             />
             <span
               className={cn(
-                "text-xs font-bold",
+                "text-xs font-bold shrink-0",
                 isNeoBrutalist ? "text-black font-black" : "text-text-muted"
               )}
             >
               KOR
             </span>
+            {stake > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  soundFx.playClick();
+                  setStake(0);
+                }}
+                className={cn(
+                  "text-[10px] font-mono px-1.5 py-0.5 rounded cursor-pointer shrink-0 transition-all uppercase tracking-wider",
+                  isNeoBrutalist
+                    ? "bg-slate-100 hover:bg-slate-200 text-black border border-black font-black shadow-[1px_1px_0_#000]"
+                    : "text-text-muted hover:text-text-primary bg-surface-raised border border-border-subtle font-bold"
+                )}
+                title="Reset stake to 0"
+              >
+                Clear
+              </button>
+            )}
           </div>
 
           {/* Balance Reminder */}
@@ -750,7 +768,7 @@ export function BetSlip({
                 <span>Conflict: 2+ Picks From Same Match</span>
               </>
             ) : !canPlaceBet ? (
-              "Insufficient KOR"
+              stake === 0 ? "Enter Stake Amount" : "Insufficient KOR"
             ) : (
               <>
                 <Check size={16} strokeWidth={2.5} />

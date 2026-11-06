@@ -27,17 +27,17 @@ export function BetModal({
   const [selection, setSelection] = useState<
     "home" | "draw" | "away" | "gg" | "nogg" | null
   >(null);
-  const [stake, setStake] = useState<number>(100);
+  const [stake, setStake] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const quickStakes = [50, 100, 250, 500];
+  const quickStakes = [50, 100, 500, 1000];
 
   const selectedOdds = selection ? match.odds[selection] : 0;
   const potentialWin = Math.round(stake * selectedOdds);
   const canPlaceBet = selection && stake > 0 && stake <= balance;
 
   const handleStakeChange = (value: number) => {
-    const newStake = Math.max(1, Math.min(value, balance));
+    const newStake = Math.max(0, Math.min(value, balance));
     setStake(newStake);
   };
 
@@ -303,7 +303,8 @@ export function BetModal({
                 <input
                   id="modal-stake-input"
                   type="number"
-                  value={stake}
+                  value={stake === 0 ? "" : stake}
+                  placeholder="0"
                   onChange={(e) => handleStakeChange(Number(e.target.value))}
                   className={cn(
                     "w-full h-10 px-3 text-center font-mono font-bold text-sm tabular-nums focus:outline-none transition-colors",
@@ -336,30 +337,28 @@ export function BetModal({
               {quickStakes.map((amount) => (
                 <button
                   key={amount}
-                  onClick={() => handleStakeChange(amount)}
-                  disabled={amount > balance}
+                  type="button"
+                  onClick={() => handleStakeChange((stake || 0) + amount)}
+                  disabled={(stake || 0) + amount > balance}
                   className={cn(
-                    "flex-1 py-1 text-xs font-mono font-bold transition-all focus-visible:outline-2",
+                    "flex-1 py-1 text-xs font-mono font-bold transition-all focus-visible:outline-2 cursor-pointer",
                     isNeoBrutalist
-                      ? stake === amount
-                        ? "bg-[#ffe600] text-black border-2 border-black rounded-[6px] font-black shadow-[1.5px_1.5px_0_#000]"
-                        : "bg-white text-black border-2 border-black rounded-[6px] hover:bg-[#faf8ee]"
-                      : stake === amount
-                      ? "bg-surface-raised text-text-primary border-border-strong rounded-sm border"
+                      ? "bg-white text-black border-2 border-black rounded-[6px] hover:bg-[#ffe600] active:translate-x-[1px] active:translate-y-[1px] font-black shadow-[1.5px_1.5px_0_#000]"
                       : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong rounded-sm border",
-                    amount > balance && "opacity-40 cursor-not-allowed"
+                    (stake || 0) + amount > balance && "opacity-40 cursor-not-allowed"
                   )}
                 >
                   +{amount}
                 </button>
               ))}
               <button
+                type="button"
                 onClick={() => handleStakeChange(balance)}
                 className={cn(
-                  "flex-1 py-1 text-xs font-mono font-bold transition-all focus-visible:outline-2",
+                  "flex-1 py-1 text-xs font-mono font-bold transition-all focus-visible:outline-2 cursor-pointer",
                   isNeoBrutalist
-                    ? "bg-[#00ff66] text-black border-2 border-black rounded-[6px] font-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#00dd55]"
-                    : "rounded-sm bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward"
+                    ? "bg-[#00ff66] text-black border-2 border-black rounded-[6px] font-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#00dd55] active:translate-x-[1px] active:translate-y-[1px]"
+                    : "rounded-sm bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward font-bold"
                 )}
               >
                 MAX
@@ -429,6 +428,8 @@ export function BetModal({
               "Select an Outcome"
             ) : bettingClosed ? (
               "Betting Closed"
+            ) : stake <= 0 ? (
+              "Enter Stake Amount"
             ) : stake > balance ? (
               "Insufficient KOR Balance"
             ) : isLoading ? (
