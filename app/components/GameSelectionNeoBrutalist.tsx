@@ -147,7 +147,7 @@ export function GameSelectionNeoBrutalist({
             <span>•</span>
             <span>★ AVIATOR HIT 52.81X WIN ★</span>
             <span>•</span>
-            <span>★ VIRTUAL FOOTBALL 35S PAYOUTS ★</span>
+            <span>★ 1-MIN BETTING WINDOW ★</span>
             <span>•</span>
             <span>★ PROVABLY FAIR SHA-256 ★</span>
             <span>•</span>
@@ -160,7 +160,7 @@ export function GameSelectionNeoBrutalist({
             <span>•</span>
             <span>★ AVIATOR HIT 52.81X WIN ★</span>
             <span>•</span>
-            <span>★ VIRTUAL FOOTBALL 35S PAYOUTS ★</span>
+            <span>★ 1-MIN BETTING WINDOW ★</span>
             <span>•</span>
             <span>★ PROVABLY FAIR SHA-256 ★</span>
             <span>•</span>

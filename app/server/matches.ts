@@ -559,6 +559,7 @@ export async function getCurrentMatchesInternal(data: { leagueId?: string }) {
       timer: 0, // Placeholder, derive from match/round start time if needed
       round: currentActiveRound,
       seasonId: activeSeason.id,
+      serverTime: new Date().toISOString(),
     };
 
     // Update Cache

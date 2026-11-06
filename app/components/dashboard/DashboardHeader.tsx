@@ -157,8 +157,16 @@ export function DashboardHeader() {
             >
               {timer > 0 ? (
                 <>
-                  <span className="hidden sm:inline">{timer}s remaining</span>
-                  <span className="sm:hidden">{timer}s</span>
+                  <span className="hidden sm:inline">
+                    {timer >= 60
+                      ? `${Math.floor(timer / 60)}m ${(timer % 60).toString().padStart(2, "0")}s remaining`
+                      : `${timer}s remaining`}
+                  </span>
+                  <span className="sm:hidden">
+                    {timer >= 60
+                      ? `${Math.floor(timer / 60)}m ${(timer % 60).toString().padStart(2, "0")}s`
+                      : `${timer}s`}
+                  </span>
                 </>
               ) : (
                 "Calculating Results..."
