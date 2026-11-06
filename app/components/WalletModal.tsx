@@ -244,7 +244,7 @@ export function WalletModal({
                       isNeoBrutalist ? "text-black" : "text-emerald-400"
                     )}
                   >
-                    {formatNumber(userStats?.korBalance ?? currentBalance ?? 1000)}
+                    {formatNumber(currentBalance ?? userStats?.korBalance ?? 1000)}
                   </p>
                   <p
                     className={cn(

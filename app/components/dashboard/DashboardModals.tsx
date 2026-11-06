@@ -42,6 +42,7 @@ export function DashboardModals() {
     gameState,
     balance,
     korBalance,
+    coins,
     setBalance,
     addTransaction,
     getCurrentGameMinute,
@@ -69,6 +70,12 @@ export function DashboardModals() {
   if (!profile) return null;
 
   const liveKorBalance = korBalance ?? balance ?? profile.korBalance ?? 1000;
+  const liveCoins = coins ?? profile.coins ?? 5000;
+  const liveStats = {
+    ...profile,
+    korBalance: liveKorBalance,
+    coins: liveCoins,
+  };
 
   return (
     <>
@@ -80,7 +87,7 @@ export function DashboardModals() {
             setShowSwapConfirm(true);
           }}
           currentBalance={liveKorBalance}
-          userStats={profile}
+          userStats={liveStats}
           transactions={transactions}
           onWalkReward={() => {}}
         />
@@ -89,6 +96,7 @@ export function DashboardModals() {
       {showSwapConfirm && (
         <SwapConfirm
           korBalance={liveKorBalance}
+          coins={liveCoins}
           onConfirm={async (amount: number) => {
             try {
               // Sign wallet conversion message
