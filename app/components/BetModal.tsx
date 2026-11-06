@@ -4,6 +4,7 @@ import { cn, formatNumber } from "../lib/utils";
 import type { Match } from "../types";
 import { X, Minus, Plus, Check } from "lucide-react";
 import { TeamLogo } from "./TeamLogo";
+import { useTheme } from "../contexts/ThemeContext";
 
 interface BetModalProps {
   match: Match;
@@ -22,6 +23,7 @@ export function BetModal({
   onClose,
   onPlaceBet,
 }: BetModalProps) {
+  const { isNeoBrutalist } = useTheme();
   const [selection, setSelection] = useState<
     "home" | "draw" | "away" | "gg" | "nogg" | null
   >(null);
@@ -90,46 +92,98 @@ export function BetModal({
       role="dialog"
       aria-modal="true"
       aria-label={`Place bet on ${match.homeTeam.name} vs ${match.awayTeam.name}`}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-page/80 backdrop-blur-xs"
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs",
+        isNeoBrutalist ? "bg-black/60" : "bg-surface-page/80"
+      )}
     >
       {/* Modal Box */}
-      <div className="relative w-full max-w-md bg-surface-panel border border-border-subtle rounded-md shadow-modal flex flex-col max-h-[90vh] overflow-hidden">
+      <div
+        className={cn(
+          "relative w-full max-w-md flex flex-col max-h-[90vh] overflow-hidden transition-colors",
+          isNeoBrutalist
+            ? "bg-white border-[3px] border-black rounded-[12px] shadow-[6px_6px_0_#000] text-black"
+            : "bg-surface-panel border border-border-subtle rounded-md shadow-modal text-text-primary"
+        )}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-surface-raised">
+        <div
+          className={cn(
+            "flex items-center justify-between p-4 transition-colors",
+            isNeoBrutalist
+              ? "border-b-2 border-black bg-[#ffe600] text-black"
+              : "border-b border-border-subtle bg-surface-raised"
+          )}
+        >
           <div>
-            <h2 className="text-sm font-bold text-text-primary uppercase tracking-wider font-mono">
+            <h2
+              className={cn(
+                "text-sm uppercase tracking-wider font-mono",
+                isNeoBrutalist ? "text-black font-black" : "text-text-primary font-bold"
+              )}
+            >
               PLACE BET
             </h2>
-            <p className="text-xs text-text-muted mt-0.5">
+            <p
+              className={cn(
+                "text-xs mt-0.5",
+                isNeoBrutalist ? "text-black/80 font-bold" : "text-text-muted"
+              )}
+            >
               {match.homeTeam.name} vs {match.awayTeam.name}
             </p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close dialog"
-            className="p-1.5 rounded-sm hover:bg-surface-panel text-text-muted hover:text-text-primary transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+            className={cn(
+              "p-1.5 transition-all focus-visible:outline-2",
+              isNeoBrutalist
+                ? "bg-white border-2 border-black rounded-[6px] text-black shadow-[1.5px_1.5px_0_#000] hover:bg-black hover:text-white"
+                : "rounded-sm hover:bg-surface-panel text-text-muted hover:text-text-primary focus-visible:outline-accent"
+            )}
           >
-            <X size={18} strokeWidth={2} />
+            <X size={18} strokeWidth={isNeoBrutalist ? 2.5 : 2} />
           </button>
         </div>
 
         {/* Content Body */}
         <div className="p-4 space-y-4 overflow-y-auto">
           {/* Match Teams Banner */}
-          <div className="flex items-center justify-around bg-surface-page p-3 rounded-sm border border-border-subtle">
+          <div
+            className={cn(
+              "flex items-center justify-around p-3 transition-colors",
+              isNeoBrutalist
+                ? "bg-[#faf8ee] border-2 border-black rounded-[8px] shadow-[2px_2px_0_#000]"
+                : "bg-surface-page p-3 rounded-sm border border-border-subtle"
+            )}
+          >
             <div className="flex flex-col items-center gap-1 text-center">
               <TeamLogo
                 name={match.homeTeam.name}
                 color={match.homeTeam.color}
                 logo={match.homeTeam.logo}
-                className="w-10 h-10 rounded-full border border-border-subtle"
+                className={cn(
+                  "w-10 h-10 rounded-full",
+                  isNeoBrutalist ? "border-2 border-black" : "border border-border-subtle"
+                )}
               />
-              <span className="text-xs font-bold text-text-primary max-w-[100px] truncate">
+              <span
+                className={cn(
+                  "text-xs max-w-[100px] truncate",
+                  isNeoBrutalist ? "text-black font-black" : "text-text-primary font-bold"
+                )}
+              >
                 {match.homeTeam.name}
               </span>
             </div>
 
-            <span className="text-xs font-mono font-bold text-text-muted uppercase tracking-widest">
+            <span
+              className={cn(
+                "text-xs font-mono uppercase tracking-widest",
+                isNeoBrutalist ? "text-black font-black" : "text-text-muted font-bold"
+              )}
+            >
               VS
             </span>
 
@@ -138,9 +192,17 @@ export function BetModal({
                 name={match.awayTeam.name}
                 color={match.awayTeam.color}
                 logo={match.awayTeam.logo}
-                className="w-10 h-10 rounded-full border border-border-subtle"
+                className={cn(
+                  "w-10 h-10 rounded-full",
+                  isNeoBrutalist ? "border-2 border-black" : "border border-border-subtle"
+                )}
               />
-              <span className="text-xs font-bold text-text-primary max-w-[100px] truncate">
+              <span
+                className={cn(
+                  "text-xs max-w-[100px] truncate",
+                  isNeoBrutalist ? "text-black font-black" : "text-text-primary font-bold"
+                )}
+              >
                 {match.awayTeam.name}
               </span>
             </div>
@@ -148,7 +210,12 @@ export function BetModal({
 
           {/* Selection Grid */}
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-text-muted block mb-2">
+            <span
+              className={cn(
+                "text-xs uppercase tracking-wider block mb-2",
+                isNeoBrutalist ? "text-black/70 font-black" : "text-text-muted font-bold"
+              )}
+            >
               Select Market
             </span>
 
@@ -199,11 +266,20 @@ export function BetModal({
           {/* Stake Input Section */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label htmlFor="modal-stake-input" className="text-xs font-bold uppercase tracking-wider text-text-muted">
+              <label
+                htmlFor="modal-stake-input"
+                className={cn(
+                  "text-xs uppercase tracking-wider",
+                  isNeoBrutalist ? "text-black/70 font-black" : "text-text-muted font-bold"
+                )}
+              >
                 Stake Amount
               </label>
-              <span className="text-xs text-text-muted">
-                Balance: <strong className="font-mono tabular-nums text-text-primary">{formatNumber(balance)} Coins KOR</strong>
+              <span className={cn("text-xs", isNeoBrutalist ? "text-black/80 font-bold" : "text-text-muted")}>
+                Balance:{" "}
+                <strong className={cn("font-mono tabular-nums", isNeoBrutalist ? "text-black font-black" : "text-text-primary")}>
+                  {formatNumber(balance)} Coins KOR
+                </strong>
               </span>
             </div>
 
@@ -212,7 +288,12 @@ export function BetModal({
                 onClick={() => handleStakeChange(stake - 50)}
                 disabled={stake <= 50}
                 aria-label="Decrease stake by 50"
-                className="h-10 w-10 flex items-center justify-center rounded-sm bg-surface-raised border border-border-subtle hover:border-border-strong text-text-primary disabled:opacity-40 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+                className={cn(
+                  "h-10 w-10 flex items-center justify-center transition-all disabled:opacity-40 focus-visible:outline-2",
+                  isNeoBrutalist
+                    ? "bg-white border-2 border-black rounded-[6px] text-black font-black shadow-[2px_2px_0_#000] hover:bg-[#ffe600] active:translate-x-[1px] active:translate-y-[1px]"
+                    : "rounded-sm bg-surface-raised border border-border-subtle hover:border-border-strong text-text-primary focus-visible:outline-accent"
+                )}
               >
                 <Minus size={16} />
               </button>
@@ -223,7 +304,12 @@ export function BetModal({
                   type="number"
                   value={stake}
                   onChange={(e) => handleStakeChange(Number(e.target.value))}
-                  className="w-full h-10 px-3 bg-surface-page border border-border-subtle rounded-sm text-center font-mono font-bold text-sm text-text-primary tabular-nums focus:outline-none focus:border-accent"
+                  className={cn(
+                    "w-full h-10 px-3 text-center font-mono font-bold text-sm tabular-nums focus:outline-none transition-colors",
+                    isNeoBrutalist
+                      ? "bg-[#fcfaf2] border-2 border-black rounded-[6px] text-black font-black focus:bg-white"
+                      : "bg-surface-page border border-border-subtle rounded-sm text-text-primary focus:border-accent"
+                  )}
                   min={1}
                   max={balance}
                 />
@@ -233,7 +319,12 @@ export function BetModal({
                 onClick={() => handleStakeChange(stake + 50)}
                 disabled={stake >= balance}
                 aria-label="Increase stake by 50"
-                className="h-10 w-10 flex items-center justify-center rounded-sm bg-surface-raised border border-border-subtle hover:border-border-strong text-text-primary disabled:opacity-40 transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+                className={cn(
+                  "h-10 w-10 flex items-center justify-center transition-all disabled:opacity-40 focus-visible:outline-2",
+                  isNeoBrutalist
+                    ? "bg-white border-2 border-black rounded-[6px] text-black font-black shadow-[2px_2px_0_#000] hover:bg-[#ffe600] active:translate-x-[1px] active:translate-y-[1px]"
+                    : "rounded-sm bg-surface-raised border border-border-subtle hover:border-border-strong text-text-primary focus-visible:outline-accent"
+                )}
               >
                 <Plus size={16} />
               </button>
@@ -247,10 +338,14 @@ export function BetModal({
                   onClick={() => handleStakeChange(amount)}
                   disabled={amount > balance}
                   className={cn(
-                    "flex-1 py-1 text-xs font-mono font-bold rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
-                    stake === amount
-                      ? "bg-surface-raised text-text-primary border-border-strong"
-                      : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong",
+                    "flex-1 py-1 text-xs font-mono font-bold transition-all focus-visible:outline-2",
+                    isNeoBrutalist
+                      ? stake === amount
+                        ? "bg-[#ffe600] text-black border-2 border-black rounded-[6px] font-black shadow-[1.5px_1.5px_0_#000]"
+                        : "bg-white text-black border-2 border-black rounded-[6px] hover:bg-[#faf8ee]"
+                      : stake === amount
+                      ? "bg-surface-raised text-text-primary border-border-strong rounded-sm border"
+                      : "bg-surface-page text-text-muted border-border-subtle hover:text-text-primary hover:border-border-strong rounded-sm border",
                     amount > balance && "opacity-40 cursor-not-allowed"
                   )}
                 >
@@ -259,7 +354,12 @@ export function BetModal({
               ))}
               <button
                 onClick={() => handleStakeChange(balance)}
-                className="flex-1 py-1 text-xs font-mono font-bold rounded-sm bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward transition-colors focus-visible:outline-2 focus-visible:outline-accent"
+                className={cn(
+                  "flex-1 py-1 text-xs font-mono font-bold transition-all focus-visible:outline-2",
+                  isNeoBrutalist
+                    ? "bg-[#00ff66] text-black border-2 border-black rounded-[6px] font-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#00dd55]"
+                    : "rounded-sm bg-surface-page text-semantic-reward border border-border-subtle hover:border-semantic-reward"
+                )}
               >
                 MAX
               </button>
@@ -268,22 +368,41 @@ export function BetModal({
 
           {/* Bet Summary Box */}
           {selection && (
-            <div className="bg-surface-page rounded-sm p-3 border border-border-subtle space-y-2">
+            <div
+              className={cn(
+                "p-3 space-y-2 transition-colors",
+                isNeoBrutalist
+                  ? "bg-[#faf8ee] border-2 border-black rounded-[8px] shadow-[2px_2px_0_#000]"
+                  : "bg-surface-page rounded-sm border border-border-subtle"
+              )}
+            >
               <div className="flex items-center justify-between text-xs">
-                <span className="text-text-muted">Selection</span>
-                <span className="font-bold text-accent">
+                <span className={isNeoBrutalist ? "text-black/70 font-bold" : "text-text-muted"}>Selection</span>
+                <span className={cn("font-bold", isNeoBrutalist ? "text-black font-black" : "text-accent")}>
                   {getSelectionLabel(selection)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-text-muted">Odds</span>
-                <span className="font-mono font-bold text-text-primary">
+                <span className={isNeoBrutalist ? "text-black/70 font-bold" : "text-text-muted"}>Odds</span>
+                <span className={cn("font-mono tabular-nums", isNeoBrutalist ? "text-black font-black" : "text-text-primary font-bold")}>
                   {selectedOdds.toFixed(2)}x
                 </span>
               </div>
-              <div className="flex items-center justify-between text-xs border-t border-border-subtle pt-2">
-                <span className="text-text-muted font-semibold">Potential Return</span>
-                <span className="font-mono font-bold text-sm text-semantic-reward tabular-nums">
+              <div
+                className={cn(
+                  "flex items-center justify-between text-xs pt-2",
+                  isNeoBrutalist ? "border-t-2 border-black" : "border-t border-border-subtle"
+                )}
+              >
+                <span className={cn(isNeoBrutalist ? "text-black font-black" : "text-text-muted font-semibold")}>
+                  Potential Return
+                </span>
+                <span
+                  className={cn(
+                    "font-mono text-sm tabular-nums",
+                    isNeoBrutalist ? "text-black font-black" : "text-semantic-reward font-bold"
+                  )}
+                >
                   {formatNumber(potentialWin)} Coins KOR
                 </span>
               </div>
@@ -295,10 +414,14 @@ export function BetModal({
             onClick={handlePlaceBet}
             disabled={!canPlaceBet || bettingClosed || isLoading}
             className={cn(
-              "w-full py-3 rounded-sm font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-2 focus-visible:outline-2 focus-visible:outline-accent",
+              "w-full py-3 font-bold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2 focus-visible:outline-2",
               canPlaceBet && !bettingClosed && !isLoading
-                ? "bg-accent text-surface-page hover:bg-accent-hover active:bg-accent-active cursor-pointer"
-                : "bg-surface-raised text-text-muted border border-border-subtle cursor-not-allowed"
+                ? isNeoBrutalist
+                  ? "bg-[#00ff66] text-black border-2 border-black rounded-[8px] font-black shadow-[3px_3px_0_#000] hover:bg-[#00dd55] cursor-pointer active:translate-x-[1px] active:translate-y-[1px]"
+                  : "bg-accent text-surface-page hover:bg-accent-hover active:bg-accent-active cursor-pointer rounded-sm"
+                : isNeoBrutalist
+                ? "bg-slate-200 text-black/40 border-2 border-black/40 rounded-[8px] cursor-not-allowed font-black"
+                : "bg-surface-raised text-text-muted border border-border-subtle cursor-not-allowed rounded-sm"
             )}
           >
             {!selection ? (
@@ -337,17 +460,27 @@ function SelectionButton({
   selected,
   onClick,
 }: SelectionButtonProps) {
+  const { isNeoBrutalist } = useTheme();
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center justify-center p-2 rounded-sm border transition-colors focus-visible:outline-2 focus-visible:outline-accent",
-        selected
-          ? "bg-[#062E1E] border-accent text-accent font-bold"
-          : "bg-surface-page border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary"
+        "flex flex-col items-center justify-center p-2 transition-all focus-visible:outline-2",
+        isNeoBrutalist
+          ? selected
+            ? "bg-[#00ff66] border-2 border-black rounded-[6px] text-black font-black shadow-[2px_2px_0_#000]"
+            : "bg-white border-2 border-black rounded-[6px] text-black shadow-[1.5px_1.5px_0_#000] hover:bg-[#ffe600]"
+          : selected
+          ? "bg-[#062E1E] border-accent text-accent font-bold rounded-sm border"
+          : "bg-surface-page border-border-subtle hover:bg-surface-panel hover:border-border-strong text-text-primary rounded-sm border"
       )}
     >
-      <span className="text-xs font-bold uppercase mb-0.5 text-text-muted">
+      <span
+        className={cn(
+          "text-xs uppercase mb-0.5",
+          isNeoBrutalist ? "text-black/70 font-black" : "text-text-muted font-bold"
+        )}
+      >
         {label} ({subLabel})
       </span>
       <span className="text-sm font-mono font-bold tabular-nums">
