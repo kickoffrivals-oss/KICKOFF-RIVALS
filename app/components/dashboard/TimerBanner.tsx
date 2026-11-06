@@ -104,7 +104,7 @@ export function TimerBanner({
         {/* Right: Round Phase Telemetry Info */}
         <div className="hidden sm:flex flex-col items-end text-right">
           <span className={`text-[11px] font-black uppercase tracking-wider ${isNeoBrutalist ? "text-black" : "text-[#94A3B8]"}`}>
-            {isLive ? "Live Simulation" : isBetting ? "1m Betting Window" : "Settlement"}
+            {isLive ? "Live Match (1 min)" : isBetting ? "20s Betting Window" : "Settlement"}
           </span>
           <p className={`text-xs font-mono mt-0.5 ${isNeoBrutalist ? "text-black/70 font-bold" : "text-[#94A3B8]"}`}>
             {isLive

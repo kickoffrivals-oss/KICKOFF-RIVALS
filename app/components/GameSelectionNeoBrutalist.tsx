@@ -147,7 +147,7 @@ export function GameSelectionNeoBrutalist({
             <span>•</span>
             <span>★ AVIATOR HIT 52.81X WIN ★</span>
             <span>•</span>
-            <span>★ 1M 30S BETTING WINDOW ★</span>
+            <span>★ 20S BETTING • 1MIN LIVE MATCHES ★</span>
             <span>•</span>
             <span>★ PROVABLY FAIR SHA-256 ★</span>
             <span>•</span>
@@ -160,7 +160,7 @@ export function GameSelectionNeoBrutalist({
             <span>•</span>
             <span>★ AVIATOR HIT 52.81X WIN ★</span>
             <span>•</span>
-            <span>★ 1M 30S BETTING WINDOW ★</span>
+            <span>★ 20S BETTING • 1MIN LIVE MATCHES ★</span>
             <span>•</span>
             <span>★ PROVABLY FAIR SHA-256 ★</span>
             <span>•</span>
