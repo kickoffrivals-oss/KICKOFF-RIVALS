@@ -280,15 +280,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [balance]);
 
-  // Sync state balance with profile's korBalance
+  // Sync state balance with profile's korBalance only when profile changes externally
+  const prevProfileKorRef = useRef<number | undefined>(profile?.korBalance);
   useEffect(() => {
-    if (profile?.korBalance !== undefined) {
-      const pBalance = Number(profile.korBalance);
-      if (pBalance !== balance) {
-        setBalance(pBalance);
-      }
+    if (
+      profile?.korBalance !== undefined &&
+      profile.korBalance !== prevProfileKorRef.current
+    ) {
+      prevProfileKorRef.current = profile.korBalance;
+      setBalance(Number(profile.korBalance));
     }
-  }, [profile?.korBalance, balance]);
+  }, [profile?.korBalance]);
 
   // Coins Balance (Earned by completing social tasks & in-game missions)
   const [coins, setCoins] = useState<number>(() => {
@@ -309,15 +311,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [coins]);
 
-  // Sync state coins with profile's coins
+  // Sync state coins with profile's coins only when profile changes externally
+  const prevProfileCoinsRef = useRef<number | undefined>(profile?.coins);
   useEffect(() => {
-    if (profile?.coins !== undefined) {
-      const pCoins = Number(profile.coins);
-      if (pCoins !== coins) {
-        setCoins(pCoins);
-      }
+    if (
+      profile?.coins !== undefined &&
+      profile.coins !== prevProfileCoinsRef.current
+    ) {
+      prevProfileCoinsRef.current = profile.coins;
+      setCoins(Number(profile.coins));
     }
-  }, [profile?.coins, coins]);
+  }, [profile?.coins]);
 
 
   // Game State
@@ -563,11 +567,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         });
         const data = await res.json();
         if (data.success) {
-          if (data.newBalance !== undefined) {
-            setBalance(data.newBalance);
-          } else {
-            setBalance((prev) => Math.max(0, prev - stake));
-          }
+          const nextBal =
+            data.newBalance !== undefined
+              ? Number(data.newBalance)
+              : Math.max(0, balance - stake);
+
+          setBalance(nextBal);
+          prevProfileKorRef.current = nextBal;
+          queryClient.setQueriesData({ queryKey: ["profile"] }, (old: any) =>
+            old ? { ...old, korBalance: nextBal, doodlBalance: nextBal } : old
+          );
+
           const bet: Bet = {
             id: data.bet?.id || `bet-${Date.now()}`,
             matchId: match.id,
@@ -601,6 +611,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       walletState.address,
       addTransaction,
       refreshProfileQuery,
+      queryClient,
     ],
   );
 
@@ -679,6 +690,17 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.success && Array.isArray(data.bets)) {
         setActiveBets(data.bets);
+
+        // Sync live korBalance from active bets API if provided and changed
+        if (data.korBalance !== undefined) {
+          const freshKor = Number(data.korBalance);
+          setBalance(freshKor);
+          prevProfileKorRef.current = freshKor;
+          queryClient.setQueriesData({ queryKey: ["profile"] }, (old: any) =>
+            old ? { ...old, korBalance: freshKor, doodlBalance: freshKor } : old
+          );
+        }
+
         // If any bet has settled (won or lost), refresh profile to sync balance & stats immediately
         const hasSettled = data.bets.some(
           (b: Bet) => b.status === "won" || b.status === "lost"
@@ -692,7 +714,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     } finally {
       isFetchingActiveBetsRef.current = false;
     }
-  }, [walletState.address, profile?.walletAddress, profile?.username, refreshProfileQuery]);
+  }, [walletState.address, profile?.walletAddress, profile?.username, refreshProfileQuery, queryClient]);
 
   const handlePlaceBetSlip = useCallback(
     async (stake: number, betType: "single" | "accumulator") => {
@@ -751,9 +773,16 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             setActiveBets((prev) => [...newBets, ...prev]);
 
             const lastSuccess = successful[successful.length - 1];
-            if (lastSuccess.data.newBalance !== undefined) {
-              setBalance(lastSuccess.data.newBalance);
-            }
+            const nextBal =
+              lastSuccess.data?.newBalance !== undefined
+                ? Number(lastSuccess.data.newBalance)
+                : Math.max(0, balance - stake * successful.length);
+
+            setBalance(nextBal);
+            prevProfileKorRef.current = nextBal;
+            queryClient.setQueriesData({ queryKey: ["profile"] }, (old: any) =>
+              old ? { ...old, korBalance: nextBal, doodlBalance: nextBal } : old
+            );
 
             const totalStake = stake * successful.length;
             addTransaction(
@@ -841,9 +870,16 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             // Batch update active bets
             setActiveBets((prev) => [...newBets, ...prev]);
 
-            if (data.newBalance !== undefined) {
-              setBalance(data.newBalance);
-            }
+            const nextBal =
+              data.newBalance !== undefined
+                ? Number(data.newBalance)
+                : Math.max(0, balance - stake);
+
+            setBalance(nextBal);
+            prevProfileKorRef.current = nextBal;
+            queryClient.setQueriesData({ queryKey: ["profile"] }, (old: any) =>
+              old ? { ...old, korBalance: nextBal, doodlBalance: nextBal } : old
+            );
 
             addTransaction(
               "bet",
@@ -869,8 +905,11 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       walletState.address,
       profile?.walletAddress,
       profile?.username,
+      balance,
       addTransaction,
       fetchActiveBets,
+      refreshProfileQuery,
+      queryClient,
     ],
   );
 

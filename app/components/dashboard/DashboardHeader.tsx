@@ -61,7 +61,7 @@ import { useTheme } from "../../contexts/ThemeContext";
 export function DashboardHeader() {
   const { walletState } = useUserStore();
   const { profile, isLoading, refresh, isFetching } = useProfile();
-  const { gameState, roundNumber, timer } = useGame();
+  const { gameState, roundNumber, timer, korBalance, balance, coins } = useGame();
   const { isNeoBrutalist } = useTheme();
   const [isMuted, setIsMuted] = useState(soundFx.getMuted());
   const location = useLocation();
@@ -121,7 +121,8 @@ export function DashboardHeader() {
     );
   };
 
-  const userBal = profile?.korBalance ?? profile?.coins ?? 0;
+  const userBal = korBalance ?? balance ?? profile?.korBalance ?? 1000;
+  const userCoins = coins ?? profile?.coins ?? 5000;
 
   return (
     <header
@@ -275,7 +276,7 @@ export function DashboardHeader() {
         {walletState.isConnected && (
           <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             {/* Unified Coins KOR Balance Chip Component */}
-            <CoinsKorBalance balance={userBal} />
+            <CoinsKorBalance korBalance={userBal} coins={userCoins} />
 
             {/* Refresh Button */}
             <button

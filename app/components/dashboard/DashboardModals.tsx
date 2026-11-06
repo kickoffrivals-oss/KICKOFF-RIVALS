@@ -68,6 +68,8 @@ export function DashboardModals() {
 
   if (!profile) return null;
 
+  const liveKorBalance = korBalance ?? balance ?? profile.korBalance ?? 1000;
+
   return (
     <>
       {showWallet && (
@@ -77,7 +79,7 @@ export function DashboardModals() {
             setShowWallet(false);
             setShowSwapConfirm(true);
           }}
-          currentBalance={profile.korBalance}
+          currentBalance={liveKorBalance}
           userStats={profile}
           transactions={transactions}
           onWalkReward={() => {}}
@@ -86,7 +88,7 @@ export function DashboardModals() {
 
       {showSwapConfirm && (
         <SwapConfirm
-          korBalance={profile.korBalance}
+          korBalance={liveKorBalance}
           onConfirm={async (amount: number) => {
             try {
               // Sign wallet conversion message

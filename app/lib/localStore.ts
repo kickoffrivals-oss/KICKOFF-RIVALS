@@ -294,7 +294,19 @@ export function updateLocalGameState() {
 
   // Check if round needs to advance
   if (elapsed >= totalCycleMs || store.matches.length === 0) {
-    // Settle pending bets of previous round before advancing
+    // 1. Ensure all current matches have scores generated and are marked FINISHED
+    for (const m of store.matches) {
+      if (m.homeScore === undefined) {
+        const seed = `sim-seed-${m.id}-${store.currentRound}`;
+        const rng = seedrandom(seed);
+        m.homeScore = Math.floor(rng() * 4);
+        m.awayScore = Math.floor(rng() * 4);
+      }
+      m.status = "FINISHED";
+      m.currentScore = { home: m.homeScore ?? 0, away: m.awayScore ?? 0 };
+    }
+
+    // 2. Settle pending bets of previous round before advancing
     settleLocalBets();
 
     store.currentRound += 1;
@@ -361,6 +373,28 @@ export function updateLocalGameState() {
   saveStore();
 }
 
+function getScoreForMatch(matchId: string, matchMap: Map<string, Match>): { homeScore: number; awayScore: number; isConcluded: boolean } {
+  const match = matchMap.get(matchId);
+  if (match) {
+    return {
+      homeScore: match.homeScore ?? 0,
+      awayScore: match.awayScore ?? 0,
+      isConcluded: match.status === "RESULT" || match.status === "FINISHED",
+    };
+  }
+
+  // Previous round match: deterministically resolve score from seed
+  const parts = matchId.split("-");
+  const roundNum = parts.length >= 3 && !isNaN(Number(parts[2])) ? Number(parts[2]) : (store.currentRound - 1);
+  const seed = `sim-seed-${matchId}-${roundNum}`;
+  const rng = seedrandom(seed);
+  return {
+    homeScore: Math.floor(rng() * 4),
+    awayScore: Math.floor(rng() * 4),
+    isConcluded: true,
+  };
+}
+
 function settleLocalBets() {
   const matchMap = new Map(store.matches.map((m) => [m.id, m]));
 
@@ -368,11 +402,11 @@ function settleLocalBets() {
   for (const bet of store.bets) {
     if (bet.status !== "pending" || bet.betType === "accumulator") continue;
 
-    const match = matchMap.get(bet.matchId);
-    if (!match || (match.status !== "RESULT" && match.status !== "FINISHED")) continue;
+    const scoreInfo = getScoreForMatch(bet.matchId, matchMap);
+    if (!scoreInfo.isConcluded) continue;
 
-    const homeScore = match.homeScore ?? 0;
-    const awayScore = match.awayScore ?? 0;
+    const homeScore = scoreInfo.homeScore;
+    const awayScore = scoreInfo.awayScore;
 
     let won = false;
     if (bet.selection === "home" && homeScore > awayScore) won = true;
@@ -426,17 +460,17 @@ function settleLocalBets() {
 
   for (const [accId, legs] of accGroups.entries()) {
     const allMatchesFinished = legs.every((leg) => {
-      const match = matchMap.get(leg.matchId);
-      return match && (match.status === "RESULT" || match.status === "FINISHED");
+      const scoreInfo = getScoreForMatch(leg.matchId, matchMap);
+      return scoreInfo.isConcluded;
     });
 
     if (!allMatchesFinished) continue;
 
     let allLegsWon = true;
     for (const leg of legs) {
-      const match = matchMap.get(leg.matchId)!;
-      const homeScore = match.homeScore ?? 0;
-      const awayScore = match.awayScore ?? 0;
+      const scoreInfo = getScoreForMatch(leg.matchId, matchMap);
+      const homeScore = scoreInfo.homeScore;
+      const awayScore = scoreInfo.awayScore;
       let won = false;
       if (leg.selection === "home" && homeScore > awayScore) won = true;
       else if (leg.selection === "away" && awayScore > homeScore) won = true;
@@ -765,10 +799,15 @@ export function getLocalMatches(leagueId?: string) {
 export function getLocalActiveBets(walletAddress: string) {
   updateLocalGameState();
   const normalized = walletAddress.trim().toLowerCase();
+  const user = store.users[normalized];
   const userBets = store.bets
     .filter((b) => b.walletAddress?.trim().toLowerCase() === normalized)
     .sort((a, b) => (b.settledAt || b.timestamp || 0) - (a.settledAt || a.timestamp || 0));
-  return { success: true, bets: userBets };
+  return {
+    success: true,
+    bets: userBets,
+    korBalance: user ? (user.doodlBalance ?? user.korBalance ?? 1000) : undefined,
+  };
 }
 
 export function getLocalStandings(leagueId: string): { success: boolean; standings: LeagueEntry[] } {
