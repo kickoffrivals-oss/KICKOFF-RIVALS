@@ -40,6 +40,8 @@ export function DashboardModals() {
     setBettingOn,
     matches,
     gameState,
+    balance,
+    korBalance,
     setBalance,
     addTransaction,
     getCurrentGameMinute,
@@ -147,7 +149,7 @@ This action does not cost gas.`;
       {bettingOn && (
         <BetModal
           match={bettingOn}
-          balance={profile.coins}
+          balance={korBalance ?? balance ?? profile?.korBalance ?? 1000}
           onClose={() => setBettingOn(null)}
           onPlaceBet={handleBetPlacement}
         />
@@ -183,7 +185,7 @@ This action does not cost gas.`;
 
       <BetSlip
         selections={betSlipSelections}
-        balance={profile.coins}
+        balance={korBalance ?? balance ?? profile?.korBalance ?? 1000}
         gameState={gameState}
         onRemoveSelection={handleRemoveFromBetSlip}
         onClearAll={handleClearBetSlip}

@@ -540,7 +540,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const handleBetPlacement = useCallback(
     async (match: Match, selection: Bet["selection"], stake: number) => {
-      if (stake > (profile?.korBalance || 0)) return false;
+      const currentAvailable = profile?.korBalance ?? balance ?? 0;
+      if (stake > currentAvailable) return false;
       if (!match.odds) return false;
 
       try {
@@ -562,9 +563,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         });
         const data = await res.json();
         if (data.success) {
-          setBalance(data.newBalance);
+          if (data.newBalance !== undefined) {
+            setBalance(data.newBalance);
+          } else {
+            setBalance((prev) => Math.max(0, prev - stake));
+          }
           const bet: Bet = {
-            id: data.bet.id,
+            id: data.bet?.id || `bet-${Date.now()}`,
             matchId: match.id,
             selection,
             odds: oddValue,
@@ -573,6 +578,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
             status: "pending",
             timestamp: Date.now(),
             txHash: generateHash(),
+            homeTeamName: match.homeTeam.name,
+            awayTeamName: match.awayTeam.name,
           };
           setActiveBets((prev) => [bet, ...prev]);
           addTransaction("bet", stake, "kor", "Match wager");
@@ -590,6 +597,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       profile?.korBalance,
       profile?.walletAddress,
       profile?.username,
+      balance,
       walletState.address,
       addTransaction,
       refreshProfileQuery,
@@ -671,13 +679,20 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.success && Array.isArray(data.bets)) {
         setActiveBets(data.bets);
+        // If any bet has settled (won or lost), refresh profile to sync balance & stats immediately
+        const hasSettled = data.bets.some(
+          (b: Bet) => b.status === "won" || b.status === "lost"
+        );
+        if (hasSettled) {
+          refreshProfileQuery();
+        }
       }
     } catch (error) {
       console.error("Failed to fetch active bets:", error);
     } finally {
       isFetchingActiveBetsRef.current = false;
     }
-  }, [walletState.address, profile?.walletAddress, profile?.username]);
+  }, [walletState.address, profile?.walletAddress, profile?.username, refreshProfileQuery]);
 
   const handlePlaceBetSlip = useCallback(
     async (stake: number, betType: "single" | "accumulator") => {
@@ -1402,22 +1417,18 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   // Refresh profile when matches are finished to reflect winnings/xp
   useEffect(() => {
-    if (
-      (gameState === "FINISHED" || gameState === "RESULT") &&
-      walletState.address
-    ) {
+    if (gameState === "FINISHED" || gameState === "RESULT") {
       if (!hasRefreshedThisRoundRef.current) {
         console.log("[GAME] Round ended. Triggering final sync...");
         hasRefreshedThisRoundRef.current = true;
-        refreshProfile(walletState.address || "");
+        refreshProfileQuery();
         fetchActiveBets(); // Refresh history
         fetchStandings(); // Final standings update
       }
     }
   }, [
     gameState,
-    walletState.address,
-    refreshProfile,
+    refreshProfileQuery,
     fetchActiveBets,
     fetchStandings,
   ]);
@@ -1443,9 +1454,13 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       }
     }, 5000);
 
-    // Poll bets if user is connected
+    // Poll bets for any active user (wallet or profile guest address)
+    const activeUser =
+      walletState.address ||
+      profile?.walletAddress ||
+      (profile?.username ? `guest-${profile.username}` : "guest-user");
     let betInterval: ReturnType<typeof setInterval>;
-    if (walletState.isConnected && walletState.address) {
+    if (activeUser) {
       betInterval = setInterval(() => {
         const now = Date.now();
         if (now - lastActiveBetsFetchRef.current >= 4000) {
@@ -1464,8 +1479,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     fetchMatches,
     fetchStandings,
     fetchActiveBets,
-    walletState.isConnected,
     walletState.address,
+    profile?.walletAddress,
+    profile?.username,
   ]);
 
   const getCurrentGameMinute = useCallback(() => {

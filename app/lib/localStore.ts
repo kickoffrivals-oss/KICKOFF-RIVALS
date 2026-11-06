@@ -387,13 +387,14 @@ function settleLocalBets() {
     bet.awayScore = awayScore;
 
     // Credit winnings and update stats for user
-    const addr = bet.walletAddress?.toLowerCase();
+    const addr = bet.walletAddress?.trim().toLowerCase();
     const user = addr ? store.users[addr] : null;
     if (user) {
       user.totalBets = (user.totalBets || 0) + 1;
       if (won) {
         user.wins = (user.wins || 0) + 1;
         user.doodlBalance = (user.doodlBalance || 0) + bet.potentialReturn;
+        user.korBalance = user.doodlBalance;
         user.currentStreak = (user.currentStreak || 0) + 1;
         if (user.currentStreak > (user.longestStreak || 0)) {
           user.longestStreak = user.currentStreak;
@@ -452,13 +453,14 @@ function settleLocalBets() {
     }
 
     const firstLeg = legs[0];
-    const accUserAddr = firstLeg?.walletAddress?.toLowerCase();
+    const accUserAddr = firstLeg?.walletAddress?.trim().toLowerCase();
     const user = accUserAddr ? store.users[accUserAddr] : null;
     if (user) {
       user.totalBets = (user.totalBets || 0) + 1;
       if (allLegsWon) {
         user.wins = (user.wins || 0) + 1;
         user.doodlBalance = (user.doodlBalance || 0) + firstLeg.potentialReturn;
+        user.korBalance = user.doodlBalance;
         user.currentStreak = (user.currentStreak || 0) + 1;
         if (user.currentStreak > (user.longestStreak || 0)) {
           user.longestStreak = user.currentStreak;
@@ -564,7 +566,7 @@ export function getLocalUserProfile(walletAddress: string, username?: string, le
     walletAddress: user.walletAddress,
     username: user.username,
     coins: user.coins ?? 5000,
-    korBalance: user.doodlBalance ?? 1000,
+    korBalance: user.doodlBalance ?? user.korBalance ?? 1000,
     unclaimedBalance: user.unclaimedBalance ?? 0,
     allianceLeagueId: user.allianceLeagueId,
     allianceTeamId: user.allianceTeamId,
@@ -607,13 +609,14 @@ export function placeLocalBet(params: {
     return { success: false, error: "Betting round is closed! Matches are currently live." };
   }
 
-  const user = store.users[params.walletAddress.toLowerCase()];
+  const user = store.users[params.walletAddress.trim().toLowerCase()];
   if (!user) return { success: false, error: "User not found" };
-  const currentKor = user.doodlBalance ?? 1000;
+  const currentKor = user.doodlBalance ?? user.korBalance ?? 1000;
   if (currentKor < params.stake) return { success: false, error: "Insufficient KOR balance" };
 
   // Deduct KOR (doodlBalance) immediately when bet is placed
   user.doodlBalance = currentKor - params.stake;
+  user.korBalance = user.doodlBalance;
 
   const match = store.matches.find((m) => m.id === params.matchId);
   if (match && (match.status === "RESULT" || match.status === "FINISHED")) {
@@ -666,13 +669,14 @@ export function placeLocalAccumulatorBet(params: {
     return { success: false, error: "Betting round is closed! Matches are currently live." };
   }
 
-  const user = store.users[params.walletAddress?.toLowerCase()];
+  const user = store.users[params.walletAddress?.trim().toLowerCase()];
   if (!user) return { success: false, error: "User not found" };
-  const currentKor = user.doodlBalance ?? 1000;
+  const currentKor = user.doodlBalance ?? user.korBalance ?? 1000;
   if (currentKor < params.stake) return { success: false, error: "Insufficient KOR balance" };
 
   // Deduct KOR immediately when accumulator bet is placed
   user.doodlBalance = currentKor - params.stake;
+  user.korBalance = user.doodlBalance;
 
   const matchMap = new Map(store.matches.map((m) => [m.id, m]));
   const potentialReturn = Math.round(params.stake * params.totalOdds);
@@ -720,6 +724,7 @@ export function convertLocalCoinsToKor(walletAddress: string, coinsAmount: numbe
   }
   user.coins = currentCoins - coinsAmount;
   user.doodlBalance = (user.doodlBalance ?? 1000) + korGained;
+  user.korBalance = user.doodlBalance;
   saveStore();
   return {
     success: true,
@@ -758,9 +763,10 @@ export function getLocalMatches(leagueId?: string) {
 }
 
 export function getLocalActiveBets(walletAddress: string) {
-  const normalized = walletAddress.toLowerCase();
+  updateLocalGameState();
+  const normalized = walletAddress.trim().toLowerCase();
   const userBets = store.bets
-    .filter((b) => b.walletAddress?.toLowerCase() === normalized)
+    .filter((b) => b.walletAddress?.trim().toLowerCase() === normalized)
     .sort((a, b) => (b.settledAt || b.timestamp || 0) - (a.settledAt || a.timestamp || 0));
   return { success: true, bets: userBets };
 }

@@ -140,7 +140,7 @@ export function SingleBetCard({ bet: b }: SingleBetCardProps) {
               Stake:
             </span>
             <span className={cn("font-mono tabular-nums", isNeoBrutalist ? "font-black text-black" : "font-bold text-text-primary")}>
-              {b.stake} Coins
+              {b.stake} KOR
             </span>
           </div>
           <div>
@@ -269,7 +269,7 @@ export function AccumulatorBetCard({ accId, legs }: AccumulatorBetCardProps) {
             Stake:
           </span>
           <span className={cn("font-mono tabular-nums", isNeoBrutalist ? "text-black font-black" : "text-text-primary font-bold")}>
-            {stake} Coins
+            {stake} KOR
           </span>
         </div>
         <div>

@@ -1168,14 +1168,15 @@ const App: React.FC = () => {
         }
 
         const totalStake = stake * betSlipSelections.length;
-        const nextBal = (s.korBalance ?? balance) - totalStake;
-        setUserStats((s) => ({
-          ...s,
-          korBalance: nextBal,
-          coins: nextBal,
-          totalBets: s.totalBets + betSlipSelections.length,
-        }));
-        setBalance(nextBal);
+        setUserStats((prev) => {
+          const nextBal = (prev.korBalance ?? balance) - totalStake;
+          setBalance(nextBal);
+          return {
+            ...prev,
+            korBalance: nextBal,
+            totalBets: prev.totalBets + betSlipSelections.length,
+          };
+        });
         addTransaction(
           "bet",
           totalStake,
@@ -1235,14 +1236,15 @@ const App: React.FC = () => {
             setActiveBets((prev) => [...prev, newBet]);
           });
 
-          const nextBal = (s.korBalance ?? balance) - stake;
-          setUserStats((s) => ({
-            ...s,
-            korBalance: nextBal,
-            coins: nextBal,
-            totalBets: s.totalBets + 1,
-          }));
-          setBalance(nextBal);
+          setUserStats((prev) => {
+            const nextBal = (prev.korBalance ?? balance) - stake;
+            setBalance(nextBal);
+            return {
+              ...prev,
+              korBalance: nextBal,
+              totalBets: prev.totalBets + 1,
+            };
+          });
           addTransaction(
             "bet",
             stake,
@@ -1916,7 +1918,7 @@ const App: React.FC = () => {
       {bettingOn && (
         <BetModal
           match={bettingOn}
-          balance={balance}
+          balance={userStats.korBalance ?? balance}
           onClose={() => setBettingOn(null)}
           onPlaceBet={handleBetPlacement}
         />

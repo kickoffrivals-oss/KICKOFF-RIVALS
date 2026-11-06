@@ -278,7 +278,7 @@ export function BetModal({
               <span className={cn("text-xs", isNeoBrutalist ? "text-black/80 font-bold" : "text-text-muted")}>
                 Balance:{" "}
                 <strong className={cn("font-mono tabular-nums", isNeoBrutalist ? "text-black font-black" : "text-text-primary")}>
-                  {formatNumber(balance)} Coins KOR
+                  {formatNumber(balance)} KOR
                 </strong>
               </span>
             </div>
@@ -403,7 +403,7 @@ export function BetModal({
                     isNeoBrutalist ? "text-black font-black" : "text-semantic-reward font-bold"
                   )}
                 >
-                  {formatNumber(potentialWin)} Coins KOR
+                  {formatNumber(potentialWin)} KOR
                 </span>
               </div>
             </div>
@@ -429,13 +429,13 @@ export function BetModal({
             ) : bettingClosed ? (
               "Betting Closed"
             ) : stake > balance ? (
-              "Insufficient Coins KOR"
+              "Insufficient KOR Balance"
             ) : isLoading ? (
               <span>Placing Bet...</span>
             ) : (
               <>
                 <Check size={16} strokeWidth={2.5} />
-                Confirm Bet ({formatNumber(stake)} Coins KOR)
+                Confirm Bet ({formatNumber(stake)} KOR)
               </>
             )}
           </button>
